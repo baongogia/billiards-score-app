@@ -1,0 +1,285 @@
+.wrap {
+  width: 580px;
+  height: 496px;
+  position: relative;
+  margin: auto;
+}
+.cssPool {
+  padding-left: 58px;
+  padding-right: 58px;
+  text-align: center;
+  line-height: 128px;
+  font-family: "Century Gothic";
+  color: #777;
+  font-size: 24px;
+  letter-spacing: 36px;
+}
+.cssPool b:first-child {
+  position: absolute;
+  left: 64px;
+}
+.cssPool b:last-child {
+  position: absolute;
+  right: 30px;
+}
+.pool {
+  position: absolute;
+  width: 464px;
+  height: 272px;
+  left: 58px;
+  top: 152px;
+  border-radius: 16px;
+  background-color: #2a363b;
+}
+.poolTexture {
+  content: "";
+  background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"%3E%3Cpath fill="%239C92AC" fill-opacity="0.4" d="M1 3h1v1H1V3zm2-2h1v1H3V1z"%3E%3C/path%3E%3C/svg%3E');
+  opacity: 0.5;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  border-radius: 16px;
+}
+.poolInner {
+  position: absolute;
+  width: 415.2px;
+  height: 223.2px;
+  left: 24.4px;
+  top: 24.4px;
+  background: #49796b;
+  border-radius: 16px;
+  box-shadow: inset 0px 0px 50px #2a363b;
+}
+.poolInnerFrame {
+  position: absolute;
+}
+.pIF1,
+.pIF2 {
+  width: 0px;
+  height: 172px;
+  top: 17px;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+}
+.pIF1 {
+  left: 0px;
+  border-left: 10px solid #83ae9b;
+}
+.pIF2 {
+  right: 0px;
+  border-right: 10px solid #83ae9b;
+}
+.pIF3,
+.pIF4 {
+  width: 158px;
+  height: 0px;
+  border-top: 10px solid #83ae9b;
+}
+.pIF3 {
+  left: 22px;
+  top: 0px;
+  border-left: 9px solid transparent;
+  border-right: 5px solid transparent;
+}
+.pIF4 {
+  right: 22px;
+  top: 0px;
+  border-left: 5px solid transparent;
+  border-right: 9px solid transparent;
+}
+.pIF5,
+.pIF6 {
+  width: 158px;
+  height: 0px;
+  border-bottom: 10px solid #83ae9b;
+}
+.pIF5 {
+  left: 22px;
+  bottom: 0px;
+  border-left: 9px solid transparent;
+  border-right: 5px solid transparent;
+}
+.pIF6 {
+  right: 22px;
+  bottom: 0px;
+  border-left: 5px solid transparent;
+  border-right: 9px solid transparent;
+}
+.poolCornerOut {
+  position: absolute;
+  width: 50px;
+  height: 44px;
+  background: #3d6b5e;
+}
+.pCO1 {
+  left: 0px;
+  top: 0px;
+  border-radius: 16px 0px 0px 0px;
+}
+.pCO2 {
+  right: 0px;
+  top: 0px;
+  border-radius: 0px 16px 0px 0px;
+}
+.pCO3 {
+  right: 0px;
+  bottom: 0px;
+  border-radius: 0px 0px 16px 0px;
+}
+.pCO4 {
+  left: 0px;
+  bottom: 0px;
+  border-radius: 0px 0px 0px 16px;
+}
+
+.pCO5,
+.pCO6 {
+  width: 38px;
+  height: 38px;
+  position: absolute;
+  background: #3d6b5e;
+}
+.pCO5 {
+  left: 212.5px;
+  top: 0px;
+}
+.pCO6 {
+  left: 212.5px;
+  bottom: 0px;
+}
+
+.poolCorner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  background: #2a363b;
+  border-radius: 50%;
+  border-style: solid;
+  border-width: 3px;
+  border-color: #49796b;
+}
+.poolCorner1 {
+  left: -6px;
+  top: -9px;
+}
+.poolCorner2 {
+  right: -6px;
+  top: -9px;
+}
+.poolCorner3 {
+  left: -6px;
+  bottom: -9px;
+}
+.poolCorner4 {
+  right: -6px;
+  bottom: -9px;
+}
+.poolCorner5 {
+  left: 190.2px;
+  top: -16px;
+}
+.poolCorner6 {
+  left: 190.2px;
+  bottom: -16px;
+}
+.cueBall {
+  position: absolute;
+  left: 150px;
+  top: 100px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0px 0px 3px 1px #2a363b;
+}
+.redDot {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: red;
+}
+.redDot2 {
+  position: absolute;
+  right: 0.5px;
+  bottom: 0.5px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: red;
+}
+.cushionDot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  position: absolute;
+  background: #83ae9b;
+}
+.cDot1,
+.cDot2,
+.cDot3,
+.cDot4,
+.cDot5,
+.cDot6 {
+  top: 10px;
+}
+.cDot7,
+.cDot8,
+.cDot9,
+.cDot10,
+.cDot11,
+.cDot12 {
+  bottom: 10px;
+}
+.cDot1,
+.cDot7 {
+  left: 89.25px;
+}
+.cDot2,
+.cDot8 {
+  left: 130px;
+}
+.cDot3,
+.cDot9 {
+  left: 169.25px;
+}
+.cDot4,
+.cDot10 {
+  right: 169.25px;
+}
+.cDot5,
+.cDot11 {
+  right: 130px;
+}
+.cDot6,
+.cDot12 {
+  right: 89.25px;
+}
+
+.cDot13,
+.cDot14,
+.cDot15 {
+  left: 10px;
+}
+.cDot16,
+.cDot17,
+.cDot18 {
+  right: 10px;
+}
+.cDot13,
+.cDot16 {
+  top: 94.5px;
+}
+.cDot14,
+.cDot17 {
+  top: 140.5px;
+}
+.cDot15,
+.cDot18 {
+  top: 186.5px;
+}
