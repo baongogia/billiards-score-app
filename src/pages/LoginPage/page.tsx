@@ -2,12 +2,46 @@
 import "./index.scss";
 import { useNavigate } from "react-router-dom";
 import { Form } from "antd";
+import { login } from "../../services/auth/authService";
+import { toast } from "react-toastify";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
+
 export default function Login() {
   const navigate = useNavigate();
+  const auth = useContext(AuthContext);
   const [form] = Form.useForm();
-  const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
-    navigate("/HomePage");
+  const [loginStatus, setLoginStatus] = useState(false);
+  const fetchData = async (email: string, password: string) => {
+    try {
+      const res = await login(email, password);
+      const data = res.data.data;
+      document.cookie = `token=${res.data.accessToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
+      document.cookie = `refreshToken=${res.data.refreshToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
+      localStorage.setItem("token", data.access_token);
+      setLoginStatus(true);
+      auth?.login(data.access_token, data.user);
+      toast.success("Login successfully");
+      setTimeout(() => {
+        navigate("/HomePage");
+      }, 1000);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(`Login failed: ${error.response.statusText}`);
+    }
+  };
+
+  useEffect(() => {
+    if (auth?.isAuthenticated) {
+      navigate("/HomePage", { replace: true });
+    }
+  }, [auth?.isAuthenticated, navigate]);
+
+  const onFinish = async (values: any) => {
+    await fetchData(values.email, values.password);
+    if (loginStatus) {
+      navigate("/HomePage");
+    }
   };
 
   return (
@@ -19,7 +53,7 @@ export default function Login() {
         <div className="form-set">
           <Form form={form} onFinish={onFinish}>
             <div className="mb-2">
-              <Form.Item name="email" style={{ margin: 0 }}>
+              <Form.Item name="email" initialValue="" style={{ margin: 0 }}>
                 <input
                   type="email"
                   placeholder="Email"
@@ -34,7 +68,7 @@ export default function Login() {
               </Form.Item>
             </div>
             <div className="mb-2">
-              <Form.Item name="password" style={{ margin: 0 }}>
+              <Form.Item name="password" initialValue="" style={{ margin: 0 }}>
                 <input
                   type="password"
                   placeholder="Password"
@@ -56,6 +90,15 @@ export default function Login() {
             className="w-full border-1 border-black rounded-3xl p-2 text-center hover:bg-[rgba(0,0,0,0.5)] hover:text-white transition duration-300 cursor-pointer uppercase font-bold"
           >
             Log in
+          </div>
+          <div
+            onClick={() => {
+              window.location.href =
+                "https://swd392sp25.com:8000/api/v1/auth/google";
+            }}
+            className="w-full border-1 border-black rounded-3xl p-2 text-center hover:bg-[rgba(0,0,0,0.5)] hover:text-white transition duration-300 cursor-pointer uppercase font-bold mt-2"
+          >
+            Log in with Google
           </div>
         </div>
         <div className="login-with">

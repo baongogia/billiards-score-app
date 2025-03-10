@@ -1,29 +1,13 @@
 // import { useEffect, useState } from "react";
 import "./index.scss";
 export default function BidaTable() {
-  // const [scale, setScale] = useState(3.4);
-
-  // useEffect(() => {
-  //   const updateScale = () => {
-  //     const baselineSize = 1400;
-  //     const newScale =
-  //       (3.4 * Math.min(window.innerWidth, window.innerHeight)) / baselineSize;
-  //     setScale(newScale);
-  //   };
-
-  //   window.addEventListener("resize", updateScale);
-  //   updateScale();
-
-  //   return () => window.removeEventListener("resize", updateScale);
-  // }, []);
-
   return (
     <div
       style={{
-        transform: `scale(${3.4})`,
+        transform: `scale(${4.8})`,
         transformOrigin: "center center",
       }}
-      className=""
+      className="mt-5"
     >
       <div className="wrap">
         <div className="pool">

@@ -1,7 +1,38 @@
-import { useNavigate } from "react-router-dom";
 import "./index.scss";
+import { useNavigate } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 const HomePage = () => {
   const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+  console.log(auth);
+
+  if (!auth?.token) {
+    navigate("/");
+  } else {
+    console.log("User authenticated");
+  }
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const userString = params.get("user");
+    const token = params.get("token");
+
+    if (userString && token) {
+      try {
+        const decodedUser = JSON.parse(decodeURIComponent(userString));
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(decodedUser));
+        auth?.login(token, decodedUser);
+        window.history.replaceState({}, document.title, location.pathname);
+        toast.success(`Welcome ${decodedUser.name}!`);
+      } catch (error) {
+        console.error("Error decoding user:", error);
+      }
+    }
+  }, [auth, navigate]);
+
   return (
     <div className="w-[100vw] h-[100vh] bg-[#2c3e50]">
       <div className="main-body text-white">
@@ -38,14 +69,14 @@ const HomePage = () => {
           </ul>
           <div className="profile-menu">
             <p>
-              Player 1
+              {auth?.user?.name || auth?.user?.email}
               <a href="#26">
                 <span className="entypo-down-open scnd-font-color"></span>
               </a>
             </p>
             <div
-              onClick={() => navigate("/")}
-              className="profile-picture small-profile-picture"
+              onClick={auth?.logout}
+              className="profile-picture small-profile-picture cursor-pointer"
             >
               <img
                 width="40px"
@@ -227,6 +258,7 @@ const HomePage = () => {
                 style={{
                   backgroundImage: `url("https://images.pexels.com/photos/5986316/pexels-photo-5986316.jpeg?auto=compress&cs=tinysrgb&w=800")`,
                 }}
+                onClick={() => navigate("/WaitingPage")}
                 className="h-full w-1/3 bg-[rgba(105,255,85,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white text-2xl shadow-2xl cursor-pointer  bg-cover bg-center"
               >
                 New Game

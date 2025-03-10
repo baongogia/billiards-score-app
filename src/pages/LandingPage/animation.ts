@@ -1,6 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import gsap from "gsap";
 
+const checkElementExists = (selector: string) => {
+  return document.querySelector(selector) !== null;
+};
+const safeGSAP = (selector: string, options: any) => {
+  if (checkElementExists(selector)) {
+    gsap.to(selector, options);
+  } else {
+    console.warn(`GSAP target ${selector} not found.`);
+  }
+};
 // Data
 const data = [
   {
@@ -102,7 +112,7 @@ function getSliderItem(index: any) {
 
 function animate(target: any, duration: any, properties: any) {
   return new Promise((resolve) => {
-    gsap.to(target, {
+    safeGSAP(target, {
       ...properties,
       duration: duration,
       onComplete: resolve,
@@ -182,7 +192,7 @@ function init() {
 
   const startDelay = 0.6;
 
-  gsap.to(".cover", {
+  safeGSAP(".cover", {
     x: width + 400,
     delay: 0.5,
     ease,
@@ -193,22 +203,22 @@ function init() {
     },
   });
   rest.forEach((i, index) => {
-    gsap.to(getCard(i), {
+    safeGSAP(getCard(i), {
       x: offsetLeft + index * (cardWidth + gap),
       zIndex: 30,
       delay: 0.05 * index,
       ease,
     });
-    gsap.to(getCardContent(i), {
+    safeGSAP(getCardContent(i), {
       x: offsetLeft + index * (cardWidth + gap),
       zIndex: 40,
       delay: 0.05 * index,
       ease,
     });
   });
-  gsap.to("#pagination", { y: 0, opacity: 1, ease, delay: startDelay });
-  gsap.to("nav", { y: 0, opacity: 1, ease, delay: startDelay });
-  gsap.to(detailsActive, { opacity: 1, x: 0, ease, delay: startDelay });
+  safeGSAP("#pagination", { y: 0, opacity: 1, ease, delay: startDelay });
+  safeGSAP("nav", { y: 0, opacity: 1, ease, delay: startDelay });
+  safeGSAP(detailsActive, { opacity: 1, x: 0, ease, delay: startDelay });
 }
 
 let clicks = 0;
@@ -225,7 +235,18 @@ function step() {
     const detailsActive = detailsEven ? "#details-even" : "#details-odd";
     const detailsInactive = detailsEven ? "#details-odd" : "#details-even";
 
-    if (!data[order[0]]) {
+    if (shifted === undefined) {
+      console.error("No more slides available, resetting order.");
+      order.push(...originalOrder);
+      return;
+    }
+
+    if (order.length === 0) {
+      console.warn("Resetting order...");
+      order.push(...originalOrder);
+    }
+
+    if (typeof order[0] === "undefined" || !data[order[0]]) {
       console.error("Invalid slide index:", order[0]);
       return;
     }
@@ -248,32 +269,32 @@ function step() {
     }
 
     gsap.set(detailsActive, { zIndex: 22 });
-    gsap.to(detailsActive, { opacity: 1, delay: 0.4, ease });
-    gsap.to(`${detailsActive} .text`, {
+    safeGSAP(detailsActive, { opacity: 1, delay: 0.4, ease });
+    safeGSAP(`${detailsActive} .text`, {
       y: 0,
       delay: 0.1,
       duration: 0.7,
       ease,
     });
-    gsap.to(`${detailsActive} .title-1`, {
+    safeGSAP(`${detailsActive} .title-1`, {
       y: 0,
       delay: 0.15,
       duration: 0.7,
       ease,
     });
-    gsap.to(`${detailsActive} .title-2`, {
+    safeGSAP(`${detailsActive} .title-2`, {
       y: 0,
       delay: 0.15,
       duration: 0.7,
       ease,
     });
-    gsap.to(`${detailsActive} .desc`, {
+    safeGSAP(`${detailsActive} .desc`, {
       y: 0,
       delay: 0.3,
       duration: 0.4,
       ease,
     });
-    gsap.to(`${detailsActive} .cta`, {
+    safeGSAP(`${detailsActive} .cta`, {
       y: 0,
       delay: 0.35,
       duration: 0.4,
@@ -287,26 +308,26 @@ function step() {
 
     // gsap.set(getCard(prv), { zIndex: 10 });
     gsap.set(getCard(active), { zIndex: 20 });
-    gsap.to(getCard(prv), {
+    safeGSAP(getCard(prv), {
       onComplete: () => {
         gsap.set(getCard(prv), { zIndex: 30 });
       },
     });
 
-    gsap.to(getCardContent(active), {
+    safeGSAP(getCardContent(active), {
       y: offsetTop + cardHeight - 10,
       opacity: 0,
       duration: 0.3,
       ease,
     });
-    gsap.to(getSliderItem(active), { x: 0, ease });
-    gsap.to(getSliderItem(prv), { x: -numberSize, ease });
-    gsap.to(".progress-sub-foreground", {
+    safeGSAP(getSliderItem(active), { x: 0, ease });
+    safeGSAP(getSliderItem(prv), { x: -numberSize, ease });
+    safeGSAP(".progress-sub-foreground", {
       width: 500 * (1 / order.length) * (active + 1),
       ease,
     });
 
-    gsap.to(getCard(active), {
+    safeGSAP(getCard(active), {
       x: 0,
       y: 0,
       ease,
@@ -357,7 +378,7 @@ function step() {
       if (i !== prv) {
         const xNew = offsetLeft + index * (cardWidth + gap);
         gsap.set(getCard(i), { zIndex: 30 });
-        gsap.to(getCard(i), {
+        safeGSAP(getCard(i), {
           x: xNew,
           y: offsetTop,
           width: cardWidth,
@@ -367,7 +388,7 @@ function step() {
           delay: 0.1 * (index + 1),
         });
 
-        gsap.to(getCardContent(i), {
+        safeGSAP(getCardContent(i), {
           x: xNew,
           y: offsetTop + cardHeight - 100,
           borderRadius: 10,
@@ -376,7 +397,7 @@ function step() {
           ease,
           delay: 0.1 * (index + 1),
         });
-        gsap.to(getSliderItem(i), { x: (index + 1) * numberSize, ease });
+        safeGSAP(getSliderItem(i), { x: (index + 1) * numberSize, ease });
       }
     });
   });
@@ -406,9 +427,10 @@ async function loadImages() {
 // Start
 async function start() {
   try {
-    await loadImages();
+    await loadImages(); // Đợi ảnh load xong trước khi tiếp tục
+
     setTimeout(() => {
-      const demoElement = _("demo");
+      const demoElement = document.getElementById("demo");
       if (!demoElement) {
         console.error("Element with ID 'demo' not found!");
         return;
@@ -422,7 +444,6 @@ async function start() {
     console.error("One or more images failed to load", error);
   }
 }
-// Event Listeners
-document.addEventListener("DOMContentLoaded", () => {
-  start();
-});
+// Event Listeners: Đảm bảo chỉ gọi `start()` khi DOM sẵn sàng
+document.addEventListener("DOMContentLoaded", start);
+export { start };

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import GuestCard from "./GuestCard.tsx";
 import "./index.scss";
 import "./animation.ts";
+import { start } from "./animation.ts";
+import gsap from "gsap";
 
 export default function LandingPage() {
   // Prevent scrolling
@@ -12,14 +14,22 @@ export default function LandingPage() {
       document.body.style.overflow = "auto";
     };
   }, []);
-  // Auto reload page
+  // Auto reload gsap
+  const location = useLocation();
+  const resetAnimation = () => {
+    gsap.killTweensOf("*");
+    console.log("GSAP animations reset!");
+  };
   useEffect(() => {
-    const handlePopState = () => {
-      window.location.reload();
+    if (location.pathname === "/") {
+      resetAnimation();
+      start();
+    }
+    return () => {
+      resetAnimation();
     };
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
+  }, [location.pathname]);
+
   // Navigate to login page
   const navigate = useNavigate();
   const [overLayer, setOverLayer] = useState(false);
@@ -30,7 +40,7 @@ export default function LandingPage() {
     }, 1000);
   };
   return (
-    <>
+    <div className="">
       <div className="indicator"></div>
       <div id="demo"></div>
       {/* Demo card */}
@@ -102,6 +112,6 @@ export default function LandingPage() {
       >
         <GuestCard />
       </div>
-    </>
+    </div>
   );
 }
