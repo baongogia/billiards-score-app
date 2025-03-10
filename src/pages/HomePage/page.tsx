@@ -1,5 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import "./index.scss";
 const HomePage = () => {
+  const navigate = useNavigate();
   return (
     <div className="w-[100vw] h-[100vh] bg-[#2c3e50]">
       <div className="main-body text-white">
@@ -36,16 +38,18 @@ const HomePage = () => {
           </ul>
           <div className="profile-menu">
             <p>
-              Me{" "}
+              Player 1
               <a href="#26">
                 <span className="entypo-down-open scnd-font-color"></span>
               </a>
             </p>
-            <div className="profile-picture small-profile-picture">
+            <div
+              onClick={() => navigate("/")}
+              className="profile-picture small-profile-picture"
+            >
               <img
                 width="40px"
-                alt="Anne Hathaway picture"
-                src="http://upload.wikimedia.org/wikipedia/commons/e/e1/Anne_Hathaway_Face.jpg"
+                src="https://images.pexels.com/photos/6254191/pexels-photo-6254191.jpeg?auto=compress&cs=tinysrgb&w=800"
               />
             </div>
           </div>
@@ -89,7 +93,7 @@ const HomePage = () => {
               </ul>
             </div>
             <div className="donut-chart-block block">
-              <h2 className="titular">OS AUDIENCE STATS</h2>
+              <h2 className="titular">GAME STATS</h2>
               <div className="donut-chart">
                 <div id="porcion1" className="recorte">
                   <div className="quesito ios" data-rel="21"></div>
@@ -111,25 +115,25 @@ const HomePage = () => {
               </div>
               <ul className="os-percentages horizontal-list">
                 <li>
-                  <p className="ios os scnd-font-color">iOS</p>
+                  <p className="ios os scnd-font-color">Win</p>
                   <p className="os-percentage">
                     21<sup>%</sup>
                   </p>
                 </li>
                 <li>
-                  <p className="mac os scnd-font-color">Mac</p>
+                  <p className="mac os scnd-font-color">Lose</p>
                   <p className="os-percentage">
                     48<sup>%</sup>
                   </p>
                 </li>
                 <li>
-                  <p className="linux os scnd-font-color">Linux</p>
+                  <p className="linux os scnd-font-color">Draw</p>
                   <p className="os-percentage">
                     9<sup>%</sup>
                   </p>
                 </li>
                 <li>
-                  <p className="win os scnd-font-color">Win</p>
+                  <p className="win os scnd-font-color">Win AI</p>
                   <p className="os-percentage">
                     32<sup>%</sup>
                   </p>
@@ -215,9 +219,34 @@ const HomePage = () => {
           </div>
           {/* Player action */}
           <div className="middle-container w-[70vw]">
-            <div className="profile block">
-              {/* Play game */}
-              {/* Create game */}
+            <div
+              style={{ display: "flex" }}
+              className="profile block p-2 gap-2"
+            >
+              <div
+                style={{
+                  backgroundImage: `url("https://images.pexels.com/photos/5986316/pexels-photo-5986316.jpeg?auto=compress&cs=tinysrgb&w=800")`,
+                }}
+                className="h-full w-1/3 bg-[rgba(105,255,85,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white text-2xl shadow-2xl cursor-pointer  bg-cover bg-center"
+              >
+                New Game
+              </div>
+              <div
+                style={{
+                  backgroundImage: `url("https://images.pexels.com/photos/6503522/pexels-photo-6503522.jpeg?auto=compress&cs=tinysrgb&w=800")`,
+                }}
+                className="h-full w-1/3 bg-[rgba(255,209,57,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white cursor-pointer bg-cover bg-center text-2xl shadow-2xl "
+              >
+                Create game
+              </div>
+              <div
+                style={{
+                  backgroundImage: `url("https://images.pexels.com/photos/7403806/pexels-photo-7403806.jpeg?auto=compress&cs=tinysrgb&w=800")`,
+                }}
+                className="h-full w-1/3 bg-[rgba(85,255,229,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white cursor-pointer bg-cover bg-center text-2xl shadow-2xl"
+              >
+                Play With AI
+              </div>
               {/*  */}
             </div>
             <div className="calendar-day mb-4">
