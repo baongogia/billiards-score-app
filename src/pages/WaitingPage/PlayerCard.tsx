@@ -7,7 +7,7 @@ export default function PlayerCard({ className }: PlayerCardProps) {
       style={{
         backgroundImage: `url("https://static.vecteezy.com/system/resources/previews/010/790/729/non_2x/abstract-background-dark-blue-with-modern-concept-vector.jpg")`,
       }}
-      className={`h-[14em] w-[14vw] bg-white rounded-xl flex justify-center items-center bg-cover bg-center border border-white shadow-xl relative overflow-hidden ${className}`}
+      className={`h-[30vh] w-[14vw] bg-white rounded-xl flex justify-center items-center bg-cover bg-center border border-white shadow-xl relative overflow-hidden ${className}`}
     >
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.3)] to-[rgba(0,0,0,0.8)] rounded-xl"></div>

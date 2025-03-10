@@ -1,9 +1,9 @@
-// import React from "react";
 import "./index.scss";
 import Loading from "../../components/Loading/Loading";
 import PlayerCard from "./PlayerCard";
 import BidaTable from "../../components/BidaTable/page";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 export default function WaitingPage() {
   // Prevent scrolling
   useEffect(() => {
@@ -12,6 +12,7 @@ export default function WaitingPage() {
       document.body.style.overflow = "auto";
     };
   }, []);
+  const navigate = useNavigate();
   return (
     <div className="relative w-[100vw] h-[100vh] bg-gray-600 flex justify-center items-center">
       {/* Background */}
@@ -23,7 +24,10 @@ export default function WaitingPage() {
         <Loading />
         {/* Button */}
         <div className="text-center text-white w-full h-10 flex gap-2">
-          <div className="w-1/2 border-1 flex justify-center items-center uppercase font-bold hover:bg-green-600 transition duration-300 cursor-pointer">
+          <div
+            onClick={() => navigate("/GamePlay")}
+            className="w-1/2 border-1 flex justify-center items-center uppercase font-bold hover:bg-green-600 transition duration-300 cursor-pointer"
+          >
             Play
           </div>
           <div className="w-1/2 border-1 flex justify-center items-center uppercase font-bold hover:bg-blue-600 transition duration-300 cursor-pointer">

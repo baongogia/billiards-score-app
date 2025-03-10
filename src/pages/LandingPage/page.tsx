@@ -12,6 +12,14 @@ export default function LandingPage() {
       document.body.style.overflow = "auto";
     };
   }, []);
+  // Auto reload page
+  useEffect(() => {
+    const handlePopState = () => {
+      window.location.reload();
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
   // Navigate to login page
   const navigate = useNavigate();
   const [overLayer, setOverLayer] = useState(false);

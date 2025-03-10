@@ -1,0 +1,198 @@
+@use "sass:color";
+@import url(https://fonts.googleapis.com/css?family=Vibur);
+$gray70: color.adjust(#ffffff, $lightness: -70%);
+$gray60: color.adjust(#ffffff, $lightness: -60%);
+$gray50: color.adjust(#ffffff, $lightness: -50%);
+$gray30: color.adjust(#ffffff, $lightness: -30%);
+$gray0: color.adjust(#ffffff, $lightness: -5%);
+
+.link {
+  cursor: pointer;
+}
+
+.container-login {
+  background: url("https://gcs.tripi.vn/public-tripi/tripi-feed/img/474072VcP/background-bong-bida-chuyen-nghiep-thi-dau_100740212.jpg")
+    no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  height: 100vh;
+  overflow: hidden;
+  .container {
+    width: 400px;
+    background-color: rgba(255, 255, 255, 0.65);
+    box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.5);
+    margin: 50px auto;
+    padding-top: 10px;
+    padding-bottom: 30px;
+    position: relative;
+    will-change: transform;
+    animation-fill-mode: forwards;
+    -webkit-transition: transform 0.5s ease;
+    transition: transform 0.5s ease;
+
+    -webkit-animation: page-down 1s forwards;
+    -moz-animation: page-down 1s forwards;
+    -o-animation: page-down 1s forwards;
+    animation: page-down 1s forwards;
+
+    &.close {
+      display: none;
+    }
+
+    .bida-title {
+      font-family: "Vibur";
+      font-size: 50px;
+      text-align: center;
+      margin: 25px 0;
+      color: $gray70;
+    }
+    .close-button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+
+      i {
+        color: $gray70;
+        padding: 10px;
+      }
+    }
+    .form {
+      &-set {
+        padding: 25px;
+        max-width: 320px;
+        margin: auto;
+        .form {
+          &-group {
+            position: relative;
+            margin-bottom: 15px;
+            border-bottom: 1px solid $gray30;
+            .form {
+              &-label {
+                position: absolute;
+                -webkit-transition: 0.15s all ease;
+                transition: 0.15s all ease;
+
+                &.on-focus,
+                &.filled {
+                  font-size: 10px;
+                  top: -10px;
+                  -webkit-transition: 0.15s all ease;
+                  transition: 0.15s all ease;
+                }
+              }
+              &-control {
+                height: 25px;
+                padding: 5px;
+                position: relative;
+                z-index: 2;
+                border: none;
+                background-color: transparent;
+                width: 100%;
+
+                &:focus {
+                  outline: -webkit-focus-ring-color auto 0px;
+                }
+              }
+            }
+          }
+        }
+        .btn {
+          width: 100%;
+          height: 40px;
+          border: 1px solid $gray50;
+          border-radius: 30px;
+          background-color: transparent;
+          font-size: 16px;
+          margin: 15px 0;
+          cursor: pointer;
+          &:focus {
+            outline: -webkit-focus-ring-color auto 0px;
+          }
+        }
+      }
+    }
+
+    .login-with {
+      .title {
+        padding-bottom: 5px;
+        padding-left: 15px;
+        border-bottom: 1px solid $gray30;
+      }
+      .social {
+        .icons {
+          text-align: center;
+          .icon {
+            list-style-type: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 40px;
+            line-height: 40px;
+            color: $gray0;
+            background-color: $gray70;
+            display: inline-block;
+            vertical-align: middle;
+            margin: 20px 5px;
+            cursor: pointer;
+
+            i {
+              color: $gray0;
+            }
+          }
+        }
+      }
+    }
+
+    .other-links {
+      div {
+        padding-left: 15px;
+        cursor: pointer;
+        font-size: 12px;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+$from: -200px;
+$to: 100px;
+
+@-moz-keyframes page-down {
+  0% {
+    -webkit-transform: translateY($from);
+    transform: translateY($from);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY($to);
+    transform: translateY($to);
+    opacity: 1;
+  }
+}
+@-o-keyframes page-down {
+  0% {
+    -webkit-transform: translateY($from);
+    transform: translateY($from);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY($to);
+    transform: translateY($to);
+    opacity: 1;
+  }
+}
+@keyframes page-down {
+  0% {
+    -webkit-transform: translateY($from);
+    transform: translateY($from);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY($to);
+    transform: translateY($to);
+    opacity: 1;
+  }
+}
