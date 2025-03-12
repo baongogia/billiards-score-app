@@ -34,7 +34,7 @@ export default function Login() {
 
   useEffect(() => {
     if (auth?.isAuthenticated) {
-      navigate("/HomePage", { replace: true });
+      navigate("/admin", { replace: true });
     }
   }, [auth?.isAuthenticated, navigate]);
 
