@@ -24,7 +24,7 @@ import Unauthorized from "./pages/Unauthorize/page";
 const router = createBrowserRouter([
   { path: "/", element: <LandingPage /> },
   { path: "/login", element: <Login /> },
-  { path: "/WaitingPage", element: <WaitingPage /> },
+  { path: "/WaitingPage/:tableId", element: <WaitingPage /> },
   {
     path: "/HomePage",
     element: (
