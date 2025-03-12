@@ -37,7 +37,10 @@ export default function LandingPage() {
       <div className="indicator"></div>
       <div id="demo"></div>
       {/* Demo card */}
-      <div className="details text-white" id="details-even">
+      <div
+        className="details text-white opacity-0 md:opacity-100"
+        id="details-even"
+      >
         <div className="place-box">
           <div className="text">Billiards</div>
         </div>
@@ -52,7 +55,10 @@ export default function LandingPage() {
           popularity for its dynamic and challenging gameplay.
         </div>
       </div>
-      <div className="details text-white" id="details-odd">
+      <div
+        className="details text-white opacity-0 md:opacity-100"
+        id="details-odd"
+      >
         <div className="place-box">
           <div className="text">Billiards</div>
         </div>

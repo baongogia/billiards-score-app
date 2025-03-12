@@ -47,8 +47,8 @@ export default function Login() {
         navigate("/admin", { replace: true });
       } else if (role === "manager") {
         navigate("/manager", { replace: true });
-      } else {
-        navigate("/home", { replace: true });
+      } else if (role === "user") {
+        navigate("/HomePage", { replace: true });
       }
     }
   }, [navigate]);
@@ -58,12 +58,15 @@ export default function Login() {
   };
 
   return (
-    <div className="container-login">
-      <div id="login-page " className="container open translate-x-[36vw]">
+    <div className="container-login ">
+      <div
+        id="login-page "
+        className="container open md:translate-x-[36vw] translate-x-3"
+      >
         {/* Title */}
         <h1 className="bida-title">Billiards Club</h1>
         {/* Login form */}
-        <div className="form-set">
+        <div className="form-set ">
           <Form form={form} onFinish={onFinish}>
             <div className="mb-2">
               <Form.Item name="email" initialValue="" style={{ margin: 0 }}>
@@ -114,6 +117,7 @@ export default function Login() {
             Log in with Google
           </div>
         </div>
+        {/* login with */}
         <div className="login-with">
           <div className="social">
             <ul className="icons">
@@ -144,6 +148,7 @@ export default function Login() {
             </ul>
           </div>
         </div>
+        {/* Links */}
         <div className="other-links">
           <div>
             <div

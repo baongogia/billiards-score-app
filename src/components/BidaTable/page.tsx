@@ -1,7 +1,7 @@
 import "./index.scss";
 export default function BidaTable() {
   return (
-    <div className="scale-400">
+    <div className="scale-240 md:scale-400">
       <div className="wrap">
         <div className="pool">
           <div className="poolTexture"></div>

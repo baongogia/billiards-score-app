@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "./index.scss";
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { createNewMatch } from "../../services/Match/matchService";
 import { toast } from "react-toastify";
 
 const HomePage = () => {
@@ -47,12 +49,23 @@ const HomePage = () => {
         localStorage.setItem("user", JSON.stringify(decodedUser));
         auth?.login(token, decodedUser);
         window.history.replaceState({}, document.title, location.pathname);
-        toast.success(`Welcome ${decodedUser.name}!`);
       } catch (error) {
         console.error("Error decoding user:", error);
       }
     }
   }, [auth, navigate]);
+  // Handle start game
+
+  const handleStartGame = async () => {
+    try {
+      await createNewMatch("ready", "8-ball", "67ceec0d423880c8153405fd");
+      toast.success("Create match successfully");
+      navigate("/WaitingPage");
+    } catch (error: any) {
+      console.error("Error creating match:", error);
+      toast.error("Error creating match");
+    }
+  };
 
   return (
     <div className="w-[100vw] h-[100vh] bg-[#2c3e50]">
@@ -72,7 +85,7 @@ const HomePage = () => {
                 Account
               </a>
             </li>
-            <li>
+            <li className="opacity-0 md:opacity-100">
               <a className="header-menu-tab" href="#3">
                 <span className="icon fontawesome-envelope scnd-font-color"></span>
                 Messages
@@ -81,7 +94,7 @@ const HomePage = () => {
                 5
               </a>
             </li>
-            <li>
+            <li className="hidden md:block">
               <a className="header-menu-tab" href="#5">
                 <span className="icon fontawesome-star-empty scnd-font-color"></span>
                 Favorites
@@ -102,10 +115,11 @@ const HomePage = () => {
             ></div>
           </div>
         </header>
-        <div className="main-container flex">
+        {/* Content */}
+        <div className="main-container md:flex">
           {/* Setting & chart */}
-          <div className="left-container w-[30vw] ml-2">
-            <div className="menu-box block">
+          <div className="left-container w-[100vw] md:w-[30vw] ml-2">
+            <div className="menu-box mb-5 hidden md:block">
               <h2 className="titular">MENU BOX</h2>
               <ul className="menu-box-menu">
                 <li>
@@ -141,7 +155,7 @@ const HomePage = () => {
               </ul>
             </div>
             {/* Donut chart */}
-            <div className="donut-chart-block block">
+            <div className="donut-chart-block  hidden md:block">
               <h2 className="titular">GAME STATS</h2>
               <div className="donut-chart">
                 <div id="porcion1" className="recorte">
@@ -190,7 +204,7 @@ const HomePage = () => {
               </ul>
             </div>
             {/* Line chart */}
-            <div className="line-chart-block block clear">
+            <div className="line-chart-block  clear hidden md:block">
               <div className="line-chart">
                 <div className="grafico">
                   <ul className="eje-y">
@@ -268,17 +282,17 @@ const HomePage = () => {
             </div>
           </div>
           {/* Player action */}
-          <div className="middle-container w-[70vw]">
+          <div className="middle-container w-[100vw] md:w-[70vw]">
             <div
               style={{ display: "flex" }}
-              className="profile block p-2 gap-2"
+              className="profile block p-2 gap-2 w-full"
             >
               <div
                 style={{
                   backgroundImage: `url("https://images.pexels.com/photos/5986316/pexels-photo-5986316.jpeg?auto=compress&cs=tinysrgb&w=800")`,
                 }}
-                onClick={() => navigate("/WaitingPage")}
-                className="h-full w-1/3 bg-[rgba(105,255,85,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white text-2xl shadow-2xl cursor-pointer  bg-cover bg-center"
+                onClick={handleStartGame}
+                className="text-center h-full w-1/3 bg-[rgba(105,255,85,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white text-2xl shadow-2xl cursor-pointer  bg-cover bg-center"
               >
                 New Game
               </div>
@@ -286,7 +300,7 @@ const HomePage = () => {
                 style={{
                   backgroundImage: `url("https://images.pexels.com/photos/6503522/pexels-photo-6503522.jpeg?auto=compress&cs=tinysrgb&w=800")`,
                 }}
-                className="h-full w-1/3 bg-[rgba(255,209,57,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white cursor-pointer bg-cover bg-center text-2xl shadow-2xl "
+                className="text-center h-full w-1/3 bg-[rgba(255,209,57,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white cursor-pointer bg-cover bg-center text-2xl shadow-2xl "
               >
                 Create game
               </div>
@@ -294,11 +308,59 @@ const HomePage = () => {
                 style={{
                   backgroundImage: `url("https://images.pexels.com/photos/7403806/pexels-photo-7403806.jpeg?auto=compress&cs=tinysrgb&w=800")`,
                 }}
-                className="h-full w-1/3 bg-[rgba(85,255,229,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white cursor-pointer bg-cover bg-center text-2xl shadow-2xl"
+                className="text-center h-full w-1/3 bg-[rgba(85,255,229,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white cursor-pointer bg-cover bg-center text-2xl shadow-2xl"
               >
                 Play With AI
               </div>
               {/*  */}
+            </div>
+            <div className="donut-chart-block  block md:hidden">
+              <h2 className="titular">GAME STATS</h2>
+              <div className="donut-chart">
+                <div id="porcion1" className="recorte">
+                  <div className="quesito ios" data-rel="21"></div>
+                </div>
+                <div id="porcion2" className="recorte">
+                  <div className="quesito mac" data-rel="39"></div>
+                </div>
+                <div id="porcion3" className="recorte">
+                  <div className="quesito win" data-rel="31"></div>
+                </div>
+                <div id="porcionFin" className="recorte">
+                  <div className="quesito linux" data-rel="9"></div>
+                </div>
+                <p className="center-date">
+                  JUNE
+                  <br />
+                  <span className="scnd-font-color">2013</span>
+                </p>
+              </div>
+              <ul className="os-percentages horizontal-list">
+                <li>
+                  <p className="ios os scnd-font-color">Win</p>
+                  <p className="os-percentage">
+                    21<sup>%</sup>
+                  </p>
+                </li>
+                <li>
+                  <p className="mac os scnd-font-color">Lose</p>
+                  <p className="os-percentage">
+                    48<sup>%</sup>
+                  </p>
+                </li>
+                <li>
+                  <p className="linux os scnd-font-color">Draw</p>
+                  <p className="os-percentage">
+                    9<sup>%</sup>
+                  </p>
+                </li>
+                <li>
+                  <p className="win os scnd-font-color">Win Rate</p>
+                  <p className="os-percentage">
+                    32<sup>%</sup>
+                  </p>
+                </li>
+              </ul>
             </div>
             <div className="calendar-day mb-4">
               <div className="arrow-btn-container">
@@ -315,7 +377,7 @@ const HomePage = () => {
                 ADD EVENT
               </a>
             </div>
-            <div className="calendar-month block">
+            <div className="calendar-month hidden md:block">
               <div className="arrow-btn-container">
                 <a className="arrow-btn left" href="#202">
                   <span className="icon fontawesome-angle-left"></span>
