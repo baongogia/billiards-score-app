@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGame } from "../../context/GameContext";
-
-export default function GuestCard() {
+interface GuestCardProps {
+  id: string;
+}
+export const GuestCard: React.FC<GuestCardProps> = ({ id }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const navigate = useNavigate();
   const { playerName, mode, gameType, setGameState } = useGame();
@@ -86,7 +88,7 @@ export default function GuestCard() {
                   <div className="flex justify-end gap-1 mt-2">
                     <button
                       className="w-20 h-8 bg-[rgba(0,0,0,0.2)] text-white flex justify-center items-center font-bold border border-white transition duration-300 cursor-pointer hover:bg-gray-300 hover:text-black"
-                      onClick={() => navigate("/WaitingPage")}
+                      onClick={() => navigate(`/WaitingPage/${id}`)}
                     >
                       OK
                     </button>
@@ -137,4 +139,4 @@ export default function GuestCard() {
       </div>
     </div>
   );
-}
+};

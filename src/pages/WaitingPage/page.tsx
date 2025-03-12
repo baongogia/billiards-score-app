@@ -32,12 +32,12 @@ export default function WaitingPage() {
   const navigate = useNavigate();
   const { setGameState } = useGame();
   const { tableId } = useParams();
-  console.log("tableId", tableId);
   const [tableData, setTableData] = useState<any>(null);
   // Host luôn là người vào trước
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [partnerName, setPartnerName] = useState("");
+  const [gameMode, setGameMode] = useState("");
 
   // Game settings
   const [gameSettings, setGameSettings] = useState<Partial<GameState>>({
@@ -50,7 +50,7 @@ export default function WaitingPage() {
   const fetchTableById = async (id: string) => {
     try {
       const response = await getTableById(id);
-      const data = response.data;
+      const data = response.data.data;
       setTableData(data);
     } catch (error) {
       console.error("Error fetching table by id", error);
@@ -58,25 +58,34 @@ export default function WaitingPage() {
   };
 
   useEffect(() => {
-    const createMatch = async () => {
-      try {
-        if (tableId && gameSettings.gameType) {
-          await createNewMatch("ready", gameSettings.gameType, tableId);
-        } else {
-          toast.error("Table ID is undefined");
-        }
-        toast.success("Match created successfully");
-      } catch (error) {
-        console.error("Error creating match", error);
-        toast.error("Error creating match");
-      }
-    };
-
     if (tableId) {
       fetchTableById(tableId);
-      createMatch();
     }
   }, [tableId, gameSettings.gameType]);
+
+  const createMatch = async () => {
+    try {
+      if (tableId && gameSettings.gameType) {
+        await createNewMatch("ready", gameMode, tableId);
+      } else {
+        toast.error("Table ID is undefined");
+      }
+      toast.success("Match created successfully");
+    } catch (error) {
+      console.error("Error creating match", error);
+      toast.error("Error creating match");
+    }
+  };
+
+  const handleCreateMatch = (value: string) => {
+    console.log("Game Type", value);
+
+    setGameSettings({
+      ...gameSettings,
+      gameType: value,
+    });
+    setGameMode(value);
+  };
 
   return (
     <div className="relative w-[100vw] bg-green-950 h-[100vh] flex justify-center items-center">
@@ -90,19 +99,19 @@ export default function WaitingPage() {
         {/* 3 Nút chính của Host */}
         <div className="text-center text-white w-full h-10 flex gap-2">
           <button
-            className="w-1/3 border-1 flex justify-center items-center uppercase font-bold bg-blue-500 hover:bg-blue-700 transition duration-300 cursor-pointer text-white rounded"
+            className="px-2 border-1 flex justify-center items-center uppercase font-bold  hover:bg-blue-500 transition duration-300 cursor-pointer text-white rounded"
             onClick={() => setShowInviteModal(true)}
           >
             Invite
           </button>
           <button
-            className="w-1/3 border-1 flex justify-center items-center uppercase font-bold bg-yellow-500 hover:bg-yellow-700 transition duration-300 cursor-pointer text-white rounded"
+            className=" border-1 px-2 flex justify-center items-center uppercase font-bold  hover:bg-yellow-500 transition duration-300 cursor-pointer text-white rounded"
             onClick={() => setShowSetupModal(true)}
           >
             Setup
           </button>
           <button
-            className={`w-1/3 border-1 flex justify-center items-center uppercase font-bold text-white rounded ${
+            className={` border-1 px-2 flex justify-center items-center uppercase font-bold text-white text-nowrap rounded ${
               partnerName
                 ? "bg-green-500 hover:bg-green-700 cursor-pointer"
                 : "bg-gray-500 cursor-not-allowed"
@@ -124,22 +133,22 @@ export default function WaitingPage() {
       {/* Invite Modal */}
       {showInviteModal && (
         <div className="absolute w-full h-full bg-[rgba(0,0,0,0.7)] flex justify-center items-center">
-          <div className="bg-white p-5 rounded-lg w-80 text-black">
+          <div className="bg-[rgba(255,255,255,0.5)] backdrop-blur-md  p-5 rounded-lg w-80 text-white">
             <h2 className="text-xl font-bold mb-3">Invite Player</h2>
             <div className="p-2 border rounded mb-3">
-              <p className="text-gray-700">🔵 Player Online: John Doe</p>
+              <p className="text-gray-700">🔵 Nobita</p>
               <button
-                className="w-full bg-blue-500 text-white py-2 mt-2 rounded hover:bg-blue-700 transition"
+                className="w-full bg-blue-500 text-white py-2 mt-2 rounded hover:bg-blue-700 transition uppercase cursor-pointer"
                 onClick={() => {
-                  setPartnerName("John Doe");
+                  setPartnerName("Nobita");
                   setShowInviteModal(false);
                 }}
               >
-                Invite John
+                Invite
               </button>
             </div>
             <button
-              className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-700 transition"
+              className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-700 transition cursor-pointer"
               onClick={() => setShowInviteModal(false)}
             >
               Close
@@ -151,23 +160,19 @@ export default function WaitingPage() {
       {/* Setup Modal */}
       {showSetupModal && (
         <div className="absolute w-full h-full bg-[rgba(0,0,0,0.7)] flex justify-center items-center">
-          <div className="bg-white p-5 rounded-lg w-80 text-black">
+          <div className="bg-[rgba(255,255,255,0.5)] backdrop-blur-md p-5 rounded-lg w-80 text-white">
             <h2 className="text-xl font-bold mb-3">Setup Match</h2>
 
             {/* Chọn chế độ Bida */}
             <div className="mb-3">
-              <label className="block text-sm">Game Mode</label>
+              <label className="text-sm">Game Mode</label>
               <select
                 className="w-full p-2 border rounded text-black"
                 value={gameSettings.gameType}
-                onChange={(e) =>
-                  setGameSettings({
-                    ...gameSettings,
-                    gameType: e.target.value,
-                  })
-                }
+                onChange={(e) => handleCreateMatch(e.target.value)}
               >
-                {tableData.compatible_modes.map((mode: any) => (
+                <option key={""} value={""}></option>
+                {tableData?.tableType?.compatible_mode.map((mode: any) => (
                   <option key={mode} value={mode}>
                     {mode}
                   </option>
@@ -177,7 +182,7 @@ export default function WaitingPage() {
 
             {/* Chọn thời gian chơi */}
             <div className="mb-3">
-              <label className="block text-sm">Time Limit (seconds)</label>
+              <label className="text-sm">Time Limit (seconds)</label>
               <input
                 type="number"
                 className="w-full p-2 border rounded text-black"
@@ -193,7 +198,7 @@ export default function WaitingPage() {
 
             {/* Chọn người đánh trước */}
             <div className="mb-3">
-              <label className="block text-sm">Who Plays First?</label>
+              <label className="text-sm">Who Plays First?</label>
               <select
                 className="w-full p-2 border rounded text-black"
                 value={gameSettings.firstTurn}
@@ -212,16 +217,17 @@ export default function WaitingPage() {
             {/* Save & Close */}
             <div className="flex justify-between">
               <button
-                className="w-[48%] bg-green-500 text-white py-2 rounded hover:bg-green-700 transition"
+                className="w-[48%] bg-green-500 opacity-80 text-white py-2 rounded hover:bg-green-700 transition cursor-pointer"
                 onClick={() => {
                   setGameState(gameSettings);
                   setShowSetupModal(false);
+                  createMatch();
                 }}
               >
                 Save
               </button>
               <button
-                className="w-[48%] bg-red-500 text-white py-2 rounded hover:bg-red-700 transition"
+                className="w-[48%] bg-red-500 text-white py-2 rounded hover:bg-red-700 transition opacity-80 cursor-pointer"
                 onClick={() => setShowSetupModal(false)}
               >
                 Close

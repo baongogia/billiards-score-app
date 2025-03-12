@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import GuestCard from "./GuestCard.tsx";
+import { useNavigate, useParams } from "react-router-dom";
 import "./index.scss";
 import "./animation.ts";
 import { start } from "./animation.ts";
+import { GuestCard } from "./GuestCard.tsx";
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const [overLayer, setOverLayer] = useState(false);
+  const { tableId } = useParams();
+  if (tableId) {
+    localStorage.setItem("tableId", tableId);
+  }
 
   // Prevent scrolling
   useEffect(() => {
@@ -18,11 +22,9 @@ export default function LandingPage() {
   }, []);
   // Start animation
   const animationStarted = useRef(false);
-  const location = useLocation();
-
   // Start animation when the page is loaded
   useEffect(() => {
-    if (location.pathname === "/" && !animationStarted.current) {
+    if (!animationStarted.current) {
       const demoElement = document.getElementById("demo");
       if (demoElement) {
         console.log("Found #demo, starting animation...");
@@ -30,7 +32,7 @@ export default function LandingPage() {
         animationStarted.current = true;
       }
     }
-  }, [location.pathname]);
+  }, []);
 
   return (
     <div className="">
@@ -109,7 +111,7 @@ export default function LandingPage() {
             : "bg-[rgba(0,0,0,0)] pointer-events-none opacity-0"
         }`}
       >
-        <GuestCard />
+        {tableId && <GuestCard id={tableId} />}
       </div>
     </div>
   );

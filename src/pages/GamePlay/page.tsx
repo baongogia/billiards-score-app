@@ -48,12 +48,10 @@ const GamePlay: React.FC = () => {
       setBalls((prevBalls) => prevBalls.filter((b) => b !== ball));
       setHistory((prev) => [...prev, { player: currentPlayer as 1 | 2, ball }]);
 
-      if (gameType === "carom") {
-        if (currentPlayer === 1) {
-          setPlayer1Score((prev) => prev + ball);
-        } else {
-          setPlayer2Score((prev) => prev + ball);
-        }
+      if (currentPlayer === 1) {
+        setPlayer1Score((prev) => prev + ball);
+      } else {
+        setPlayer2Score((prev) => prev + ball);
       }
     }
   };
@@ -66,12 +64,10 @@ const GamePlay: React.FC = () => {
           [...prevBalls, lastMove.ball].sort((a, b) => a - b)
         );
 
-        if (gameType === "carom") {
-          if (lastMove.player === 1) {
-            setPlayer1Score((prev) => prev - lastMove.ball);
-          } else {
-            setPlayer2Score((prev) => prev - lastMove.ball);
-          }
+        if (lastMove.player === 1) {
+          setPlayer1Score((prev) => prev - lastMove.ball);
+        } else {
+          setPlayer2Score((prev) => prev - lastMove.ball);
         }
       }
     }
@@ -82,22 +78,18 @@ const GamePlay: React.FC = () => {
   };
 
   useEffect(() => {
-    if (gameType === "bida" && balls.length === 0) {
+    if (balls.length === 0) {
       setTimeout(() => {
-        alert(`🎉 Player ${currentPlayer} wins!`);
+        const winner =
+          player1Score > player2Score
+            ? "Player 1 Wins!"
+            : player2Score > player1Score
+            ? "Player 2 Wins!"
+            : "It's a Draw!";
+        alert(winner);
       }, 500);
     }
-
-    if (gameType === "carom") {
-      if (player1Score > 60) {
-        alert("🎉 Player 1 Wins!");
-      } else if (player2Score > 60) {
-        alert("🎉 Player 2 Wins!");
-      } else if (player1Score === 60 && player2Score === 60) {
-        alert("🤝 It's a Draw!");
-      }
-    }
-  }, [balls, player1Score, player2Score, gameType, currentPlayer]);
+  }, [balls, player1Score, player2Score]);
 
   return (
     <div className="flex items-center justify-center h-screen bg-green-950">
@@ -122,7 +114,7 @@ const GamePlay: React.FC = () => {
             />
             <div className="player-info">
               <p>Player 1</p>
-              {gameType === "carom" && <p className="score">{player1Score}</p>}
+              <p className="score">{player1Score}</p>
             </div>
           </div>
 
@@ -139,7 +131,7 @@ const GamePlay: React.FC = () => {
             />
             <div className="player-info">
               <p>Player 2</p>
-              {gameType === "carom" && <p className="score">{player2Score}</p>}
+              <p className="score">{player2Score}</p>
             </div>
           </div>
         </div>

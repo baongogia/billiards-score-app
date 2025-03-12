@@ -22,7 +22,7 @@ import { ProtectedRoute } from "./components/ProtectRoute/ProtectedRoute";
 import Unauthorized from "./pages/Unauthorize/page";
 
 const router = createBrowserRouter([
-  { path: "/", element: <LandingPage /> },
+  { path: "/:tableId", element: <LandingPage /> },
   { path: "/login", element: <Login /> },
   { path: "/WaitingPage/:tableId", element: <WaitingPage /> },
   {
@@ -65,7 +65,7 @@ const router = createBrowserRouter([
 function App() {
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={2000} />
       <RouterProvider router={router} />
     </>
   );

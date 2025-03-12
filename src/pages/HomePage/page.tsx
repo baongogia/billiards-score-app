@@ -1,17 +1,22 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import "./index.scss";
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import { createNewMatch } from "../../services/Match/matchService";
 import { toast } from "react-toastify";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
+  const tableId = localStorage.getItem("tableId");
+  useEffect(() => {
+    if (tableId) {
+      localStorage.setItem("tableId", tableId);
+    }
+  }, [tableId]);
   // Kiểm tra xem người dùng đã đăng nhập chưa
   if (!auth?.token) {
-    navigate("/");
+    navigate(`/${tableId}`);
+    toast.success("Log out successfully!");
   } else {
     console.log("User authenticated");
   }
@@ -57,14 +62,7 @@ const HomePage = () => {
   // Handle start game
 
   const handleStartGame = async () => {
-    try {
-      await createNewMatch("ready", "8-ball", "67ceec0d423880c8153405fd");
-      toast.success("Create match successfully");
-      navigate("/WaitingPage");
-    } catch (error: any) {
-      console.error("Error creating match:", error);
-      toast.error("Error creating match");
-    }
+    navigate(`/WaitingPage/${tableId}`);
   };
 
   return (

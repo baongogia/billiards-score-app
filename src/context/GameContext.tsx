@@ -13,8 +13,8 @@ interface GameState {
 // Khởi tạo giá trị mặc định
 const defaultGameState: GameState = {
   playerName: "",
-  mode: "solo",
-  gameType: "bida",
+  mode: "",
+  gameType: "",
   firstTurn: "",
   timeLimit: 300,
   setGameState: () => {},
