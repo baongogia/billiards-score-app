@@ -2,21 +2,25 @@ import { createContext, useContext, useState, ReactNode } from "react";
 
 // Định nghĩa kiểu dữ liệu cho game
 interface GameState {
-  playerName: string;
+  playerName: string; // Tên của người chơi chính (Host)
+  partnerName: string; // Tên của người chơi thứ hai (Guest)
   mode: string;
   gameType: string;
   firstTurn: string;
   timeLimit: number;
+  tableId?: string;
   setGameState: (newState: Partial<GameState>) => void;
 }
 
 // Khởi tạo giá trị mặc định
 const defaultGameState: GameState = {
   playerName: "",
+  partnerName: "",
   mode: "",
   gameType: "",
   firstTurn: "",
-  timeLimit: 300,
+  timeLimit: 60,
+  tableId: undefined,
   setGameState: () => {},
 };
 

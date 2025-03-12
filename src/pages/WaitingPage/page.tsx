@@ -3,7 +3,7 @@ import "./index.scss";
 import Loading from "../../components/Loading/Loading";
 import PlayerCard from "./PlayerCard";
 import BidaTable from "../../components/BidaTable/page";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGame } from "../../context/GameContext";
 import {
@@ -11,6 +11,7 @@ import {
   getTableById,
 } from "../../services/Match/matchService";
 import { toast } from "react-toastify";
+import { AuthContext } from "../../context/AuthContext";
 
 interface GameState {
   playerName: string;
@@ -30,7 +31,6 @@ export default function WaitingPage() {
   }, []);
 
   const navigate = useNavigate();
-  const { setGameState } = useGame();
   const { tableId } = useParams();
   const [tableData, setTableData] = useState<any>(null);
   // Host luôn là người vào trước
@@ -38,7 +38,8 @@ export default function WaitingPage() {
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [partnerName, setPartnerName] = useState("");
   const [gameMode, setGameMode] = useState("");
-
+  const auth = useContext(AuthContext);
+  const { playerName, setGameState } = useGame();
   // Game settings
   const [gameSettings, setGameSettings] = useState<Partial<GameState>>({
     gameType: "bida",
@@ -94,7 +95,7 @@ export default function WaitingPage() {
         <BidaTable />
       </div>
 
-      <div className="absolute scale-150 flex flex-col">
+      <div className="absolute md:scale-150 flex flex-col">
         <Loading />
         {/* 3 Nút chính của Host */}
         <div className="text-center text-white w-full h-10 flex gap-2">
@@ -126,7 +127,7 @@ export default function WaitingPage() {
 
       {/* Player Cards */}
       <div className="relative grid grid-cols-2 w-screen h-screen pointer-events-none">
-        <PlayerCard className="player-1" name="YOU (Host)" />
+        <PlayerCard className="player-1" name={`${playerName} (HOST)`} />
         {partnerName && <PlayerCard className="player-2" name={partnerName} />}
       </div>
 
@@ -141,6 +142,7 @@ export default function WaitingPage() {
                 className="w-full bg-blue-500 text-white py-2 mt-2 rounded hover:bg-blue-700 transition uppercase cursor-pointer"
                 onClick={() => {
                   setPartnerName("Nobita");
+                  setGameState({ partnerName: "Nobita" });
                   setShowInviteModal(false);
                 }}
               >
@@ -209,8 +211,8 @@ export default function WaitingPage() {
                   })
                 }
               >
-                <option value="player1">Player 1</option>
-                <option value="player2">Player 2</option>
+                <option value="player1">{playerName}</option>
+                <option value="player2">{partnerName}</option>
               </select>
             </div>
 
@@ -221,7 +223,9 @@ export default function WaitingPage() {
                 onClick={() => {
                   setGameState(gameSettings);
                   setShowSetupModal(false);
-                  createMatch();
+                  if (auth?.token) {
+                    createMatch();
+                  }
                 }}
               >
                 Save

@@ -4,18 +4,18 @@ import { useGame } from "../../context/GameContext";
 import "./index.scss";
 
 const GamePlay: React.FC = () => {
-  const { gameType, firstTurn, timeLimit } = useGame();
-
-  const [player1Score, setPlayer1Score] = useState(0);
-  const [player2Score, setPlayer2Score] = useState(0);
+  const { gameType, firstTurn, timeLimit, playerName, partnerName } = useGame();
   const [currentPlayer, setCurrentPlayer] = useState(
     firstTurn === "player1" ? 1 : 2
   );
   const [timer, setTimer] = useState(timeLimit);
-  const [balls, setBalls] = useState<number[]>([
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-  ]);
   const [paused, setPaused] = useState(false);
+  const [winner, setWinner] = useState<string | null>(null);
+  const [balls, setBalls] = useState<number[]>(
+    gameType === "8-ball"
+      ? [1, 2, 3, 4, 5, 6, 7, 8]
+      : [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  );
   const [history, setHistory] = useState<{ player: 1 | 2; ball: number }[]>([]);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const GamePlay: React.FC = () => {
   }, [timeLimit]);
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || winner) return;
     const countdown = setInterval(() => {
       setTimer((prev) => {
         if (prev > 0) return prev - 1;
@@ -41,18 +41,22 @@ const GamePlay: React.FC = () => {
       });
     }, 1000);
     return () => clearInterval(countdown);
-  }, [paused, currentPlayer, handleEndTurn]);
+  }, [paused, currentPlayer, handleEndTurn, winner]);
 
   const handleBallClick = (ball: number) => {
-    if (balls.includes(ball)) {
-      setBalls((prevBalls) => prevBalls.filter((b) => b !== ball));
-      setHistory((prev) => [...prev, { player: currentPlayer as 1 | 2, ball }]);
+    if (!balls.includes(ball) || winner) return;
 
-      if (currentPlayer === 1) {
-        setPlayer1Score((prev) => prev + ball);
-      } else {
-        setPlayer2Score((prev) => prev + ball);
-      }
+    setBalls((prevBalls) => prevBalls.filter((b) => b !== ball));
+    setHistory((prev) => [...prev, { player: currentPlayer as 1 | 2, ball }]);
+
+    // Luật Bida 8: Đánh bi 8 hợp lệ cuối cùng thì thắng
+    if (gameType === "8-ball" && ball === 8 && balls.length === 1) {
+      setWinner(`🎉 ${currentPlayer === 1 ? playerName : playerName} Wins!`);
+    }
+
+    // Luật Bida 9: Đánh bi 9 hợp lệ thì thắng
+    if (gameType === "9-ball" && ball === 9) {
+      setWinner(`🎉 ${currentPlayer === 1 ? playerName : playerName} Wins!`);
     }
   };
 
@@ -63,12 +67,6 @@ const GamePlay: React.FC = () => {
         setBalls((prevBalls) =>
           [...prevBalls, lastMove.ball].sort((a, b) => a - b)
         );
-
-        if (lastMove.player === 1) {
-          setPlayer1Score((prev) => prev - lastMove.ball);
-        } else {
-          setPlayer2Score((prev) => prev - lastMove.ball);
-        }
       }
     }
   };
@@ -77,19 +75,16 @@ const GamePlay: React.FC = () => {
     setPaused((prev) => !prev);
   };
 
-  useEffect(() => {
-    if (balls.length === 0) {
-      setTimeout(() => {
-        const winner =
-          player1Score > player2Score
-            ? "Player 1 Wins!"
-            : player2Score > player1Score
-            ? "Player 2 Wins!"
-            : "It's a Draw!";
-        alert(winner);
-      }, 500);
-    }
-  }, [balls, player1Score, player2Score]);
+  const handleRestart = () => {
+    setBalls(
+      gameType === "8-ball"
+        ? [1, 2, 3, 4, 5, 6, 7, 8]
+        : [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    );
+    setWinner(null);
+    setTimer(timeLimit);
+    setHistory([]);
+  };
 
   return (
     <div className="flex items-center justify-center h-screen bg-green-950">
@@ -113,8 +108,7 @@ const GamePlay: React.FC = () => {
               alt="P1"
             />
             <div className="player-info">
-              <p>Player 1</p>
-              <p className="score">{player1Score}</p>
+              <p>{playerName}</p>
             </div>
           </div>
 
@@ -130,8 +124,7 @@ const GamePlay: React.FC = () => {
               alt="P2"
             />
             <div className="player-info">
-              <p>Player 2</p>
-              <p className="score">{player2Score}</p>
+              <p>{partnerName}</p>
             </div>
           </div>
         </div>
@@ -149,13 +142,11 @@ const GamePlay: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-8 gap-3 p-4 rounded-lg mt-4">
-          {Array.from({ length: 15 }, (_, i) => i + 1).map((num) => (
+          {balls.map((num) => (
             <button
               key={num}
               onClick={() => handleBallClick(num)}
-              className={`billiard-ball cursor-pointer ${
-                !balls.includes(num) ? "opacity-20" : ""
-              }`}
+              className="billiard-ball cursor-pointer"
               data-pool={num}
             ></button>
           ))}
@@ -163,21 +154,28 @@ const GamePlay: React.FC = () => {
 
         <div className="flex justify-center mt-4">
           <button
-            onClick={() =>
-              alert(
-                player1Score > player2Score
-                  ? "Player 1 Wins!"
-                  : player2Score > player1Score
-                  ? "Player 2 Wins!"
-                  : "It's a Draw!"
-              )
-            }
+            onClick={() => setWinner("Game Over!")}
             className="control-button"
           >
             🚩 End Game
           </button>
         </div>
       </div>
+
+      {/* Modal thông báo thắng */}
+      {winner && (
+        <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] flex justify-center items-center z-10">
+          <div className="bg-[rgba(255,255,255,0.5)] backdrop-blur-sm shadow-2xl w-50 h-50 p-6 rounded-lg text-center">
+            <h2 className="text-xl text-white font-bold mb-3">{winner}</h2>
+            <button
+              onClick={handleRestart}
+              className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-700 transition"
+            >
+              Chơi lại
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
