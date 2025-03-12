@@ -32,6 +32,7 @@ export default function WaitingPage() {
   const navigate = useNavigate();
   const { setGameState } = useGame();
   const { tableId } = useParams();
+  console.log("tableId", tableId);
   const [tableData, setTableData] = useState<any>(null);
   // Host luôn là người vào trước
   const [showInviteModal, setShowInviteModal] = useState(false);
