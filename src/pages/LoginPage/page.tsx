@@ -4,27 +4,28 @@ import { useNavigate } from "react-router-dom";
 import { Form } from "antd";
 import { login } from "../../services/auth/authService";
 import { toast } from "react-toastify";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
   const [form] = Form.useForm();
-  const [loginStatus, setLoginStatus] = useState(false);
   const fetchData = async (email: string, password: string) => {
     try {
       const res = await login(email, password);
       const data = res.data.data;
+      // Set token to cookie
       document.cookie = `token=${res.data.accessToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
       document.cookie = `refreshToken=${res.data.refreshToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
       localStorage.setItem("token", data.access_token);
-      setLoginStatus(true);
       auth?.login(data.access_token, data.user);
+      // Decode JWT
+      const base64Url = data.access_token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const payload = JSON.parse(window.atob(base64));
+      localStorage.setItem("role", payload.role);
       toast.success("Login successfully");
-      setTimeout(() => {
-        navigate("/HomePage");
-      }, 1000);
     } catch (error: any) {
       console.log(error);
       toast.error(`Login failed: ${error.response.statusText}`);
@@ -39,9 +40,6 @@ export default function Login() {
 
   const onFinish = async (values: any) => {
     await fetchData(values.email, values.password);
-    if (loginStatus) {
-      navigate("/HomePage");
-    }
   };
 
   return (

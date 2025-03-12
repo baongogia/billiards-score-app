@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import GuestCard from "./GuestCard.tsx";
 import "./index.scss";
 import "./animation.ts";
 import { start } from "./animation.ts";
-import gsap from "gsap";
 
 export default function LandingPage() {
   // Prevent scrolling
@@ -14,22 +13,27 @@ export default function LandingPage() {
       document.body.style.overflow = "auto";
     };
   }, []);
-  // Auto reload gsap
+  // Start animation
+  const animationStarted = useRef(false);
   const location = useLocation();
-  const resetAnimation = () => {
-    gsap.killTweensOf("*");
-    console.log("GSAP animations reset!");
-  };
-  useEffect(() => {
-    if (location.pathname === "/") {
-      resetAnimation();
-      start();
-    }
-    return () => {
-      resetAnimation();
-    };
-  }, [location.pathname]);
 
+  useEffect(() => {
+    if (location.pathname === "/" && !animationStarted.current) {
+      const waitForDemo = setInterval(() => {
+        const demoElement = document.getElementById("demo");
+        if (demoElement) {
+          clearInterval(waitForDemo);
+          console.log("Found #demo, starting animation...");
+          start();
+          animationStarted.current = true; // Đánh dấu đã chạy
+        }
+      }, 300);
+
+      return () => {
+        clearInterval(waitForDemo);
+      };
+    }
+  }, [location.pathname]);
   // Navigate to login page
   const navigate = useNavigate();
   const [overLayer, setOverLayer] = useState(false);

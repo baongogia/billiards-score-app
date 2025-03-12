@@ -427,18 +427,18 @@ async function loadImages() {
 // Start
 async function start() {
   try {
-    await loadImages(); // Đợi ảnh load xong trước khi tiếp tục
-
+    await loadImages();
     setTimeout(() => {
       const demoElement = document.getElementById("demo");
       if (!demoElement) {
         console.error("Element with ID 'demo' not found!");
         return;
+      } else {
+        demoElement.innerHTML = cards + cardContents;
+        demoElement.style.opacity = "1";
+        init();
+        loop();
       }
-      demoElement.innerHTML = cards + cardContents;
-      demoElement.style.opacity = "1";
-      init();
-      loop();
     }, 500);
   } catch (error) {
     console.error("One or more images failed to load", error);

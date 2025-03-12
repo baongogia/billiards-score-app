@@ -1,19 +1,39 @@
 import "./index.scss";
 import { useNavigate } from "react-router-dom";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 const HomePage = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
-  console.log(auth);
-
+  // Kiểm tra xem người dùng đã đăng nhập chưa
   if (!auth?.token) {
     navigate("/");
   } else {
     console.log("User authenticated");
   }
+  // Profile image
+  const [profileImage, setProfileImage] = useState<string>(
+    localStorage.getItem("profileImage") ||
+      "https://images.pexels.com/photos/6253978/pexels-photo-6253978.jpeg?auto=compress&cs=tinysrgb&w=800"
+  );
 
+  // Theo dõi khi ảnh thay đổi trong LocalStorage
+  useEffect(() => {
+    const updateProfileImage = () => {
+      setProfileImage(
+        localStorage.getItem("profileImage") || "default-avatar.png"
+      );
+    };
+
+    // Lắng nghe sự kiện storage khi localStorage thay đổi
+    window.addEventListener("storage", updateProfileImage);
+
+    return () => {
+      window.removeEventListener("storage", updateProfileImage);
+    };
+  }, []);
+  // Xử lý khi người dùng đăng nhập
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const userString = params.get("user");
@@ -46,7 +66,7 @@ const HomePage = () => {
               </a>
             </li>
             <li>
-              <a className="header-menu-tab" href="#2">
+              <a className="header-menu-tab" href="/UserProfile">
                 <span className="icon fontawesome-user scnd-font-color"></span>
                 Account
               </a>
@@ -76,13 +96,9 @@ const HomePage = () => {
             </p>
             <div
               onClick={auth?.logout}
-              className="profile-picture small-profile-picture cursor-pointer"
-            >
-              <img
-                width="40px"
-                src="https://images.pexels.com/photos/6254191/pexels-photo-6254191.jpeg?auto=compress&cs=tinysrgb&w=800"
-              />
-            </div>
+              className="profile-picture small-profile-picture cursor-pointer bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${profileImage})` }}
+            ></div>
           </div>
         </header>
         <div className="main-container flex">
@@ -110,7 +126,7 @@ const HomePage = () => {
                   </a>
                 </li>
                 <li>
-                  <a className="menu-box-tab" href="#12">
+                  <a className="menu-box-tab" href="/UserProfile">
                     <span className="icon entypo-cog scnd-font-color"></span>
                     Account Settings
                   </a>
@@ -123,6 +139,7 @@ const HomePage = () => {
                 </li>
               </ul>
             </div>
+            {/* Donut chart */}
             <div className="donut-chart-block block">
               <h2 className="titular">GAME STATS</h2>
               <div className="donut-chart">
@@ -164,13 +181,14 @@ const HomePage = () => {
                   </p>
                 </li>
                 <li>
-                  <p className="win os scnd-font-color">Win AI</p>
+                  <p className="win os scnd-font-color">Win Rate</p>
                   <p className="os-percentage">
                     32<sup>%</sup>
                   </p>
                 </li>
               </ul>
             </div>
+            {/* Line chart */}
             <div className="line-chart-block block clear">
               <div className="line-chart">
                 <div className="grafico">

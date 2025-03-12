@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import BidaTable from "../../components/BidaTable/page";
+import "./index.scss";
 
 const GamePlay: React.FC = () => {
+  // Trạng thái game
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
   const [currentPlayer, setCurrentPlayer] = useState<1 | 2>(1);
@@ -9,7 +11,10 @@ const GamePlay: React.FC = () => {
   const [balls, setBalls] = useState<number[]>([
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
   ]);
+  const [paused, setPaused] = useState(false);
+  const [history, setHistory] = useState<{ player: 1 | 2; ball: number }[]>([]);
 
+  // Ngăn cuộn trang
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -17,20 +22,49 @@ const GamePlay: React.FC = () => {
     };
   }, []);
 
+  // Đếm ngược thời gian
   useEffect(() => {
+    if (paused) return;
     const countdown = setInterval(() => {
-      setTimer((prev) => (prev > 0 ? prev - 1 : 0));
+      setTimer((prev) => {
+        if (prev > 0) return prev - 1;
+        clearInterval(countdown);
+        handleEndTurn(); // Hết giờ => chuyển lượt
+        return 0;
+      });
     }, 1000);
     return () => clearInterval(countdown);
-  }, []);
+  }, [paused]);
 
-  // Xử lý khi người chơi bấm vào bi (bi vào lỗ)
+  // Xử lý khi bi vào lỗ
   const handleBallClick = (ball: number) => {
-    setBalls((prevBalls) => prevBalls.filter((b) => b !== ball));
-    if (currentPlayer === 1) {
-      setPlayer1Score((prev) => prev + ball);
-    } else {
-      setPlayer2Score((prev) => prev + ball);
+    if (balls.includes(ball)) {
+      setBalls((prevBalls) => prevBalls.filter((b) => b !== ball));
+      setHistory((prev) => [...prev, { player: currentPlayer, ball }]);
+
+      if (currentPlayer === 1) {
+        setPlayer1Score((prev) => prev + ball);
+      } else {
+        setPlayer2Score((prev) => prev + ball);
+      }
+    }
+  };
+
+  // Hoàn tác nước đi gần nhất
+  const handleUndo = () => {
+    if (history.length > 0) {
+      const lastMove = history.pop();
+      if (lastMove) {
+        setBalls((prevBalls) =>
+          [...prevBalls, lastMove.ball].sort((a, b) => a - b)
+        );
+
+        if (lastMove.player === 1) {
+          setPlayer1Score((prev) => prev - lastMove.ball);
+        } else {
+          setPlayer2Score((prev) => prev - lastMove.ball);
+        }
+      }
     }
   };
 
@@ -40,46 +74,56 @@ const GamePlay: React.FC = () => {
     setTimer(300);
   };
 
+  // Dừng / tiếp tục game
+  const handlePause = () => {
+    setPaused((prev) => !prev);
+  };
+
+  // Xác định người chiến thắng
+  useEffect(() => {
+    if (balls.length === 0) {
+      setTimeout(() => {
+        const winner =
+          player1Score > player2Score
+            ? "Player 1 Wins!"
+            : player2Score > player1Score
+            ? "Player 2 Wins!"
+            : "It's a Draw!";
+        alert(winner);
+      }, 500);
+    }
+  }, [balls, player1Score, player2Score]);
+
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-900">
-      <div className="absolute top-14">
+    <div className="flex items-center justify-center h-screen">
+      <div className="absolute">
         <BidaTable />
       </div>
-      <div className="z-10 w-[600px] bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+
+      <div className="z-10 scale-200 w-[600px] p-6 rounded-xl">
         {/* Player Info */}
         <div className="flex justify-between items-center">
-          <div
-            className={`flex items-center space-x-2 p-2 rounded-lg ${
-              currentPlayer === 1 ? "bg-blue-600" : "bg-gray-700"
-            }`}
-          >
+          {/* Player 1 */}
+          <div className={`player-card ${currentPlayer === 1 ? "active" : ""}`}>
             <img
-              src="/player1.jpg"
-              className="w-10 h-10 rounded-full"
+              src="https://images.pexels.com/photos/6253978/pexels-photo-6253978.jpeg?auto=compress&cs=tinysrgb&w=800"
               alt="P1"
             />
-            <div>
-              <p className="text-white font-bold">Player 1</p>
-              <p className="text-white text-xl">{player1Score}</p>
+            <div className="player-info">
+              <p>Player 1</p>
+              <p className="score">{player1Score}</p>
             </div>
           </div>
-
-          <div className="text-yellow-500 text-3xl font-bold bg-black px-4 py-1 rounded-md">
-            {timer}s
-          </div>
-
-          <div
-            className={`flex items-center space-x-2 p-2 rounded-lg ${
-              currentPlayer === 2 ? "bg-blue-600" : "bg-gray-700"
-            }`}
-          >
-            <div>
-              <p className="text-white font-bold">Player 2</p>
-              <p className="text-white text-xl">{player2Score}</p>
+          {/* Time */}
+          <div className="timer">{timer}s</div>
+          {/* Player 2 */}
+          <div className={`player-card ${currentPlayer === 2 ? "active" : ""}`}>
+            <div className="player-info mr-2">
+              <p>Player 2</p>
+              <p className="score">{player2Score}</p>
             </div>
             <img
-              src="/player2.jpg"
-              className="w-10 h-10 rounded-full"
+              src="https://images.pexels.com/photos/6253978/pexels-photo-6253978.jpeg?auto=compress&cs=tinysrgb&w=800"
               alt="P2"
             />
           </div>
@@ -87,41 +131,45 @@ const GamePlay: React.FC = () => {
 
         {/* Control Buttons */}
         <div className="flex justify-center mt-4 space-x-3">
-          <button className="px-4 py-2 bg-gray-700 text-white rounded-lg">
-            ⟲ Undo
+          <button onClick={handleUndo} className="control-button">
+            Undo
           </button>
-          <button className="px-4 py-2 bg-gray-700 text-white rounded-lg">
-            ⏸ Pause
+          <button onClick={handlePause} className="control-button">
+            {paused ? "Resume" : "Pause"}
           </button>
-          <button
-            onClick={handleEndTurn}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg"
-          >
-            ⏭ End Turn
-          </button>
-          <button className="px-4 py-2 bg-gray-700 text-white rounded-lg">
-            ⚠ Foul
+          <button onClick={handleEndTurn} className="control-button">
+            End Turn
           </button>
         </div>
 
         {/* Balls State */}
-        <div className="grid grid-cols-8 gap-3 bg-gray-700 p-4 rounded-lg mt-4">
+        <div className="grid grid-cols-8 gap-3 p-4 rounded-lg mt-4">
           {Array.from({ length: 15 }, (_, i) => i + 1).map((num) => (
             <button
               key={num}
               onClick={() => handleBallClick(num)}
-              className={`w-10 h-10 text-white rounded-full text-lg font-bold ${
-                balls.includes(num) ? "bg-blue-500" : "bg-gray-500 opacity-50"
+              className={`billiard-ball cursor-pointer ${
+                !balls.includes(num) ? "hidden" : ""
               }`}
-            >
-              {num}
-            </button>
+              data-pool={num}
+            ></button>
           ))}
         </div>
 
         {/* End Game Button */}
         <div className="flex justify-center mt-4">
-          <button className="px-6 py-2 bg-red-600 text-white font-bold rounded-lg">
+          <button
+            onClick={() => {
+              const winner =
+                player1Score > player2Score
+                  ? "Player 1 Wins!"
+                  : player2Score > player1Score
+                  ? "Player 2 Wins!"
+                  : "It's a Draw!";
+              alert(winner);
+            }}
+            className="control-button"
+          >
             🚩 End Game
           </button>
         </div>

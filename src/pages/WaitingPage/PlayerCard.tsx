@@ -1,7 +1,8 @@
 interface PlayerCardProps {
   className?: string;
+  name: string;
 }
-export default function PlayerCard({ className }: PlayerCardProps) {
+export default function PlayerCard({ className, name }: PlayerCardProps) {
   return (
     <div
       style={{
@@ -21,7 +22,7 @@ export default function PlayerCard({ className }: PlayerCardProps) {
       >
         {/* Name Tag */}
         <div className="absolute bottom-0 w-full h-14 bg-[rgba(255,255,255,0.15)] backdrop-blur-md rounded-b-xl flex justify-center items-center uppercase text-white font-bold text-lg shadow-md">
-          <div className="">Doraemon</div>
+          <div className="">{name}</div>
         </div>
 
         {/* Badge */}

@@ -6,7 +6,7 @@ export default function GuestCard() {
   const navigate = useNavigate();
   return (
     <div className="flex flex-col items-center">
-      <div className="relative w-64 h-40 perspective-1000">
+      <div className="relative w-64 h-80 perspective-1000">
         <div
           className={`w-full h-full relative transition-transform duration-500 transform ${
             isFlipped ? "rotate-y-180" : ""
@@ -18,8 +18,15 @@ export default function GuestCard() {
             {/* Card */}
             <div className={`${isFlipped ? "-rotate-y-180 " : ""}`}>
               {isFlipped ? (
-                <div className="flex flex-col gap-1">
-                  <div className={``}>Select yout game</div>
+                <div className="flex flex-col justify-center gap-1">
+                  <div className="w-full flex justify-center items-center">
+                    <img
+                      src="https://aobidathietke.com/wp-content/uploads/2023/04/Mau-Logo-Bida-Thiet-Ke-Dep-Danh-Cho-doi-Cau-Lac-Bo-Club-Quan-Billiards-2-400x400.png"
+                      alt=""
+                      className="h-39 scale-130 w-40"
+                    />
+                  </div>
+                  <div className={`uppercase font-bold`}>Select yout game</div>
                   <div className="flex flex-col gap-2">
                     <div className="flex gap-2">
                       <div
@@ -56,7 +63,14 @@ export default function GuestCard() {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col justify-center gap-4">
+                  <div className="w-full flex justify-center items-center">
+                    <img
+                      src="https://aobidathietke.com/wp-content/uploads/2023/04/Mau-Logo-Bida-Thiet-Ke-Dep-Danh-Cho-doi-Cau-Lac-Bo-Club-Quan-Billiards-2-400x400.png"
+                      alt=""
+                      className=" scale-150 h-37"
+                    />
+                  </div>
                   <div className="text-center font-bold">
                     Welcome to Billiards
                   </div>
