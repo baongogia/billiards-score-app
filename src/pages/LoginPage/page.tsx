@@ -12,6 +12,7 @@ export default function Login() {
   const auth = useContext(AuthContext);
   const [form] = Form.useForm();
   const [loginStatus, setLoginStatus] = useState(false);
+
   const fetchData = async (email: string, password: string) => {
     try {
       const res = await login(email, password);
@@ -23,7 +24,7 @@ export default function Login() {
       auth?.login(data.access_token, data.user);
       toast.success("Login successfully");
       setTimeout(() => {
-        navigate("/HomePage");
+        navigate("/admin");
       }, 1000);
     } catch (error: any) {
       console.log(error);
@@ -40,7 +41,7 @@ export default function Login() {
   const onFinish = async (values: any) => {
     await fetchData(values.email, values.password);
     if (loginStatus) {
-      navigate("/HomePage");
+      navigate("/admin");
     }
   };
 

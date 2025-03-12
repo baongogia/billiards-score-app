@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
-import { fetchMatches, MatchData } from "../../../services/Manager/Matches/matchesService";
+import { fetchMatches, MatchData } from "../../../services/Admin/Matches/matchesService";
 
 export default function MatchHistory() {
   const [matches, setMatches] = useState<MatchData[]>([]);

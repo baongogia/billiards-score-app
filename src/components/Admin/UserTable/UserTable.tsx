@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
-import { fetchUsers, fetchManagersWithoutStore, fetchUserProfile, deleteUser, User } from "../../../services/Admin/User/userService";
+import { fetchUsers, fetchManagersWithoutStore, fetchUserProfile, deleteUser, fetchInactiveUsers, User } from "../../../services/Admin/User/userService";
 
 export default function UserTable() {
   const [users, setUsers] = useState<User[]>([]);
@@ -19,6 +19,8 @@ export default function UserTable() {
       try {
         const activeUsers = await fetchUsers();
         console.log("Active Users:", activeUsers); // Log active users to verify filtering
+        console.log("Raw API Response:", activeUsers); // Log dữ liệu thô
+        console.log("Total Users Returned:", activeUsers.length); // Log số lượng
         setUsers(activeUsers); // Filter users with role "manager" or "admin" and status "active"
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -39,6 +41,16 @@ export default function UserTable() {
     }
   };
 
+  const loadInactiveUsers = async () => {
+    try {
+      const inactiveUsers = await fetchInactiveUsers();
+      console.log("Inactive Users:", inactiveUsers);
+      setUsers(inactiveUsers);
+    } catch (error) {
+      console.error("Error fetching inactive users:", error);
+    }
+  };
+
   const filteredUsers = Array.isArray(users) ? users.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -54,7 +66,7 @@ export default function UserTable() {
     try {
       const userProfile = await fetchUserProfile(id);
       console.log("User Profile:", userProfile);
-      navigate(`/profile/${id}`);
+      navigate(`/admin/user/${id}`);
     } catch (error) {
       console.error("Error fetching user profile:", error);
     }
@@ -100,7 +112,7 @@ export default function UserTable() {
           </div>
 
           <button
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/admin/register")}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="h-5 w-5" />
@@ -111,6 +123,12 @@ export default function UserTable() {
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
             <span>Find Managers Without Store</span>
+          </button>
+          <button
+            onClick={loadInactiveUsers}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            <span>Find Inactive Users</span>
           </button>
         </div>
       </div>

@@ -75,6 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
+    console.log("Logout successfully");
   };
 
   const setAuthState = (state: {

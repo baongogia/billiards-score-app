@@ -1,12 +1,12 @@
 import React from "react";
-import ManagerLayout from "../ManagerLayout";
+import AdminLayout from "../AdminLayout";
 import TableList from "../../../components/Admin/TablesList/TablesList";
 
 const TablePage = () => {
   return (
-    <ManagerLayout>
+    <AdminLayout>
       <TableList />
-    </ManagerLayout>
+    </AdminLayout>
   );
 };
 
