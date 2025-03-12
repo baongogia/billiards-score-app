@@ -428,22 +428,16 @@ async function loadImages() {
 async function start() {
   try {
     await loadImages();
-    setTimeout(() => {
-      const demoElement = document.getElementById("demo");
-      if (!demoElement) {
-        console.error("Element with ID 'demo' not found!");
-        return;
-      } else {
-        demoElement.innerHTML = cards + cardContents;
-        demoElement.style.opacity = "1";
-        init();
-        loop();
-      }
-    }, 500);
+    const demoElement = document.getElementById("demo");
+    if (demoElement) {
+      demoElement.innerHTML = cards + cardContents;
+      demoElement.style.opacity = "1";
+    }
+    init();
+    loop();
   } catch (error) {
     console.error("One or more images failed to load", error);
   }
 }
-// Event Listeners: Đảm bảo chỉ gọi `start()` khi DOM sẵn sàng
-document.addEventListener("DOMContentLoaded", start);
+
 export { start };

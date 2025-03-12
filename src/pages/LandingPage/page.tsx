@@ -6,6 +6,9 @@ import "./animation.ts";
 import { start } from "./animation.ts";
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+  const [overLayer, setOverLayer] = useState(false);
+
   // Prevent scrolling
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -17,32 +20,18 @@ export default function LandingPage() {
   const animationStarted = useRef(false);
   const location = useLocation();
 
+  // Start animation when the page is loaded
   useEffect(() => {
     if (location.pathname === "/" && !animationStarted.current) {
-      const waitForDemo = setInterval(() => {
-        const demoElement = document.getElementById("demo");
-        if (demoElement) {
-          clearInterval(waitForDemo);
-          console.log("Found #demo, starting animation...");
-          start();
-          animationStarted.current = true; // Đánh dấu đã chạy
-        }
-      }, 300);
-
-      return () => {
-        clearInterval(waitForDemo);
-      };
+      const demoElement = document.getElementById("demo");
+      if (demoElement) {
+        console.log("Found #demo, starting animation...");
+        start();
+        animationStarted.current = true;
+      }
     }
   }, [location.pathname]);
-  // Navigate to login page
-  const navigate = useNavigate();
-  const [overLayer, setOverLayer] = useState(false);
-  // Handle login
-  const handleLogin = () => {
-    setTimeout(() => {
-      navigate("/login");
-    }, 1000);
-  };
+
   return (
     <div className="">
       <div className="indicator"></div>
@@ -91,7 +80,7 @@ export default function LandingPage() {
           <div
             className="w-full h-full bg-[rgba(0,0,0,0.2)] text-white flex justify-center items-center
                              font-bold hover:bg-white hover:text-black transition duration-300 cursor-pointer"
-            onClick={handleLogin}
+            onClick={() => navigate("/login")}
           >
             LOGIN
           </div>

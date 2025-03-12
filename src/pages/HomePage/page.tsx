@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+
 const HomePage = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);

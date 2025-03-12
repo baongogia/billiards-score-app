@@ -16,15 +16,21 @@ export default function Login() {
       const res = await login(email, password);
       const data = res.data.data;
       // Set token to cookie
-      document.cookie = `token=${res.data.accessToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
-      document.cookie = `refreshToken=${res.data.refreshToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
       localStorage.setItem("token", data.access_token);
       auth?.login(data.access_token, data.user);
       // Decode JWT
       const base64Url = data.access_token.split(".")[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       const payload = JSON.parse(window.atob(base64));
-      localStorage.setItem("role", payload.role);
+      const role = payload.role;
+      localStorage.setItem("role", role);
+      if (role === "admin") {
+        navigate("/admin", { replace: true });
+      } else if (role === "manager") {
+        navigate("/manager", { replace: true });
+      } else {
+        navigate("/HomePage", { replace: true });
+      }
       toast.success("Login successfully");
     } catch (error: any) {
       console.log(error);
@@ -33,10 +39,19 @@ export default function Login() {
   };
 
   useEffect(() => {
-    if (auth?.isAuthenticated) {
-      navigate("/admin", { replace: true });
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    if (token && role) {
+      if (role === "admin") {
+        navigate("/admin", { replace: true });
+      } else if (role === "manager") {
+        navigate("/manager", { replace: true });
+      } else {
+        navigate("/home", { replace: true });
+      }
     }
-  }, [auth?.isAuthenticated, navigate]);
+  }, [navigate]);
 
   const onFinish = async (values: any) => {
     await fetchData(values.email, values.password);
