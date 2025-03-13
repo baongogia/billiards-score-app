@@ -9,10 +9,11 @@ interface EditMatchModalProps {
 }
 
 const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, matchId, onClose, onSave }) => {
-  if (!isOpen) return null;
-
   const [selectedMatch, setSelectedMatch] = React.useState<MatchData | null>(null);
+
   useEffect(() => {
+    if (!isOpen) return;
+
     const loadMatch = async () => {
       try {
         const res = await fetchMatchById(matchId);
@@ -23,7 +24,9 @@ const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, matchId, onClos
     };
 
     loadMatch();
-  }, [matchId]);
+  }, [matchId, isOpen]);
+
+  if (!isOpen) return null;
 
   console.log(selectedMatch?.status);
 
