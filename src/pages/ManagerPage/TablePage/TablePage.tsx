@@ -1,4 +1,3 @@
-import React from "react";
 import ManagerLayout from "../ManagerLayout";
 import TableList from "../../../components/Admin/TablesList/TablesList";
 

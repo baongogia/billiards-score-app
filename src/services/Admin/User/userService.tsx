@@ -16,7 +16,11 @@ export const fetchUsers = async (): Promise<User[]> => {
     const response = await api.get("v1/users/find");
     console.log("API Response:", response.data.data); // Log để kiểm tra
     const data = response.data as { data: User[] };
-    return data.data.filter(user => (user.role === "manager" || user.role === "admin") && user.status === "active");
+    return data.data.filter(
+      (user) =>
+        (user.role === "manager" || user.role === "admin") &&
+        user.status === "active"
+    );
   } catch (error) {
     console.error("Error fetching users:", error);
     throw error;
@@ -27,7 +31,9 @@ export const fetchMember = async (): Promise<User[]> => {
   try {
     const response = await api.get("v1/users/find");
     const data = response.data as { data: User[] };
-    return data.data.filter(user => user.role === "user" && user.status === "active");
+    return data.data.filter(
+      (user) => user.role === "user" && user.status === "active"
+    );
   } catch (error) {
     console.error("Error fetching users:", error);
     throw error;
@@ -38,7 +44,9 @@ export const fetchManagersWithoutStore = async (): Promise<User[]> => {
   try {
     const response = await api.get("v1/stores/manager/withoutStore");
     const data = response.data as { data: User[] };
-    return data.data.filter(user => user.role === "manager" && user.status === "active");
+    return data.data.filter(
+      (user) => user.role === "manager" && user.status === "active"
+    );
   } catch (error) {
     console.error("Error fetching managers without store:", error);
     throw error;

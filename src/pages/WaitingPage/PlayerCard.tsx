@@ -1,5 +1,6 @@
 interface PlayerCardProps {
-  className?: string;
+  className: string;
+  name: string;
 }
 export default function PlayerCard({ className }: PlayerCardProps) {
   return (

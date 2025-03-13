@@ -9,7 +9,11 @@ interface ViewMatchModalProps {
   match: MatchData | null;
 }
 
-const ViewMatchModal: React.FC<ViewMatchModalProps> = ({ isOpen, onClose, match }) => {
+const ViewMatchModal: React.FC<ViewMatchModalProps> = ({
+  isOpen,
+  onClose,
+  match,
+}) => {
   if (!isOpen || !match) return null;
 
   return (
@@ -39,30 +43,36 @@ const ViewMatchModal: React.FC<ViewMatchModalProps> = ({ isOpen, onClose, match 
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
+                <Dialog.Title
+                  as="h3"
+                  className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200"
+                >
                   Match Details
                 </Dialog.Title>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    <strong>ID:</strong> {match.match._id}
+                    <strong>ID:</strong> {match._id}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    <strong>Mode Game:</strong> {match.match.mode_game}
+                    <strong>Mode Game:</strong> {match.mode_game}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    <strong>Pool Table:</strong> {match.match.pooltable}
+                    <strong>Pool Table:</strong> {match.pooltable}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    <strong>Status:</strong> {match.match.status}
+                    <strong>Status:</strong> {match.status}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    <strong>Created At:</strong> {new Date(match.match.createdAt).toLocaleDateString()}
+                    <strong>Created At:</strong>{" "}
+                    {new Date(match.createdAt).toLocaleDateString()}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    <strong>End At:</strong> {new Date(match.match.endAt).toLocaleDateString()}
+                    <strong>End At:</strong>{" "}
+                    {new Date(match.endAt).toLocaleDateString()}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    <strong>Updated At:</strong> {new Date(match.match.updatedAt).toLocaleDateString()}
+                    <strong>Updated At:</strong>{" "}
+                    {new Date(match.updatedAt).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="mt-4">

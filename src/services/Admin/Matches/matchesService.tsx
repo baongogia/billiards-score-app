@@ -30,9 +30,14 @@ export const fetchMatchById = async (id: string): Promise<MatchData> => {
   }
 };
 
-export const createMatch = async (matchData: Partial<MatchData>): Promise<MatchData> => {
+export const createMatch = async (
+  matchData: Partial<MatchData>
+): Promise<MatchData> => {
   try {
-    const response = await api.post<{ data: MatchData }>("v1/matches", matchData);
+    const response = await api.post<{ data: MatchData }>(
+      "v1/matches",
+      matchData
+    );
     return response.data.data;
   } catch (error) {
     console.error("Error creating match:", error);
@@ -40,9 +45,15 @@ export const createMatch = async (matchData: Partial<MatchData>): Promise<MatchD
   }
 };
 
-export const updateMatch = async (id: string, matchData: Partial<MatchData>): Promise<MatchData> => {
+export const updateMatch = async (
+  id: string,
+  matchData: Partial<MatchData>
+): Promise<MatchData> => {
   try {
-    const response = await api.put<{ data: MatchData }>(`v1/matches/${id}`, matchData);
+    const response = await api.put<{ data: MatchData }>(
+      `v1/matches/${id}`,
+      matchData
+    );
     return response.data.data;
   } catch (error) {
     console.error("Error updating match:", error);

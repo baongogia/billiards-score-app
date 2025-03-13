@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
-import { fetchMatches, MatchData } from "../../../services/Admin/Matches/matchesService";
+import {
+  fetchMatches,
+  MatchData,
+} from "../../../services/Admin/Matches/matchesService";
 
 export default function MatchHistory() {
   const [matches, setMatches] = useState<MatchData[]>([]);
@@ -23,7 +26,9 @@ export default function MatchHistory() {
       {/* Background image with overlay */}
       <div
         className="absolute inset-0 -z-10 bg-cover bg-center opacity-30"
-        style={{ backgroundImage: "url('/placeholder.svg?height=800&width=600')" }}
+        style={{
+          backgroundImage: "url('/placeholder.svg?height=800&width=600')",
+        }}
       />
 
       {/* Header */}
@@ -31,13 +36,17 @@ export default function MatchHistory() {
         <button className="p-2">
           <ArrowLeft size={24} />
         </button>
-        <h1 className="text-center flex-1 text-3xl font-bold tracking-wider">MATCH HISTORY</h1>
+        <h1 className="text-center flex-1 text-3xl font-bold tracking-wider">
+          MATCH HISTORY
+        </h1>
       </div>
 
       {/* Recent Games Section */}
       <div className="px-4 pb-6">
         <div className="bg-white bg-opacity-10 rounded-lg overflow-hidden">
-          <div className="bg-[#5d2e2e] py-3 px-4 text-center font-medium text-2xl">RECENT GAMES</div>
+          <div className="bg-[#5d2e2e] py-3 px-4 text-center font-medium text-2xl">
+            RECENT GAMES
+          </div>
 
           {/* Table Header */}
           <div className="grid grid-cols-5 text-lg font-medium py-2 px-3 border-b border-gray-700">
@@ -59,8 +68,12 @@ export default function MatchHistory() {
               <div className="text-center">{match.mode_game}</div>
               <div className="text-center">{match.pooltable}</div>
               <div className="text-center">{match.status}</div>
-              <div className="text-center">{new Date(match.endAt).toLocaleString()}</div>
-              <div className="text-center">{new Date(match.createdAt).toLocaleString()}</div>
+              <div className="text-center">
+                {new Date(match.endAt).toLocaleString()}
+              </div>
+              <div className="text-center">
+                {new Date(match.createdAt).toLocaleString()}
+              </div>
             </div>
           ))}
         </div>

@@ -3,7 +3,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
-import { fetchManagersWithoutStore, fetchUserProfile, deleteUser, fetchInactiveUsers, User, fetchFilteredUsers } from "../../../services/Admin/User/userService";
+import {
+  fetchManagersWithoutStore,
+  fetchUserProfile,
+  deleteUser,
+  fetchInactiveUsers,
+  User,
+  fetchFilteredUsers,
+} from "../../../services/Admin/User/userService";
 
 export default function UserTable() {
   const [users, setUsers] = useState<User[]>([]);
@@ -34,8 +41,8 @@ export default function UserTable() {
           sortBy,
           sortDirection
         );
-        setUsers(response.data); // Truy cập danh sách users từ response.data
-        setTotalItems(response.pagination.totalItem); // Truy cập tổng số items từ pagination
+        setUsers(response);
+        setTotalItems(response.length);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -49,7 +56,7 @@ export default function UserTable() {
       const managers = await fetchManagersWithoutStore();
       console.log("Managers Without Store:", managers);
       // Giả sử API trả về cấu trúc tương tự hoặc chỉ mảng
-      setManagersWithoutStore(managers.data || managers);
+      setManagersWithoutStore(managers || managers);
       setIsModalOpen(true);
     } catch (error) {
       console.error("Error fetching managers without store:", error);
@@ -61,8 +68,8 @@ export default function UserTable() {
       const inactiveUsers = await fetchInactiveUsers();
       console.log("Inactive Users:", inactiveUsers);
       // Giả sử API trả về cấu trúc tương tự hoặc chỉ mảng
-      setUsers(inactiveUsers.data || inactiveUsers);
-      setTotalItems(inactiveUsers.pagination?.totalItem || inactiveUsers.length);
+      setUsers(inactiveUsers || inactiveUsers);
+      setTotalItems(inactiveUsers.length);
     } catch (error) {
       console.error("Error fetching inactive users:", error);
     }
@@ -92,10 +99,10 @@ export default function UserTable() {
         sortBy,
         sortDirection
       );
-      setUsers(response.data);
-      setTotalItems(response.pagination.totalItem);
+      setUsers(response);
+      setTotalItems(response.length);
       // Nếu trang hiện tại không còn dữ liệu, chuyển về trang trước
-      if (response.data.length === 0 && currentPage > 1) {
+      if (response.length === 0 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
     } catch (error) {
@@ -120,7 +127,9 @@ export default function UserTable() {
     <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       {/* Header Section */}
       <div className="flex flex-col gap-4 mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">User Management</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+          User Management
+        </h2>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
@@ -197,24 +206,51 @@ export default function UserTable() {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-50 dark:bg-gray-700 border-y border-gray-200 dark:border-gray-600">
-              <th className="text-left py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">#</th>
-              <th className="text-left py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">Name</th>
-              <th className="text-left py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">Phone</th>
-              <th className="text-left py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">Email</th>
-              <th className="text-left py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">Role</th>
-              <th className="text-right py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">Actions</th>
+              <th className="text-left py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">
+                #
+              </th>
+              <th className="text-left py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">
+                Name
+              </th>
+              <th className="text-left py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">
+                Phone
+              </th>
+              <th className="text-left py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">
+                Email
+              </th>
+              <th className="text-left py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">
+                Role
+              </th>
+              <th className="text-right py-4 px-5 text-lg font-semibold text-gray-900 dark:text-gray-200">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
             {users.length > 0 ? (
               users.map((user, index) => (
-                <tr key={user._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">{(currentPage - 1) * pageSize + index + 1}</td>
-                  <td className="py-4 px-5 text-lg text-gray-900 dark:text-gray-200 font-medium">{user.name}</td>
-                  <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">{user.phone || "N/A"}</td>
-                  <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">{user.email || "N/A"}</td>
+                <tr
+                  key={user._id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">
+                    {(currentPage - 1) * pageSize + index + 1}
+                  </td>
+                  <td className="py-4 px-5 text-lg text-gray-900 dark:text-gray-200 font-medium">
+                    {user.name}
+                  </td>
+                  <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">
+                    {user.phone || "N/A"}
+                  </td>
+                  <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">
+                    {user.email || "N/A"}
+                  </td>
                   <td className="py-4 px-5">
-                    <span className={`inline-block px-3 py-2 rounded-full text-lg font-medium ${getRoleBadgeClass(user.role)}`}>
+                    <span
+                      className={`inline-block px-3 py-2 rounded-full text-lg font-medium ${getRoleBadgeClass(
+                        user.role
+                      )}`}
+                    >
                       {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                     </span>
                   </td>
@@ -236,7 +272,10 @@ export default function UserTable() {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="py-4 px-5 text-center text-lg text-gray-600 dark:text-gray-300">
+                <td
+                  colSpan={6}
+                  className="py-4 px-5 text-center text-lg text-gray-600 dark:text-gray-300"
+                >
                   No users found
                 </td>
               </tr>
@@ -257,7 +296,9 @@ export default function UserTable() {
               Previous
             </button>
             <button
-              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+              onClick={() =>
+                setCurrentPage((page) => Math.min(totalPages, page + 1))
+              }
               disabled={currentPage === totalPages}
               className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -267,9 +308,15 @@ export default function UserTable() {
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
               <p className="text-lg text-gray-700 dark:text-gray-300">
-                Showing <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span> to{" "}
-                <span className="font-medium">{Math.min(currentPage * pageSize, totalItems)}</span> of{" "}
-                <span className="font-medium">{totalItems}</span> results
+                Showing{" "}
+                <span className="font-medium">
+                  {(currentPage - 1) * pageSize + 1}
+                </span>{" "}
+                to{" "}
+                <span className="font-medium">
+                  {Math.min(currentPage * pageSize, totalItems)}
+                </span>{" "}
+                of <span className="font-medium">{totalItems}</span> results
               </p>
             </div>
             <div className="flex gap-1">
@@ -284,14 +331,19 @@ export default function UserTable() {
                 <button
                   key={i + 1}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`relative inline-flex items-center px-4 py-2 text-lg font-medium rounded-md ${currentPage === i + 1 ? "bg-blue-600 text-white" : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
-                    }`}
+                  className={`relative inline-flex items-center px-4 py-2 text-lg font-medium rounded-md ${
+                    currentPage === i + 1
+                      ? "bg-blue-600 text-white"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  }`}
                 >
                   {i + 1}
                 </button>
               ))}
               <button
-                onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                onClick={() =>
+                  setCurrentPage((page) => Math.min(totalPages, page + 1))
+                }
                 disabled={currentPage === totalPages}
                 className="relative inline-flex items-center rounded-md p-3 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -316,10 +368,19 @@ export default function UserTable() {
               {managersWithoutStore.length > 0 ? (
                 <ul className="space-y-3">
                   {managersWithoutStore.map((manager) => (
-                    <li key={manager._id} className="border p-3 rounded-lg shadow-sm">
-                      <p><strong>Name:</strong> {manager.name}</p>
-                      <p><strong>Email:</strong> {manager.email || "N/A"}</p>
-                      <p><strong>Manager ID:</strong> {manager._id}</p>
+                    <li
+                      key={manager._id}
+                      className="border p-3 rounded-lg shadow-sm"
+                    >
+                      <p>
+                        <strong>Name:</strong> {manager.name}
+                      </p>
+                      <p>
+                        <strong>Email:</strong> {manager.email || "N/A"}
+                      </p>
+                      <p>
+                        <strong>Manager ID:</strong> {manager._id}
+                      </p>
                     </li>
                   ))}
                 </ul>
