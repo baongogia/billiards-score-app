@@ -6,13 +6,13 @@ import { PoolTable } from "../../../services/Admin/Tables/poolTableService"
 interface TableModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (tableData: { 
-    status: string; 
-    tableType: { 
-      type_name: string; 
-      compatible_mode: string[] 
-    }; 
-    store: string 
+  onSubmit: (tableData: {
+    status: string;
+    tableType: {
+      type_name: string;
+      compatible_mode: string[]
+    };
+    store: string
   }) => void;
   isEditing: boolean;
   selectedTable?: {
