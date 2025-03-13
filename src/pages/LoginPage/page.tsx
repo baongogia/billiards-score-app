@@ -4,34 +4,28 @@ import { useNavigate } from "react-router-dom";
 import { Form } from "antd";
 import { login } from "../../services/auth/authService";
 import { toast } from "react-toastify";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
   const [form] = Form.useForm();
+  const [loginStatus, setLoginStatus] = useState(false);
+
   const fetchData = async (email: string, password: string) => {
     try {
       const res = await login(email, password);
       const data = res.data.data;
-      // Set token to cookie
+      document.cookie = `token=${res.data.accessToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
+      document.cookie = `refreshToken=${res.data.refreshToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
       localStorage.setItem("token", data.access_token);
+      setLoginStatus(true);
       auth?.login(data.access_token, data.user);
-      // Decode JWT
-      const base64Url = data.access_token.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const payload = JSON.parse(window.atob(base64));
-      const role = payload.role;
-      localStorage.setItem("role", role);
-      if (role === "admin") {
-        navigate("/admin", { replace: true });
-      } else if (role === "manager") {
-        navigate("/manager", { replace: true });
-      } else {
-        navigate("/HomePage", { replace: true });
-      }
       toast.success("Login successfully");
+      setTimeout(() => {
+        navigate("/admin");
+      }, 1000);
     } catch (error: any) {
       console.log(error);
       toast.error(`Login failed: ${error.response.statusText}`);
@@ -39,34 +33,25 @@ export default function Login() {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-
-    if (token && role) {
-      if (role === "admin") {
-        navigate("/admin", { replace: true });
-      } else if (role === "manager") {
-        navigate("/manager", { replace: true });
-      } else if (role === "user") {
-        navigate("/HomePage", { replace: true });
-      }
+    if (auth?.isAuthenticated) {
+      navigate("/admin", { replace: true });
     }
-  }, [navigate]);
+  }, [auth?.isAuthenticated, navigate]);
 
   const onFinish = async (values: any) => {
     await fetchData(values.email, values.password);
+    if (loginStatus) {
+      navigate("/admin");
+    }
   };
 
   return (
-    <div className="container-login ">
-      <div
-        id="login-page "
-        className="container open md:translate-x-[36vw] translate-x-3"
-      >
+    <div className="container-login">
+      <div id="login-page " className="container open translate-x-[36vw]">
         {/* Title */}
         <h1 className="bida-title">Billiards Club</h1>
         {/* Login form */}
-        <div className="form-set ">
+        <div className="form-set">
           <Form form={form} onFinish={onFinish}>
             <div className="mb-2">
               <Form.Item name="email" initialValue="" style={{ margin: 0 }}>
@@ -117,7 +102,6 @@ export default function Login() {
             Log in with Google
           </div>
         </div>
-        {/* login with */}
         <div className="login-with">
           <div className="social">
             <ul className="icons">
@@ -148,7 +132,6 @@ export default function Login() {
             </ul>
           </div>
         </div>
-        {/* Links */}
         <div className="other-links">
           <div>
             <div

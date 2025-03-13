@@ -21,6 +21,16 @@ export const fetchStores = async (): Promise<Store[]> => {
   }
 };
 
+export const fetchStoreById = async (id: string): Promise<Store> => {
+  try {
+    const response = await api.get<{ data: Store }>(`v1/stores/${id}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching store by ID:", error);
+    throw error;
+  }
+};
+
 export const deleteStore = async (storeId: string): Promise<void> => {
   try {
     await api.delete(`v1/stores/${storeId}`);
@@ -43,18 +53,40 @@ export const updateStore = async (storeId: string, newName: string): Promise<Sto
   }
 };
 
-export const searchStore = async (searchTerm: string): Promise<Store[]> => {
+export const fetchInactiveStores = async (): Promise<Store[]> => {
   try {
-    const response = await api.get<{ data: Store }>("v1/stores", {
-      params: { action: "findOne", id: searchTerm },
+    const response = await api.get<{ data: Store[] }>("v1/stores/showDeleted");
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching inactive stores:", error);
+    throw error;
+  }
+};
+
+export interface SearchStoreParams {
+  term?: string;           // Từ khóa tìm kiếm
+  isDeleted?: boolean;     // Trạng thái xóa
+  current?: number;        // Trang hiện tại
+  pageSize?: number;       // Số lượng item mỗi trang
+  sortBy?: string;         // Trường để sắp xếp
+  sortDirection?: string;  // Hướng sắp xếp (asc/desc)
+}
+
+export const searchStore = async (searchParams: Partial<SearchStoreParams> = {}): Promise<Store[]> => {
+  try {
+    // Tạo object chỉ chứa các trường có giá trị (loại bỏ undefined)
+    const filteredParams = Object.fromEntries(
+      Object.entries(searchParams).filter(([_, value]) => value !== undefined)
+    );
+
+    // Gửi request với filteredParams
+    const response = await api.get<{ data: Store[] }>("v1/stores/search", {
+      params: filteredParams,
     });
 
-    const store = response.data.data;
-    if (!store.isDeleted) {
-      return [store];
-    } else {
-      return [];
-    }
+    const stores = response.data.data;
+    // Lọc các store chưa bị xóa (nếu cần)
+    return Array.isArray(stores) ? stores.filter(store => !store.isDeleted) : [];
   } catch (error) {
     console.error("Error searching store:", error);
     throw error;
