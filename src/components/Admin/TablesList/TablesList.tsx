@@ -1,50 +1,67 @@
-import { useState, useEffect } from "react"
-import { Search, ChevronLeft, ChevronRight } from "lucide-react"
-import { fetchPoolTables, PoolTable } from "../../../services/Admin/Tables/poolTableService"
+// TablesList.tsx
+import { useState, useEffect } from "react";
+import { Search, ChevronLeft, ChevronRight, Edit, Trash2, Plus, Eye } from "lucide-react";
+import { fetchPoolTables, PoolTable, deletePoolTable } from "../../../services/Admin/Tables/poolTableService";
+import EditMatchModal from "./EditMatchModal";
+import ViewTableModal from "./ViewTableModal";
 
 export default function TablesList() {
-  const [tables, setTables] = useState<PoolTable[]>([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 5
+  const [tables, setTables] = useState<PoolTable[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false); // State cho View Modal
+  const [selectedTable, setSelectedTable] = useState<PoolTable | null>(null);
+  const itemsPerPage = 5;
 
   useEffect(() => {
-    const loadTables = async () => {
+    loadTables();
+  }, []);
+
+  const loadTables = async () => {
+    try {
+      const data = await fetchPoolTables();
+      setTables(data);
+    } catch (error) {
+      console.error("Error fetching tables:", error);
+    }
+  };
+
+  const handleDelete = async (tableId: string) => {
+    if (window.confirm("Are you sure you want to delete this table?")) {
       try {
-        const data = await fetchPoolTables()
-        setTables(data)
+        await deletePoolTable(tableId);
+        loadTables();
       } catch (error) {
-        console.error("Error fetching tables:", error)
+        console.error("Error deleting table:", error);
       }
     }
-
-    loadTables()
-  }, [])
+  };
 
   const filteredTables = tables.filter((table) => {
     const matchesSearch =
       table._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       table.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      table.tableType.type_name.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesSearch
-  })
+      table.tableType.type_name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
+  });
 
-  const totalPages = Math.ceil(filteredTables.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedTables = filteredTables.slice(startIndex, startIndex + itemsPerPage)
+  const totalPages = Math.ceil(filteredTables.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedTables = filteredTables.slice(startIndex, startIndex + itemsPerPage);
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case "available":
-        return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+        return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300";
       case "occupied":
-        return "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+        return "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300";
       case "maintenance":
-        return "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
+        return "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300";
       default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300"
+        return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300";
     }
-  }
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
@@ -64,6 +81,16 @@ export default function TablesList() {
             className="pl-10 w-full border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-gray-700 dark:text-gray-200 py-2 px-4"
           />
         </div>
+        <button
+          onClick={() => {
+            setSelectedTable(null);
+            setIsModalOpen(true);
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          <Plus className="h-5 w-5" />
+          Add New Table
+        </button>
       </div>
 
       {/* Table */}
@@ -77,6 +104,7 @@ export default function TablesList() {
               <th className="text-left py-4 px-5 text-sm font-semibold text-gray-900 dark:text-gray-200">Compatible Modes</th>
               <th className="text-left py-4 px-5 text-sm font-semibold text-gray-900 dark:text-gray-200">Created At</th>
               <th className="text-left py-4 px-5 text-sm font-semibold text-gray-900 dark:text-gray-200">QR Code</th>
+              <th className="text-left py-4 px-5 text-sm font-semibold text-gray-900 dark:text-gray-200">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
@@ -109,6 +137,37 @@ export default function TablesList() {
                       className="w-10 h-10 object-contain"
                     />
                   </a>
+                </td>
+                <td className="py-4 px-5">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setSelectedTable(table);
+                        setIsViewModalOpen(true); // Mở View Modal
+                      }}
+                      className="p-2 text-green-600 hover:bg-green-100 rounded-full"
+                      title="View"
+                    >
+                      <Eye className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedTable(table);
+                        setIsModalOpen(true);
+                      }}
+                      className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
+                      title="Edit"
+                    >
+                      <Edit className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(table._id)}
+                      className="p-2 text-red-600 hover:bg-red-100 rounded-full"
+                      title="Delete"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -157,6 +216,21 @@ export default function TablesList() {
           </div>
         </div>
       )}
+
+      {/* Edit Modal */}
+      <EditMatchModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        table={selectedTable}
+        onSuccess={loadTables}
+      />
+
+      {/* View Modal */}
+      <ViewTableModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        table={selectedTable}
+      />
     </div>
-  )
+  );
 }

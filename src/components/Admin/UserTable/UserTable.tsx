@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
-import { fetchUsers, fetchManagersWithoutStore, fetchUserProfile, deleteUser, fetchInactiveUsers, User, fetchFilteredUsers } from "../../../services/Admin/User/userService";
+import { fetchManagersWithoutStore, fetchUserProfile, deleteUser, fetchInactiveUsers, User, fetchFilteredUsers } from "../../../services/Admin/User/userService";
 
 export default function UserTable() {
   const [users, setUsers] = useState<User[]>([]);

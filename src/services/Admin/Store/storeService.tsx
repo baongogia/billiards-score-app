@@ -76,7 +76,7 @@ export const searchStore = async (searchParams: Partial<SearchStoreParams> = {})
   try {
     // Tạo object chỉ chứa các trường có giá trị (loại bỏ undefined)
     const filteredParams = Object.fromEntries(
-      Object.entries(searchParams).filter(([_, value]) => value !== undefined)
+      Object.entries(searchParams).filter(([value]) => value !== undefined)
     );
 
     // Gửi request với filteredParams

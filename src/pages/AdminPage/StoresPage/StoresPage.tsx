@@ -3,14 +3,17 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { fetchStores, deleteStore, updateStore, searchStore, fetchInactiveStores, Store } from "../../../services/Admin/Store/storeService";
 import AppLayout from "../AdminLayout";
 import StoreProfileModal from "../../../components/Admin/StoreTable/StoreProfileModal";
+import EditStoreModal from "../../../components/Admin/StoreTable/EditStoreModal";
 
 const StoreManagement: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [stores, setStores] = useState<Store[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     const loadStores = async () => {
@@ -35,12 +38,20 @@ const StoreManagement: React.FC = () => {
     }
   };
 
-  const handleUpdateStore = async (storeId: string, newName: string) => {
-    try {
-      const updatedStore = await updateStore(storeId, newName);
-      setStores(stores.map((store) => (store._id === storeId ? updatedStore : store)));
-    } catch (error) {
-      console.error("Error updating store:", error);
+  const handleUpdateStore = (store: Store) => {
+    setSelectedStore(store);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveStore = async (storeData: Partial<Store>) => {
+    if (selectedStore) {
+      try {
+        const updatedStore = await updateStore(selectedStore._id, storeData.name || selectedStore.name);
+        setStores(stores.map((store) => (store._id === selectedStore._id ? updatedStore : store)));
+        setIsEditModalOpen(false);
+      } catch (error) {
+        console.error("Error updating store:", error);
+      }
     }
   };
 
@@ -50,7 +61,7 @@ const StoreManagement: React.FC = () => {
 
   const handleViewStore = (storeId: string) => {
     setSelectedStoreId(storeId);
-    setIsModalOpen(true);
+    setIsProfileModalOpen(true);
   };
 
   const handleSearch = async () => {
@@ -143,7 +154,7 @@ const StoreManagement: React.FC = () => {
                       View Tables
                     </button>
                     <button
-                      onClick={() => handleUpdateStore(store._id, store.name)}
+                      onClick={() => handleUpdateStore(store)}
                       className="px-4 py-2 text-lg text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900 rounded-md transition-colors"
                     >
                       Update
@@ -164,8 +175,15 @@ const StoreManagement: React.FC = () => {
 
       <StoreProfileModal
         storeId={selectedStoreId}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
+
+      <EditStoreModal
+        isOpen={isEditModalOpen}
+        selectedStore={selectedStore}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSaveStore}
       />
     </AppLayout>
   );

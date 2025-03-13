@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
+import { PoolTable } from "../../../services/Admin/Tables/poolTableService"
 
 interface TableModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (tableData: { 
-    status: string; 
-    tableType: { 
-      type_name: string; 
-      compatible_mode: string[] 
-    }; 
-    store: string 
+  onSubmit: (tableData: {
+    status: string;
+    tableType: {
+      type_name: string;
+      compatible_mode: string[]
+    };
+    store: string
   }) => void;
   isEditing: boolean;
   selectedTable?: {
@@ -184,18 +185,7 @@ export function TableModal({ isOpen, onClose, onSubmit, isEditing, selectedTable
 interface SuccessModalProps {
   isOpen: boolean;
   onClose: () => void;
-  successData?: {
-    status: string;
-    tableType: {
-      type_name: string;
-      compatible_mode: string[];
-      _id: string;
-    };
-    store: string;
-    _id: string;
-    createdAt: string;
-    qrCodeImg: string;
-  };
+  successData?: PoolTable;
 }
 
 export function SuccessModal({ isOpen, onClose, successData }: SuccessModalProps) {
@@ -231,16 +221,16 @@ export function SuccessModal({ isOpen, onClose, successData }: SuccessModalProps
                 </Dialog.Title>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {successData 
+                    {successData
                       ? `Table ${successData.tableType.type_name} (ID: ${successData._id.substring(0, 8)}...) has been successfully ${successData.createdAt ? 'added' : 'updated'}.`
                       : "Operation completed successfully."}
                   </p>
                   {successData?.qrCodeImg && (
                     <div className="mt-2">
                       <p className="text-sm text-gray-500 dark:text-gray-400">QR Code:</p>
-                      <img 
-                        src={successData.qrCodeImg} 
-                        alt="QR Code" 
+                      <img
+                        src={successData.qrCodeImg}
+                        alt="QR Code"
                         className="mt-1 w-24 h-24 object-contain"
                       />
                     </div>
