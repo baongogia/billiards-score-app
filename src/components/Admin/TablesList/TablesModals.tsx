@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment } from "react"
+import { PoolTable } from "../../../services/Admin/Tables/poolTableService"
 
 interface TableModalProps {
   isOpen: boolean;
@@ -184,18 +185,7 @@ export function TableModal({ isOpen, onClose, onSubmit, isEditing, selectedTable
 interface SuccessModalProps {
   isOpen: boolean;
   onClose: () => void;
-  successData?: {
-    status: string;
-    tableType: {
-      type_name: string;
-      compatible_mode: string[];
-      _id: string;
-    };
-    store: string;
-    _id: string;
-    createdAt: string;
-    qrCodeImg: string;
-  };
+  successData?: PoolTable;
 }
 
 export function SuccessModal({ isOpen, onClose, successData }: SuccessModalProps) {

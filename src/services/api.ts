@@ -67,8 +67,8 @@ api.interceptors.request.use(
     // Thêm X-Tenant-ID
     config.headers["X-Tenant-ID"] = "ITC";
 
-    // Nếu là GET và không phải là v1/stores/search, thêm limit=1000 vào query params
-    if (config.method?.toUpperCase() === "GET" && config.url !== "v1/stores/search" && config.url !== "v1/stores/search") {
+    // Nếu là GET, thêm limit=1000 vào query params
+    if (config.method?.toUpperCase() === "GET"  && config.url !== "v1/stores/search") {
       config.params = {
         ...config.params,
         limit: 1000,

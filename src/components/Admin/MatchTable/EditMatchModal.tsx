@@ -34,9 +34,9 @@ const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, selectedMatch, 
                 className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
                 required
               >
-                <option value="Active">Active</option>
-                <option value="Pending">Pending</option>
-                <option value="Finished">Finished</option>
+                <option value="active">Active</option>
+                <option value="pending">Pending</option>
+                <option value="finished">Finished</option>
               </select>
             </div>
           </div>
