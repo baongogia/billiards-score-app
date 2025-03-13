@@ -10,13 +10,16 @@ import {
 import { Plus, Search } from "lucide-react";
 import CreateMatchModal from "./CreateMatchModal";
 import EditMatchModal from "./EditMatchModal";
+import ViewMatchModal from "./ViewMatchModal";
 
 const MatchTable: React.FC = () => {
   const [matches, setMatches] = useState<MatchData[]>([]);
   const [currentMatchId, setCurrentMatchId] = useState('')
+  const [selectedMatch, setSelectedMatch] = useState<MatchData | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false); // State cho View Modal
 
   useEffect(() => {
     const loadMatches = async () => {
@@ -70,6 +73,17 @@ const MatchTable: React.FC = () => {
     }
   };
 
+  const handleViewMatch = async (id: string) => {
+    try {
+      const match = await fetchMatchById(id);
+      console.log("Fetched match for view:", match); // Log để kiểm tra
+      setSelectedMatch(match);
+      setIsViewModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching match for view:", error);
+    }
+  };
+
   const filteredMatches = matches.filter(match =>
     match.mode_game.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -118,6 +132,7 @@ const MatchTable: React.FC = () => {
                 <td className="py-4 px-5 text-gray-900 dark:text-white">{match.pooltable}</td>
                 <td className="py-4 px-5 text-gray-900 dark:text-white">{match.status}</td>
                 <td className="py-4 px-5 text-right">
+                  <button onClick={() => handleViewMatch(match._id)} className="px-4 py-2 text-green-600 hover:text-green-800">View</button>
                   <button onClick={() => handleEditMatch(match._id)} className="px-4 py-2 text-yellow-600 hover:text-yellow-800">Edit</button>
                   <button onClick={() => handleDeleteMatch(match._id)} className="px-4 py-2 text-red-600 hover:text-red-800">Delete</button>
                 </td>
@@ -140,6 +155,13 @@ const MatchTable: React.FC = () => {
         matchId={currentMatchId}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleUpdateMatchStatus}
+      />
+
+      {/* View Match Modal */}
+      <ViewMatchModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        match={selectedMatch}
       />
     </div>
   );
