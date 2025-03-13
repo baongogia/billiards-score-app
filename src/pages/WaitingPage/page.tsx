@@ -8,12 +8,11 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { toast } from "react-toastify";
 import { AuthContext } from "../../context/AuthContext";
-import { useGame } from "../../context/GameContex";
 import {
-  createMatch,
-  fetchMatchById,
-  MatchData,
+  createNewMatch,
+  getTableById,
 } from "../../services/Admin/Matches/matchesService";
+import { useGame } from "../../context/GameContext";
 
 interface GameState {
   playerName: string;
@@ -38,22 +37,24 @@ export default function WaitingPage() {
   // Host luôn là người vào trước
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showSetupModal, setShowSetupModal] = useState(false);
+  const [showAddPartnerModal, setShowAddPartnerModal] = useState(false);
+  const [newPartnerName, setNewPartnerName] = useState("");
   const [partnerName, setPartnerName] = useState("");
   const [gameMode, setGameMode] = useState("");
   const auth = useContext(AuthContext);
   const { playerName, setGameState } = useGame();
+
   // Game settings
   const [gameSettings, setGameSettings] = useState<Partial<GameState>>({
     gameType: "bida",
     timeLimit: 60,
     firstTurn: "player1",
   });
-
   // Create a new match
   const fetchTableById = async (id: string) => {
     try {
-      const response = await fetchMatchById(id);
-      const data = response as MatchData;
+      const response = await getTableById(id);
+      const data = response.data.data;
       setTableData(data);
     } catch (error) {
       console.error("Error fetching table by id", error);
@@ -66,14 +67,10 @@ export default function WaitingPage() {
     }
   }, [tableId, gameSettings.gameType]);
 
-  const createNewMatch = async () => {
+  const createMatch = async () => {
     try {
       if (tableId && gameSettings.gameType) {
-        await createMatch({
-          status: "ready",
-          mode_game: gameMode,
-          pooltable: tableId,
-        });
+        await createNewMatch("ready", gameMode, tableId);
       } else {
         toast.error("Table ID is undefined");
       }
@@ -85,8 +82,6 @@ export default function WaitingPage() {
   };
 
   const handleCreateMatch = (value: string) => {
-    console.log("Game Type", value);
-
     setGameSettings({
       ...gameSettings,
       gameType: value,
@@ -101,16 +96,18 @@ export default function WaitingPage() {
         <BidaTable />
       </div>
 
-      <div className="absolute md:scale-150 flex flex-col">
+      <div className="absolute md:scale-150 flex flex-col justify-center items-center ">
         <Loading />
         {/* 3 Nút chính của Host */}
         <div className="text-center text-white w-full h-10 flex gap-2">
-          <button
-            className="px-2 border-1 flex justify-center items-center uppercase font-bold  hover:bg-blue-500 transition duration-300 cursor-pointer text-white rounded"
-            onClick={() => setShowInviteModal(true)}
-          >
-            Invite
-          </button>
+          {auth?.token && (
+            <button
+              className="px-2 border-1 flex justify-center items-center uppercase font-bold  hover:bg-blue-500 transition duration-300 cursor-pointer text-white rounded"
+              onClick={() => setShowInviteModal(true)}
+            >
+              Invite
+            </button>
+          )}
           <button
             className=" border-1 px-2 flex justify-center items-center uppercase font-bold  hover:bg-yellow-500 transition duration-300 cursor-pointer text-white rounded"
             onClick={() => setShowSetupModal(true)}
@@ -128,6 +125,14 @@ export default function WaitingPage() {
           >
             Start Match
           </button>
+          {!auth?.token && (
+            <button
+              className="px-2 border-1 flex justify-center items-center uppercase font-bold hover:bg-purple-500 transition duration-300 cursor-pointer text-white rounded"
+              onClick={() => setShowAddPartnerModal(true)}
+            >
+              Add Partner
+            </button>
+          )}
         </div>
       </div>
 
@@ -230,7 +235,7 @@ export default function WaitingPage() {
                   setGameState(gameSettings);
                   setShowSetupModal(false);
                   if (auth?.token) {
-                    createNewMatch();
+                    createMatch();
                   }
                 }}
               >
@@ -239,6 +244,42 @@ export default function WaitingPage() {
               <button
                 className="w-[48%] bg-red-500 text-white py-2 rounded hover:bg-red-700 transition opacity-80 cursor-pointer"
                 onClick={() => setShowSetupModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Partner Modal */}
+      {showAddPartnerModal && (
+        <div className="absolute w-full h-full bg-[rgba(0,0,0,0.7)] flex justify-center items-center">
+          <div className="bg-[rgba(255,255,255,0.5)] backdrop-blur-md p-5 rounded-lg w-80 text-white">
+            <h2 className="text-xl font-bold mb-3">Add Partner</h2>
+            <input
+              type="text"
+              className="w-full p-2 border rounded text-black mb-3"
+              placeholder="Enter partner's name"
+              value={newPartnerName}
+              onChange={(e) => setNewPartnerName(e.target.value)}
+            />
+            <div className="flex justify-between">
+              <button
+                className="w-[48%] bg-green-500 text-white py-2 rounded hover:bg-green-700 transition cursor-pointer"
+                onClick={() => {
+                  if (newPartnerName.trim()) {
+                    setPartnerName(newPartnerName);
+                    setGameState({ partnerName: newPartnerName });
+                    setShowAddPartnerModal(false);
+                  }
+                }}
+              >
+                Save
+              </button>
+              <button
+                className="w-[48%] bg-red-500 text-white py-2 rounded hover:bg-red-700 transition cursor-pointer"
+                onClick={() => setShowAddPartnerModal(false)}
               >
                 Close
               </button>

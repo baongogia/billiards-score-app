@@ -78,7 +78,7 @@ const HomePage = () => {
               </a>
             </li>
             <li>
-              <a className="header-menu-tab" href="/UserProfile">
+              <a className="header-menu-tab" href="/MemberProfile">
                 <span className="icon fontawesome-user scnd-font-color"></span>
                 Account
               </a>
@@ -139,7 +139,7 @@ const HomePage = () => {
                   </a>
                 </li>
                 <li>
-                  <a className="menu-box-tab" href="/UserProfile">
+                  <a className="menu-box-tab" href="/MemberProfile">
                     <span className="icon entypo-cog scnd-font-color"></span>
                     Account Settings
                   </a>
