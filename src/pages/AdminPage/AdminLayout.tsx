@@ -1,13 +1,16 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { Users, User, Store, LogOut, Menu, X, Database } from "lucide-react"
+import { useContext, useState } from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Users, User, Store, LogOut, Menu, X, Database, LaptopMinimalCheck, Table } from "lucide-react"
+import { AuthContext } from "../../context/AuthContext"
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const location = useLocation()
+  const navigate = useNavigate()
+  const auth = useContext(AuthContext)
 
   const user = {
     name: "Admin",
@@ -19,10 +22,17 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { path: "/admin/users", icon: User, label: "Users" },
     { path: "/admin/members", icon: Users, label: "Members" },
     { path: "/admin/stores", icon: Store, label: "Stores" },
+    { path: "/admin/matches", icon: LaptopMinimalCheck, label: "Matches" },
+    { path: "/admin/tables", icon: Table, label: "Tables" },
   ]
 
   const isActive = (path: string) => {
     return location.pathname === path
+  }
+
+  const handleLogout = () => {
+    auth?.logout()
+    navigate("/")
   }
 
   return (
@@ -35,7 +45,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="p-4 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                <Store className="w-5 h-5 text-indigo-600" />
+                <Database className="w-5 h-5 text-indigo-600" />
               </div>
               <span className="ml-3 text-lg font-semibold text-gray-800">Billiard Club</span>
             </div>
@@ -73,10 +83,13 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-800">{user.name}</p>
-                  <p className="text-xs text-gray-500">Administrator</p>
+                  <p className="text-xs text-gray-500">Admin</p>
                 </div>
               </div>
-              <button className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-indigo-700 bg-white rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors duration-200">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-indigo-700 bg-white rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors duration-200"
+              >
                 <LogOut size={16} />
                 <span>Logout</span>
               </button>

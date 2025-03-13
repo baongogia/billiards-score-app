@@ -1,18 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import GuestCard from "./GuestCard.tsx";
 import "./index.scss";
 import "./animation.ts";
 import { start } from "./animation.ts";
-import { GuestCard } from "./GuestCard.tsx";
+import gsap from "gsap";
 
 export default function LandingPage() {
-  const navigate = useNavigate();
-  const [overLayer, setOverLayer] = useState(false);
-  const { tableId } = useParams();
-  if (tableId) {
-    localStorage.setItem("tableId", tableId);
-  }
-
   // Prevent scrolling
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -20,29 +14,37 @@ export default function LandingPage() {
       document.body.style.overflow = "auto";
     };
   }, []);
-  // Start animation
-  const animationStarted = useRef(false);
-  // Start animation when the page is loaded
+  // Auto reload gsap
+  const location = useLocation();
+  const resetAnimation = () => {
+    gsap.killTweensOf("*");
+    console.log("GSAP animations reset!");
+  };
   useEffect(() => {
-    if (!animationStarted.current) {
-      const demoElement = document.getElementById("demo");
-      if (demoElement) {
-        console.log("Found #demo, starting animation...");
-        start();
-        animationStarted.current = true;
-      }
+    if (location.pathname === "/") {
+      resetAnimation();
+      start();
     }
-  }, []);
+    return () => {
+      resetAnimation();
+    };
+  }, [location.pathname]);
 
+  // Navigate to login page
+  const navigate = useNavigate();
+  const [overLayer, setOverLayer] = useState(false);
+  // Handle login
+  const handleLogin = () => {
+    setTimeout(() => {
+      navigate("/login");
+    }, 1000);
+  };
   return (
     <div className="">
       <div className="indicator"></div>
       <div id="demo"></div>
       {/* Demo card */}
-      <div
-        className="details text-white opacity-0 md:opacity-100"
-        id="details-even"
-      >
+      <div className="details text-white" id="details-even">
         <div className="place-box">
           <div className="text">Billiards</div>
         </div>
@@ -57,10 +59,7 @@ export default function LandingPage() {
           popularity for its dynamic and challenging gameplay.
         </div>
       </div>
-      <div
-        className="details text-white opacity-0 md:opacity-100"
-        id="details-odd"
-      >
+      <div className="details text-white" id="details-odd">
         <div className="place-box">
           <div className="text">Billiards</div>
         </div>
@@ -88,7 +87,7 @@ export default function LandingPage() {
           <div
             className="w-full h-full bg-[rgba(0,0,0,0.2)] text-white flex justify-center items-center
                              font-bold hover:bg-white hover:text-black transition duration-300 cursor-pointer"
-            onClick={() => navigate("/login")}
+            onClick={handleLogin}
           >
             LOGIN
           </div>
@@ -111,7 +110,7 @@ export default function LandingPage() {
             : "bg-[rgba(0,0,0,0)] pointer-events-none opacity-0"
         }`}
       >
-        {tableId && <GuestCard id={tableId} />}
+        <GuestCard />
       </div>
     </div>
   );

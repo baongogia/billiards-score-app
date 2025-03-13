@@ -1,13 +1,16 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { User, Table, LogOut, Menu, X , PlayIcon, Database} from "lucide-react"
+import { useContext, useState } from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Users, User, Table, LogOut, Menu, X } from "lucide-react"
+import { AuthContext } from "../../context/AuthContext"
 
 const ManagerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const location = useLocation()
+  const navigate = useNavigate()
+  const auth = useContext(AuthContext)
 
   const user = {
     name: "Manager",
@@ -15,13 +18,17 @@ const ManagerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }
 
   const navItems = [
-    { path: "/manager", icon: Database, label: "Dashboard" },
-    { path: "/manager/tables", icon: Table, label: "Tables" },
-    { path: "/manager/matches", icon: PlayIcon, label: "Matches" },
+    { path: "/manager", icon: Table, label: "Tables" },
+    { path: "/manager/matches", icon: Users, label: "Matches" },
   ]
 
   const isActive = (path: string) => {
     return location.pathname === path
+  }
+
+  const handleLogout = () => {
+    auth?.logout()
+    navigate("/")
   }
 
   return (
@@ -75,7 +82,10 @@ const ManagerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   <p className="text-xs text-gray-500">Manager</p>
                 </div>
               </div>
-              <button className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-indigo-700 bg-white rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors duration-200">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-indigo-700 bg-white rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors duration-200"
+              >
                 <LogOut size={16} />
                 <span>Logout</span>
               </button>

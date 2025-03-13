@@ -3,58 +3,76 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
-import { fetchUsers, fetchManagersWithoutStore, fetchUserProfile, deleteUser, User } from "../../../services/Admin/User/userService";
+import { fetchUsers, fetchManagersWithoutStore, fetchUserProfile, deleteUser, fetchInactiveUsers, User, fetchFilteredUsers } from "../../../services/Admin/User/userService";
 
 export default function UserTable() {
   const [users, setUsers] = useState<User[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [totalItems, setTotalItems] = useState(0);
   const navigate = useNavigate();
   const [managersWithoutStore, setManagersWithoutStore] = useState<User[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  //#region query
+  const [searchTerm, setSearchTerm] = useState("");
+  const [role, setRole] = useState("");
+  const [status, setStatus] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  //#endregion
+
   useEffect(() => {
     const loadUsers = async () => {
       try {
-        const activeUsers = await fetchUsers();
-        console.log("Active Users:", activeUsers); // Log active users to verify filtering
-        setUsers(activeUsers); // Filter users with role "manager" or "admin" and status "active"
+        const response = await fetchFilteredUsers(
+          searchTerm,
+          role,
+          status,
+          currentPage,
+          pageSize,
+          sortBy,
+          sortDirection
+        );
+        setUsers(response.data); // Truy cập danh sách users từ response.data
+        setTotalItems(response.pagination.totalItem); // Truy cập tổng số items từ pagination
       } catch (error) {
         console.error("Error fetching users:", error);
       }
     };
 
     loadUsers();
-  }, []);
+  }, [searchTerm, role, status, currentPage, sortBy, sortDirection]);
 
   const loadManagersWithoutStore = async () => {
     try {
       const managers = await fetchManagersWithoutStore();
       console.log("Managers Without Store:", managers);
-      setManagersWithoutStore(managers);
-      setIsModalOpen(true); // Open the modal
+      // Giả sử API trả về cấu trúc tương tự hoặc chỉ mảng
+      setManagersWithoutStore(managers.data || managers);
+      setIsModalOpen(true);
     } catch (error) {
       console.error("Error fetching managers without store:", error);
     }
   };
 
-  const filteredUsers = Array.isArray(users) ? users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.phone.includes(searchTerm)
-  ) : [];
-
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+  const loadInactiveUsers = async () => {
+    try {
+      const inactiveUsers = await fetchInactiveUsers();
+      console.log("Inactive Users:", inactiveUsers);
+      // Giả sử API trả về cấu trúc tương tự hoặc chỉ mảng
+      setUsers(inactiveUsers.data || inactiveUsers);
+      setTotalItems(inactiveUsers.pagination?.totalItem || inactiveUsers.length);
+    } catch (error) {
+      console.error("Error fetching inactive users:", error);
+    }
+  };
 
   const handleView = async (id: string) => {
     try {
       const userProfile = await fetchUserProfile(id);
       console.log("User Profile:", userProfile);
-      navigate(`/profile/${id}`);
+      navigate(`/admin/user/${id}`);
     } catch (error) {
       console.error("Error fetching user profile:", error);
     }
@@ -64,7 +82,22 @@ export default function UserTable() {
     try {
       await deleteUser(id);
       console.log(`User with ID: ${id} deleted`);
-      setUsers(users.filter(user => user._id !== id));
+      // Gọi lại API để đồng bộ dữ liệu
+      const response = await fetchFilteredUsers(
+        searchTerm,
+        role,
+        status,
+        currentPage,
+        pageSize,
+        sortBy,
+        sortDirection
+      );
+      setUsers(response.data);
+      setTotalItems(response.pagination.totalItem);
+      // Nếu trang hiện tại không còn dữ liệu, chuyển về trang trước
+      if (response.data.length === 0 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -81,14 +114,15 @@ export default function UserTable() {
     }
   };
 
+  const totalPages = Math.ceil(totalItems / pageSize);
+
   return (
     <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+      <div className="flex flex-col gap-4 mb-6">
         <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">User Management</h2>
-
-        <div className="flex w-full sm:w-auto gap-3">
-          <div className="relative flex-1 sm:flex-initial">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
@@ -98,20 +132,63 @@ export default function UserTable() {
               className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-gray-700 dark:text-gray-200"
             />
           </div>
-
-          <button
-            onClick={() => navigate("/register")}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200"
           >
-            <Plus className="h-5 w-5" />
-            <span>New User</span>
-          </button>
-          <button
-            onClick={loadManagersWithoutStore}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            <option value="">All Roles</option>
+            <option value="admin">Admin</option>
+            <option value="manager">Manager</option>
+            <option value="user">User</option>
+          </select>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200"
           >
-            <span>Find Managers Without Store</span>
-          </button>
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200"
+          >
+            <option value="createdAt">Sort by Created At</option>
+            <option value="name">Sort by Name</option>
+            <option value="email">Sort by Email</option>
+          </select>
+          <select
+            value={sortDirection}
+            onChange={(e) => setSortDirection(e.target.value)}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200"
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate("/admin/register")}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="h-5 w-5" />
+              <span>New User</span>
+            </button>
+            <button
+              onClick={loadManagersWithoutStore}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <span>Find Managers</span>
+            </button>
+            <button
+              onClick={loadInactiveUsers}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <span>Inactive Users</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -129,41 +206,47 @@ export default function UserTable() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
-            {paginatedUsers.map((user, index) => (
-              <tr key={user._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">{startIndex + index + 1}</td>
-                <td className="py-4 px-5 text-lg text-gray-900 dark:text-gray-200 font-medium">{user.name}</td>
-                <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">{user.phone}</td>
-                <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">{user.email}</td>
-                <td className="py-4 px-5">
-                  <span
-                    className={`inline-block px-3 py-2 rounded-full text-lg font-medium ${getRoleBadgeClass(user.role)}`}
-                  >
-                    {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                  </span>
-                </td>
-                <td className="py-4 px-5 text-right space-x-2">
-                  <button
-                    onClick={() => handleView(user._id)}
-                    className="px-4 py-2 text-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-md transition-colors"
-                  >
-                    View
-                  </button>
-                  <button
-                    onClick={() => handleDelete(user._id)}
-                    className="px-4 py-2 text-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-md transition-colors"
-                  >
-                    Delete
-                  </button>
+            {users.length > 0 ? (
+              users.map((user, index) => (
+                <tr key={user._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">{(currentPage - 1) * pageSize + index + 1}</td>
+                  <td className="py-4 px-5 text-lg text-gray-900 dark:text-gray-200 font-medium">{user.name}</td>
+                  <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">{user.phone || "N/A"}</td>
+                  <td className="py-4 px-5 text-lg text-gray-600 dark:text-gray-300">{user.email || "N/A"}</td>
+                  <td className="py-4 px-5">
+                    <span className={`inline-block px-3 py-2 rounded-full text-lg font-medium ${getRoleBadgeClass(user.role)}`}>
+                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                    </span>
+                  </td>
+                  <td className="py-4 px-5 text-right space-x-2">
+                    <button
+                      onClick={() => handleView(user._id)}
+                      className="px-4 py-2 text-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-md transition-colors"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user._id)}
+                      className="px-4 py-2 text-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-md transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="py-4 px-5 text-center text-lg text-gray-600 dark:text-gray-300">
+                  No users found
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {totalPages > 0 && (
         <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-600 px-4 py-3 sm:px-6 mt-4">
           <div className="flex flex-1 justify-between sm:hidden">
             <button
@@ -184,9 +267,9 @@ export default function UserTable() {
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
               <p className="text-lg text-gray-700 dark:text-gray-300">
-                Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
-                <span className="font-medium">{Math.min(startIndex + itemsPerPage, filteredUsers.length)}</span> of{" "}
-                <span className="font-medium">{filteredUsers.length}</span> results
+                Showing <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span> to{" "}
+                <span className="font-medium">{Math.min(currentPage * pageSize, totalItems)}</span> of{" "}
+                <span className="font-medium">{totalItems}</span> results
               </p>
             </div>
             <div className="flex gap-1">
@@ -201,9 +284,8 @@ export default function UserTable() {
                 <button
                   key={i + 1}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`relative inline-flex items-center px-4 py-2 text-lg font-medium rounded-md ${
-                    currentPage === i + 1 ? "bg-blue-600 text-white" : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
-                  }`}
+                  className={`relative inline-flex items-center px-4 py-2 text-lg font-medium rounded-md ${currentPage === i + 1 ? "bg-blue-600 text-white" : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+                    }`}
                 >
                   {i + 1}
                 </button>
@@ -219,6 +301,8 @@ export default function UserTable() {
           </div>
         </div>
       )}
+
+      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
@@ -230,11 +314,11 @@ export default function UserTable() {
             </div>
             <div className="modal-body">
               {managersWithoutStore.length > 0 ? (
-                <ul>
+                <ul className="space-y-3">
                   {managersWithoutStore.map((manager) => (
                     <li key={manager._id} className="border p-3 rounded-lg shadow-sm">
                       <p><strong>Name:</strong> {manager.name}</p>
-                      <p><strong>Email:</strong> {manager.email}</p>
+                      <p><strong>Email:</strong> {manager.email || "N/A"}</p>
                       <p><strong>Manager ID:</strong> {manager._id}</p>
                     </li>
                   ))}

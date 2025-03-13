@@ -1,7 +1,14 @@
+// import { useEffect, useState } from "react";
 import "./index.scss";
 export default function BidaTable() {
   return (
-    <div className="scale-240 md:scale-400">
+    <div
+      style={{
+        transform: `scale(${4.8})`,
+        transformOrigin: "center center",
+      }}
+      className="mt-5"
+    >
       <div className="wrap">
         <div className="pool">
           <div className="poolTexture"></div>

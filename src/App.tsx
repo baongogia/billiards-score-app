@@ -7,67 +7,47 @@ import GamePlay from "./pages/GamePlay/page";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import UserProfile from "./pages/UserProfile/page";
 
 import AdminPage from "./pages/AdminPage/AdminPage";
 import UsersPage from "./pages/AdminPage/UserPage/UsersPage";
+import UserProfile from "./components/Admin/UserTable/UserProfile";
+import UserCreate from "./components/Admin/UserTable/register";
 import MembersPage from "./pages/AdminPage/MemberPage/MembersPage";
 import StoresPage from "./pages/AdminPage/StoresPage/StoresPage";
 import CreateStore from "./components/Admin/StoreTable/CreateStore";
+import MatchesPage from "./pages/AdminPage/MatchesPage/MatchesPage";
+import TablesPage from "./pages/AdminPage/TablesPage/TablesPage";
 
 import ManagerPage from "./pages/ManagerPage/ManagerPage";
-import TablesPage from "./pages/ManagerPage/TablePage/TablePage";
-import MatchesPage from "./pages/ManagerPage/MatchesPage/MatchesPage";
-import { ProtectedRoute } from "./components/ProtectRoute/ProtectedRoute";
-import Unauthorized from "./pages/Unauthorize/page";
+import TablePage from "./pages/ManagerPage/TablePage/TablePage";
+import MatchPage from "./pages/ManagerPage/MatchesPage/MatchesPage";
 
 const router = createBrowserRouter([
-  { path: "/:tableId", element: <LandingPage /> },
   { path: "/", element: <LandingPage /> },
   { path: "/login", element: <Login /> },
-  { path: "/WaitingPage/:tableId", element: <WaitingPage /> },
   { path: "/WaitingPage", element: <WaitingPage /> },
-  {
-    path: "/HomePage",
-    element: (
-      <ProtectedRoute allowedRoles={["user"]}>
-        <HomePage />
-      </ProtectedRoute>
-    ),
-  },
+  { path: "/HomePage", element: <HomePage /> },
   { path: "/GamePlay", element: <GamePlay /> },
 
-  {
-    path: "/admin",
-    element: (
-      <ProtectedRoute allowedRoles={["admin"]}>
-        <AdminPage />
-      </ProtectedRoute>
-    ),
-  },
+  { path: "/admin", element: <AdminPage /> },
   { path: "/admin/users", element: <UsersPage /> },
+  { path: "/admin/user/:id", element: <UserProfile /> },
+  { path: "/admin/register", element: <UserCreate /> },
   { path: "/admin/members", element: <MembersPage /> },
   { path: "/admin/stores", element: <StoresPage /> },
-  { path: "/admin/create-store", element: <CreateStore /> },
-  { path: "/UserProfile", element: <UserProfile /> },
+  { path: "/admin/create-store", element: <CreateStore/> },
+  { path: "/admin/matches", element: <MatchesPage/> },
+  { path: "/admin/tables", element: <TablesPage/> },
 
-  {
-    path: "/manager",
-    element: (
-      <ProtectedRoute allowedRoles={["manager"]}>
-        <ManagerPage />
-      </ProtectedRoute>
-    ),
-  },
-  { path: "manager/tables", element: <TablesPage /> },
-  { path: "/manager/matches", element: <MatchesPage /> },
-  { path: "*", element: <Unauthorized /> },
+  { path: "/manager", element: <ManagerPage /> },
+  { path: "/manager/tables", element: <TablePage /> },
+  { path: "/manager/matches", element: <MatchPage /> },
 ]);
 
 function App() {
   return (
     <>
-      <ToastContainer autoClose={2000} />
+      <ToastContainer />
       <RouterProvider router={router} />
     </>
   );
