@@ -18,7 +18,7 @@ export default function TablesList() {
   const [typeFilter, setTypeFilter] = useState("");
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortDirection, setSortDirection] = useState("asc");
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadTables();
@@ -115,12 +115,14 @@ export default function TablesList() {
   const paginatedTables = sortedTables.slice(startIndex, startIndex + itemsPerPage);
 
   const getStatusBadgeClass = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "available":
+        return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300";
+      case "ready":
         return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300";
-      case "occupied":
+      case "playing":
         return "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300";
-      case "maintenance":
+      case "finished":
         return "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300";
       default:
         return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300";

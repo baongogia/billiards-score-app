@@ -9,7 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../../context/AuthContext";
 import {
-  createNewMatch,
+  createMatch,
   getTableById,
 } from "../../services/Admin/Matches/matchesService";
 import { useGame } from "../../context/GameContext";
@@ -70,7 +70,7 @@ export default function WaitingPage() {
   const createMatch = async () => {
     try {
       if (tableId && gameSettings.gameType) {
-        await createNewMatch("ready", gameMode, tableId);
+        await createMatch("ready", gameMode, tableId);
       } else {
         toast.error("Table ID is undefined");
       }

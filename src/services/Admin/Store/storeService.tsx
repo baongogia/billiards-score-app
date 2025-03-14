@@ -1,4 +1,5 @@
 import api from "../../api";
+import { PoolTable } from "../Tables/poolTableService";
 
 export interface Store {
   _id: string;
@@ -158,6 +159,27 @@ export const fetchFilteredStores = async (
     };
   } catch (error) {
     console.error("Error fetching filtered stores:", error);
+    throw error;
+  }
+};
+
+export interface StorePoolTablesResponse {
+  data: {
+    number: number;
+    tables: PoolTable[];
+  };
+}
+
+export const fetchStorePoolTables = async (storeId: string): Promise<PoolTable[]> => {
+  try {
+    console.log('Fetching tables for store:', storeId);
+    const response = await api.get<StorePoolTablesResponse>(`v1/stores/viewPooltable/${storeId}`);
+    console.log('API Response:', response.data);
+    const tables = response.data.data.tables;
+    console.log('Extracted tables:', tables);
+    return tables || [];
+  } catch (error) {
+    console.error("Error fetching store pool tables:", error);
     throw error;
   }
 };

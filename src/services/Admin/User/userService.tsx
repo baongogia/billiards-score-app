@@ -11,28 +11,17 @@ export interface User {
   avatar?: string;
 }
 
-export const fetchUsers = async (): Promise<User[]> => {
-  try {
-    const response = await api.get("v1/users/find");
-    console.log("API Response:", response.data.data); // Log để kiểm tra
-    const data = response.data as { data: User[] };
-    return data.data.filter(user => (user.role === "manager" || user.role === "admin") && user.status === "active");
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    throw error;
-  }
-};
-
-export const fetchMember = async (): Promise<User[]> => {
-  try {
-    const response = await api.get("v1/users/find");
-    const data = response.data as { data: User[] };
-    return data.data.filter(user => user.role === "user" && user.status === "active");
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    throw error;
-  }
-};
+// export const fetchUsers = async (): Promise<User[]> => {
+//   try {
+//     const response = await api.get("v1/users/find");
+//     console.log("API Response:", response.data.data); // Log để kiểm tra
+//     const data = response.data as { data: User[] };
+//     return data.data.filter(user => (user.role === "manager" || user.role === "admin") && user.status === "active");
+//   } catch (error) {
+//     console.error("Error fetching users:", error);
+//     throw error;
+//   }
+// };
 
 export const fetchManagersWithoutStore = async (): Promise<User[]> => {
   try {
@@ -98,7 +87,9 @@ export const fetchFilteredUsers = async (
   pageSize?: number,
   sortBy?: string,
   sortDirection?: string
-): Promise<{ data: User[]; pagination: { totalItem: number } }> => {
+): Promise<{
+  length: number; data: User[]; pagination: { totalItem: number } 
+}> => {
   try {
     const params = new URLSearchParams();
     if (term) params.append('term', term);
@@ -110,6 +101,8 @@ export const fetchFilteredUsers = async (
     if (sortDirection) params.append('sortDirection', sortDirection);
 
     const response = await api.get(`v1/users/search?${params.toString()}`);
+    console.log("API Response:", response.data); // Thêm log để kiểm tra response
+
     return {
       data: response.data.data || [],
       pagination: {

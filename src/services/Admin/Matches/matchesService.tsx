@@ -31,9 +31,13 @@ export const fetchMatchById = async (id: string): Promise<MatchData> => {
   }
 };
 
-export const createMatch = async (matchData: Partial<MatchData>): Promise<MatchData> => {
+export const createMatch = async (status: string, mode_game: string, pooltable: string): Promise<MatchData> => {
   try {
-    const response = await api.post<{ data: MatchData }>("v1/matches", matchData);
+    const response = await api.post<{ data: MatchData }>("v1/matches", {
+      status,
+      mode_game,
+      pooltable
+    });
     return response.data.data;
   } catch (error) {
     console.error("Error creating match:", error);
@@ -56,6 +60,16 @@ export const deleteMatch = async (id: string): Promise<void> => {
     await api.delete(`v1/matches/${id}`);
   } catch (error) {
     console.error("Error deleting match:", error);
+    throw error;
+  }
+};
+
+export const getTableById = async (id: string) => {
+  try {
+    const response = await api.get(`v1/tables/${id}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching table by id:", error);
     throw error;
   }
 };

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { X } from 'lucide-react';
-import { PoolTable, fetchPoolTablesByStoreId } from '../../../services/Admin/Tables/poolTableService';
+import { PoolTable } from '../../../services/Admin/Tables/poolTableService';
+import { fetchStorePoolTables } from '../../../services/Admin/Store/storeService';
 
 interface StoreTablesModalProps {
   isOpen: boolean;
@@ -21,11 +22,12 @@ const StoreTablesModal: React.FC<StoreTablesModalProps> = ({ isOpen, onClose, st
       try {
         setLoading(true);
         setError(null);
-        const data = await fetchPoolTablesByStoreId(storeId);
-        setTables(data);
+        const data = await fetchStorePoolTables(storeId);
+        setTables(data || []);
       } catch (err) {
         setError('Failed to load tables. Please try again.');
         console.error('Error loading tables:', err);
+        setTables([]);
       } finally {
         setLoading(false);
       }
@@ -33,16 +35,22 @@ const StoreTablesModal: React.FC<StoreTablesModalProps> = ({ isOpen, onClose, st
 
     if (isOpen && storeId) {
       loadTables();
+    } else {
+      setTables([]);
+      setError(null);
+      setLoading(true);
     }
   }, [isOpen, storeId]);
 
   const getStatusBadgeClass = (status: string) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "available":
+        return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300";
+      case "ready":
         return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300";
-      case "occupied":
+      case "playing":
         return "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300";
-      case "maintenance":
+      case "finished":
         return "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300";
       default:
         return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300";
@@ -100,7 +108,7 @@ const StoreTablesModal: React.FC<StoreTablesModalProps> = ({ isOpen, onClose, st
                         {table._id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                        {table.tableType.type_name}
+                        {table.tableType?.type_name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(table.status)}`}>

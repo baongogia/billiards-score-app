@@ -9,7 +9,7 @@ export interface TableType {
 
 export interface PoolTable {
   _id: string; // Sử dụng _id thay vì id để khớp với response
-  status: "available" | "occupied" | "maintenance";
+  status: "available" | "ready" | "playing" | "finished";
   tableType: TableType;
   store: string;
   deletedAt: null | string;
@@ -21,7 +21,7 @@ export interface PoolTable {
 
 // Request interface cho create/update
 export interface PoolTableRequest {
-  status: "available" | "occupied" | "maintenance";
+  status: "available" | "ready" | "playing" | "finished";
   tableType: {
     type_name: string;
     compatible_mode: string[];

@@ -12,7 +12,7 @@ interface EditTableModalProps {
 
 export function EditTableModal({ isOpen, onClose, onSubmit, table }: EditTableModalProps) {
   const [tableData, setTableData] = useState<Partial<PoolTable>>({
-    status: "",
+    status: "ready",
     tableType: {
       type_name: "",
       compatible_mode: []
@@ -98,8 +98,9 @@ export function EditTableModal({ isOpen, onClose, onSubmit, table }: EditTableMo
                       required
                     >
                       <option value="available">Available</option>
-                      <option value="occupied">Occupied</option>
-                      <option value="maintenance">Maintenance</option>
+                      <option value="ready">Ready</option>
+                      <option value="playing">Playing</option>
+                      <option value="finished">Finished</option>
                     </select>
                   </div>
                   <div className="mb-4">
