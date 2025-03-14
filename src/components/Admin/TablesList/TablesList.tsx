@@ -1,17 +1,23 @@
 // TablesList.tsx
 import { useState, useEffect } from "react";
 import { Search, ChevronLeft, ChevronRight, Edit, Trash2, Plus, Eye } from "lucide-react";
-import { fetchPoolTables, PoolTable, deletePoolTable } from "../../../services/Admin/Tables/poolTableService";
-import EditMatchModal from "./EditMatchModal";
+import { fetchPoolTables, PoolTable, deletePoolTable, createPoolTable, updatePoolTable } from "../../../services/Admin/Tables/poolTableService";
 import ViewTableModal from "./ViewTableModal";
+import { CreateTableModal } from "./CreateTableModal";
+import { EditTableModal } from "./EditTableModal";
 
 export default function TablesList() {
   const [tables, setTables] = useState<PoolTable[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false); // State cho View Modal
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedTable, setSelectedTable] = useState<PoolTable | null>(null);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState("asc");
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -27,28 +33,86 @@ export default function TablesList() {
     }
   };
 
+  const handleCreateTable = async (tableData: any) => {
+    try {
+      await createPoolTable(tableData);
+      await loadTables();
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      console.error("Error creating table:", error);
+    }
+  };
+
+  const handleEditTable = async (tableData: Partial<PoolTable>) => {
+    if (!selectedTable?._id) return;
+    try {
+      await updatePoolTable(selectedTable._id, tableData);
+      await loadTables();
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Error updating table:", error);
+    }
+  };
+
   const handleDelete = async (tableId: string) => {
     if (window.confirm("Are you sure you want to delete this table?")) {
       try {
         await deletePoolTable(tableId);
-        loadTables();
+        await loadTables();
       } catch (error) {
         console.error("Error deleting table:", error);
       }
     }
   };
 
+  const openEditModal = (table: PoolTable) => {
+    setSelectedTable(table);
+    setIsEditModalOpen(true);
+  };
+
+  const openViewModal = (table: PoolTable) => {
+    setSelectedTable(table);
+    setIsViewModalOpen(true);
+  };
+
   const filteredTables = tables.filter((table) => {
-    const matchesSearch =
+    const matchesSearch = 
       table._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       table.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
       table.tableType.type_name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
+    
+    const matchesStatus = statusFilter === "" || table.status === statusFilter;
+    const matchesType = typeFilter === "" || table.tableType.type_name === typeFilter;
+    
+    return matchesSearch && matchesStatus && matchesType;
   });
 
-  const totalPages = Math.ceil(filteredTables.length / itemsPerPage);
+  // Get unique table types for filter dropdown
+  const tableTypes = Array.from(new Set(tables.map(table => table.tableType.type_name)));
+
+  // Sort tables
+  const sortedTables = [...filteredTables].sort((a, b) => {
+    if (sortBy === "createdAt") {
+      return sortDirection === "asc" 
+        ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    if (sortBy === "status") {
+      return sortDirection === "asc"
+        ? a.status.localeCompare(b.status)
+        : b.status.localeCompare(a.status);
+    }
+    if (sortBy === "type") {
+      return sortDirection === "asc"
+        ? a.tableType.type_name.localeCompare(b.tableType.type_name)
+        : b.tableType.type_name.localeCompare(a.tableType.type_name);
+    }
+    return 0;
+  });
+
+  const totalPages = Math.ceil(sortedTables.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedTables = filteredTables.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedTables = sortedTables.slice(startIndex, startIndex + itemsPerPage);
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -71,103 +135,121 @@ export default function TablesList() {
 
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search tables..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 w-full border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-gray-700 dark:text-gray-200 py-2 px-4"
-          />
-        </div>
         <button
-          onClick={() => {
-            setSelectedTable(null);
-            setIsModalOpen(true);
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          onClick={() => setIsCreateModalOpen(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
         >
-          <Plus className="h-5 w-5" />
+          <Plus className="mr-2" />
           Add New Table
         </button>
+
+        {/* Filters Section */}
+        <div className="flex flex-wrap gap-2">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border p-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
+            placeholder="Search tables..."
+          />
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border p-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
+          >
+            <option value="">All Status</option>
+            <option value="available">Available</option>
+            <option value="occupied">Occupied</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
+
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="border p-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
+          >
+            <option value="">All Types</option>
+            {tableTypes.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+
+          <div className="flex gap-2">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="border p-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              <option value="createdAt">Created At</option>
+              <option value="status">Status</option>
+              <option value="type">Type</option>
+            </select>
+
+            <select
+              value={sortDirection}
+              onChange={(e) => setSortDirection(e.target.value)}
+              className="border p-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      {/* Table */}
+      {/* Tables Section */}
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-50 dark:bg-gray-700 border-y border-gray-200 dark:border-gray-600">
-              <th className="text-left py-4 px-5 text-sm font-semibold text-gray-900 dark:text-gray-200">ID</th>
-              <th className="text-left py-4 px-5 text-sm font-semibold text-gray-900 dark:text-gray-200">Status</th>
-              <th className="text-left py-4 px-5 text-sm font-semibold text-gray-900 dark:text-gray-200">Type</th>
-              <th className="text-left py-4 px-5 text-sm font-semibold text-gray-900 dark:text-gray-200">Compatible Modes</th>
-              <th className="text-left py-4 px-5 text-sm font-semibold text-gray-900 dark:text-gray-200">Created At</th>
-              <th className="text-left py-4 px-5 text-sm font-semibold text-gray-900 dark:text-gray-200">QR Code</th>
-              <th className="text-left py-4 px-5 text-sm font-semibold text-gray-900 dark:text-gray-200">Actions</th>
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                ID
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Type
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {paginatedTables.map((table) => (
-              <tr key={table._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td className="py-4 px-5 text-gray-900 dark:text-gray-200 font-medium">
-                  {table._id.substring(0, 8)}...
+              <tr key={table._id}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                  {table._id}
                 </td>
-                <td className="py-4 px-5">
-                  <span
-                    className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(table.status)}`}
-                  >
-                    {table.status.charAt(0).toUpperCase() + table.status.slice(1)}
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(table.status)}`}>
+                    {table.status}
                   </span>
                 </td>
-                <td className="py-4 px-5 text-gray-900 dark:text-gray-200">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                   {table.tableType.type_name}
                 </td>
-                <td className="py-4 px-5 text-gray-900 dark:text-gray-200">
-                  {table.tableType.compatible_mode.join(", ")}
-                </td>
-                <td className="py-4 px-5 text-gray-600 dark:text-gray-400">
-                  {new Date(table.createdAt).toLocaleDateString()}
-                </td>
-                <td className="py-4 px-5">
-                  <a href={table.qrCodeImg} target="_blank" rel="noopener noreferrer">
-                    <img 
-                      src={table.qrCodeImg} 
-                      alt="QR Code" 
-                      className="w-10 h-10 object-contain"
-                    />
-                  </a>
-                </td>
-                <td className="py-4 px-5">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setSelectedTable(table);
-                        setIsViewModalOpen(true); // Mở View Modal
-                      }}
-                      className="p-2 text-green-600 hover:bg-green-100 rounded-full"
-                      title="View"
-                    >
-                      <Eye className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedTable(table);
-                        setIsModalOpen(true);
-                      }}
-                      className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"
-                      title="Edit"
-                    >
-                      <Edit className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(table._id)}
-                      className="p-2 text-red-600 hover:bg-red-100 rounded-full"
-                      title="Delete"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
-                  </div>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <button
+                    onClick={() => openViewModal(table)}
+                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
+                  >
+                    <Eye className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => openEditModal(table)}
+                    className="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 mr-4"
+                  >
+                    <Edit className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(table._id)}
+                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -177,55 +259,51 @@ export default function TablesList() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-600 px-4 py-3 sm:px-6 mt-4">
-          <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
-                <span className="font-medium">{Math.min(startIndex + itemsPerPage, filteredTables.length)}</span> of{" "}
-                <span className="font-medium">{filteredTables.length}</span> results
-              </p>
-            </div>
-            <div className="flex gap-1">
+        <div className="flex justify-center mt-4">
+          <div className="flex gap-1">
+            <button
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={currentPage === 1}
+              className="relative inline-flex items-center rounded-md p-3 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            {[...Array(totalPages)].map((_, i) => (
               <button
-                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-                disabled={currentPage === 1}
-                className="relative inline-flex items-center rounded-md p-3 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                key={i + 1}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                  currentPage === i + 1 ? "bg-blue-600 text-white" : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+                }`}
               >
-                <ChevronLeft className="h-6 w-6" />
+                {i + 1}
               </button>
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                    currentPage === i + 1 ? "bg-blue-600 text-white" : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-              <button
-                onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
-                disabled={currentPage === totalPages}
-                className="relative inline-flex items-center rounded-md p-3 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </button>
-            </div>
+            ))}
+            <button
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+              disabled={currentPage === totalPages}
+              className="relative inline-flex items-center rounded-md p-3 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
           </div>
         </div>
       )}
 
-      {/* Edit Modal */}
-      <EditMatchModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        table={selectedTable}
-        onSuccess={loadTables}
+      {/* Modals */}
+      <CreateTableModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateTable}
       />
 
-      {/* View Modal */}
+      <EditTableModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSubmit={handleEditTable}
+        table={selectedTable}
+      />
+
       <ViewTableModal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}

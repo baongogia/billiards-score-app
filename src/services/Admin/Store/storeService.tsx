@@ -76,7 +76,7 @@ export const searchStore = async (searchParams: Partial<SearchStoreParams> = {})
   try {
     // Tạo object chỉ chứa các trường có giá trị (loại bỏ undefined)
     const filteredParams = Object.fromEntries(
-      Object.entries(searchParams).filter(([_, value]) => value !== undefined)
+      Object.entries(searchParams).filter(([value]) => value !== undefined)
     );
 
     // Gửi request với filteredParams
@@ -106,6 +106,58 @@ export const createStore = async (name: string, address: string, manager: string
     return response.data.data as Store;
   } catch (error) {
     console.error("Error creating store:", error);
+    throw error;
+  }
+};
+
+export interface StoreResponse {
+  data: {
+    data: Store[];
+    pagination: {
+      totalItem: number;
+      current: number;
+      pageSize: number;
+      totalPage: number;
+    };
+  };
+}
+
+export const fetchFilteredStores = async (
+  term?: string,
+  status?: string,
+  current?: number,
+  pageSize?: number,
+  sortBy?: string,
+  sortDirection?: string
+): Promise<{data: Store[], pagination: { totalItem: number; current: number; pageSize: number; totalPage: number }}> => {
+  try {
+    const isDeleted = status === "inactive" ? true : status === "active" ? false : undefined;
+    const queryParams = new URLSearchParams();
+    
+    if (term) queryParams.append("term", term);
+    queryParams.append("isDeleted", String(isDeleted ?? false));
+    if (current) queryParams.append("current", String(current));
+    if (pageSize) queryParams.append("pageSize", String(pageSize));
+    if (sortBy) queryParams.append("sortBy", sortBy);
+    if (sortDirection) queryParams.append("sortDirection", sortDirection);
+
+    console.log("Query params:", queryParams.toString()); // Debug log
+
+    const response = await api.get<StoreResponse>(`v1/stores/search?${queryParams.toString()}`);
+    
+    let filteredData = response.data.data.data;
+    if (status === "active") {
+      filteredData = filteredData.filter(store => !store.isDeleted);
+    } else if (status === "inactive") {
+      filteredData = filteredData.filter(store => store.isDeleted);
+    }
+
+    return {
+      data: filteredData,
+      pagination: response.data.data.pagination
+    };
+  } catch (error) {
+    console.error("Error fetching filtered stores:", error);
     throw error;
   }
 };

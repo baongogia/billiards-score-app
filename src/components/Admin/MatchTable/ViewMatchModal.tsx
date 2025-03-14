@@ -42,7 +42,7 @@ const ViewMatchModal: React.FC<ViewMatchModalProps> = ({ isOpen, onClose, match 
                 <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
                   Match Details
                 </Dialog.Title>
-                <div className="mt-2">
+                <div className="mt-2 space-y-3">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     <strong>ID:</strong> {match.match._id}
                   </p>
@@ -56,16 +56,18 @@ const ViewMatchModal: React.FC<ViewMatchModalProps> = ({ isOpen, onClose, match 
                     <strong>Status:</strong> {match.match.status}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    <strong>Created At:</strong> {new Date(match.match.createdAt).toLocaleDateString()}
+                    <strong>Created At:</strong> {new Date(match.createdAt).toLocaleString()}
                   </p>
+                  {match.endAt && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <strong>End At:</strong> {new Date(match.endAt).toLocaleString()}
+                    </p>
+                  )}
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    <strong>End At:</strong> {new Date(match.match.endAt).toLocaleDateString()}
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    <strong>Updated At:</strong> {new Date(match.match.updatedAt).toLocaleDateString()}
+                    <strong>Updated At:</strong> {new Date(match.updatedAt).toLocaleString()}
                   </p>
                 </div>
-                <div className="mt-4">
+                <div className="mt-6">
                   <button
                     type="button"
                     className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

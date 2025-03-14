@@ -1,6 +1,7 @@
 import api from "../../api";
 
 export interface MatchData {
+  match: any;
   _id: string;
   status: string;
   mode_game: string;
@@ -22,8 +23,8 @@ export const fetchMatches = async (): Promise<MatchData[]> => {
 
 export const fetchMatchById = async (id: string): Promise<MatchData> => {
   try {
-    const response = await api.get<{ data: MatchData }>(`v1/matches/${id}`);
-    return response.data.data;
+    const response = await api.get<{ data: { match: MatchData } }>(`v1/matches/${id}`);
+    return response.data.data.match;
   } catch (error) {
     console.error("Error fetching match:", error);
     throw error;

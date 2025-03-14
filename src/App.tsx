@@ -21,27 +21,54 @@ import TablesPage from "./pages/AdminPage/TablesPage/TablesPage";
 import ManagerPage from "./pages/ManagerPage/ManagerPage";
 import TablePage from "./pages/ManagerPage/TablePage/TablePage";
 import MatchPage from "./pages/ManagerPage/MatchesPage/MatchesPage";
+import Unauthorized from "./pages/Unauthorize/page";
+import { ProtectedRoute } from "./components/ProtectRoute/ProtectedRoute";
+import MemberProfile from "./pages/MemberProfile/page";
 
 const router = createBrowserRouter([
+  { path: "/:tableId", element: <LandingPage /> },
   { path: "/", element: <LandingPage /> },
   { path: "/login", element: <Login /> },
+  { path: "/WaitingPage/:tableId", element: <WaitingPage /> },
   { path: "/WaitingPage", element: <WaitingPage /> },
-  { path: "/HomePage", element: <HomePage /> },
+  {
+    path: "/HomePage",
+    element: (
+      <ProtectedRoute allowedRoles={["user"]}>
+        <HomePage />
+      </ProtectedRoute>
+    ),
+  },
   { path: "/GamePlay", element: <GamePlay /> },
-
-  { path: "/admin", element: <AdminPage /> },
+  { path: "/MemberProfile", element: <MemberProfile /> },
+  {
+    path: "/admin",
+    element: (
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <AdminPage />
+      </ProtectedRoute>
+    ),
+  },
   { path: "/admin/users", element: <UsersPage /> },
   { path: "/admin/user/:id", element: <UserProfile /> },
   { path: "/admin/register", element: <UserCreate /> },
   { path: "/admin/members", element: <MembersPage /> },
   { path: "/admin/stores", element: <StoresPage /> },
-  { path: "/admin/create-store", element: <CreateStore/> },
-  { path: "/admin/matches", element: <MatchesPage/> },
-  { path: "/admin/tables", element: <TablesPage/> },
+  { path: "/admin/create-store", element: <CreateStore /> },
+  { path: "/admin/matches", element: <MatchesPage /> },
+  { path: "/admin/tables", element: <TablesPage /> },
 
-  { path: "/manager", element: <ManagerPage /> },
+  {
+    path: "/manager",
+    element: (
+      <ProtectedRoute allowedRoles={["manager"]}>
+        <ManagerPage />
+      </ProtectedRoute>
+    ),
+  },
   { path: "/manager/tables", element: <TablePage /> },
   { path: "/manager/matches", element: <MatchPage /> },
+  { path: "*", element: <Unauthorized /> },
 ]);
 
 function App() {

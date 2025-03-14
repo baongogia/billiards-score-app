@@ -48,7 +48,7 @@ export const fetchManagersWithoutStore = async (): Promise<User[]> => {
 export const fetchUserProfile = async (id: string): Promise<User> => {
   try {
     const response = await api.get(`v1/users/${id}`);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error("Error fetching user profile:", error);
     throw error;
@@ -90,10 +90,32 @@ export const fetchInactiveUsers = async (): Promise<User[]> => {
   }
 };
 
-export const fetchFilteredUsers = async (term: string, sortBy: string, sortDirection: string): Promise<User[]> => {
+export const fetchFilteredUsers = async (
+  term?: string,
+  role?: string,
+  status?: string,
+  current?: number,
+  pageSize?: number,
+  sortBy?: string,
+  sortDirection?: string
+): Promise<{ data: User[]; pagination: { totalItem: number } }> => {
   try {
-    const response = await api.get<{ data: User[] }>(`v1/users/search?term=${term}&sortBy=${sortBy}&sortDirection=${sortDirection}`);
-    return response.data.data;
+    const params = new URLSearchParams();
+    if (term) params.append('term', term);
+    if (role) params.append('role', role);
+    if (status) params.append('status', status);
+    if (current) params.append('current', current.toString());
+    if (pageSize) params.append('pageSize', pageSize.toString());
+    if (sortBy) params.append('sortBy', sortBy);
+    if (sortDirection) params.append('sortDirection', sortDirection);
+
+    const response = await api.get(`v1/users/search?${params.toString()}`);
+    return {
+      data: response.data.data || [],
+      pagination: {
+        totalItem: response.data.pagination?.totalItem || 0
+      }
+    };
   } catch (error) {
     console.error("Error fetching filtered users:", error);
     throw error;
