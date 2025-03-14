@@ -12,7 +12,6 @@ import AdminPage from "./pages/AdminPage/AdminPage";
 import UsersPage from "./pages/AdminPage/UserPage/UsersPage";
 import UserProfile from "./components/Admin/UserTable/UserProfile";
 import UserCreate from "./components/Admin/UserTable/register";
-import MembersPage from "./pages/AdminPage/MemberPage/MembersPage";
 import StoresPage from "./pages/AdminPage/StoresPage/StoresPage";
 import CreateStore from "./components/Admin/StoreTable/CreateStore";
 import MatchesPage from "./pages/AdminPage/MatchesPage/MatchesPage";
@@ -52,7 +51,6 @@ const router = createBrowserRouter([
   { path: "/admin/users", element: <UsersPage /> },
   { path: "/admin/user/:id", element: <UserProfile /> },
   { path: "/admin/register", element: <UserCreate /> },
-  { path: "/admin/members", element: <MembersPage /> },
   { path: "/admin/stores", element: <StoresPage /> },
   { path: "/admin/create-store", element: <CreateStore /> },
   { path: "/admin/matches", element: <MatchesPage /> },
