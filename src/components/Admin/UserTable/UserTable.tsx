@@ -11,7 +11,7 @@ import {
   fetchFilteredUsers,
 } from "../../../services/Admin/User/userService"
 import DeleteConfirmationModal from "./DeleteConfirmationModal"
-import ManagersModal from "./ManagersModal"
+import ManagersModal from "./ManagersWithoutStoreModal"
 import Pagination from "./Pagination" // Import component mới
 
 export default function UserTable() {
