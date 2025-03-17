@@ -34,9 +34,9 @@ const router = createBrowserRouter([
   {
     path: "/HomePage/*",
     element: (
-      <ProtectedRoute allowedRoles={["user"]}>
-        <HomePage />
-      </ProtectedRoute>
+      // <ProtectedRoute allowedRoles={["user"]}>
+      <HomePage />
+      // </ProtectedRoute>
     ),
   },
   { path: "/GamePlay", element: <GamePlay /> },

@@ -19,7 +19,6 @@ export default function Login() {
       localStorage.setItem("token", data.access_token);
       auth?.login(data.access_token, data.user);
       // Decode JWT
-
       const base64Url = data.access_token.split(".")[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       const payload = JSON.parse(window.atob(base64));
