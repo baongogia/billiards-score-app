@@ -32,7 +32,7 @@ const router = createBrowserRouter([
   { path: "/WaitingPage/:tableId", element: <WaitingPage /> },
   { path: "/WaitingPage", element: <WaitingPage /> },
   {
-    path: "/HomePage",
+    path: "/HomePage/*",
     element: (
       <ProtectedRoute allowedRoles={["user"]}>
         <HomePage />

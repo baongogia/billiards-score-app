@@ -61,14 +61,21 @@ export default function Login() {
   useEffect(() => {
     if (userEncoded) {
       try {
-        const user = JSON.parse(
-          decodeURIComponent(decodeURIComponent(userEncoded))
-        );
-        console.log("User Data:", user);
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("token", token || "");
+        console.log("Raw user:", userEncoded);
+        const decodedUser = decodeURIComponent(userEncoded);
+        console.log("Decoded user:", decodedUser);
+
+        // Kiểm tra JSON hợp lệ trước khi parse
+        if (decodedUser.startsWith("{") && decodedUser.endsWith("}")) {
+          const user = JSON.parse(decodedUser);
+          console.log("User Data:", user);
+          localStorage.setItem("user", JSON.stringify(user));
+          localStorage.setItem("token", token || "");
+        } else {
+          console.error("Invalid JSON format:", decodedUser);
+        }
       } catch (error) {
-        console.error("Error parsing user data:", error);
+        console.error("Error decoding user data:", error);
       }
     }
   }, [userEncoded, token]);
