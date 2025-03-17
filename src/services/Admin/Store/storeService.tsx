@@ -8,6 +8,7 @@ export interface Store {
   address: string;
   manager: string;
   isDeleted: boolean;
+  location: string; // Added location field
 }
 
 export const fetchStores = async (): Promise<Store[]> => {

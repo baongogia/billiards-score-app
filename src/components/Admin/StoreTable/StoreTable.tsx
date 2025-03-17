@@ -31,21 +31,21 @@ const StoresTable: React.FC<StoresTableProps> = ({ stores, onUpdateStore, onDele
     setSelectedStore(null)
   }
 
-  const getStatusBadge = (status: string) => {
-    const statusLower = status.toLowerCase()
+  // const getStatusBadge = (status: string) => {
+  //   const statusLower = status.toLowerCase()
 
-    const baseClasses = "px-2.5 py-0.5 text-xs font-medium rounded-full"
+  //   const baseClasses = "px-2.5 py-0.5 text-xs font-medium rounded-full"
 
-    if (statusLower === "active") {
-      return `${baseClasses} bg-emerald-900/60 text-emerald-300 border border-emerald-500/30`
-    } else if (statusLower === "inactive") {
-      return `${baseClasses} bg-red-900/60 text-red-300 border border-red-500/30`
-    } else if (statusLower === "pending") {
-      return `${baseClasses} bg-amber-900/60 text-amber-300 border border-amber-500/30`
-    } else {
-      return `${baseClasses} bg-blue-900/60 text-blue-300 border border-blue-500/30`
-    }
-  }
+  //   if (statusLower === "active") {
+  //     return `${baseClasses} bg-emerald-900/60 text-emerald-300 border border-emerald-500/30`
+  //   } else if (statusLower === "inactive") {
+  //     return `${baseClasses} bg-red-900/60 text-red-300 border border-red-500/30`
+  //   } else if (statusLower === "pending") {
+  //     return `${baseClasses} bg-amber-900/60 text-amber-300 border border-amber-500/30`
+  //   } else {
+  //     return `${baseClasses} bg-blue-900/60 text-blue-300 border border-blue-500/30`
+  //   }
+  // }
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react"
-import { Dialog, Transition } from "@headlessui/react"
-import { Fragment } from "react"
-import { PoolTable } from "../../../services/Admin/Tables/poolTableService"
+import React, { useState, useEffect } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { PoolTable } from "../../../services/Admin/Tables/poolTableService";
 
 interface EditTableModalProps {
   isOpen: boolean;
@@ -12,47 +12,30 @@ interface EditTableModalProps {
 
 export function EditTableModal({ isOpen, onClose, onSubmit, table }: EditTableModalProps) {
   const [tableData, setTableData] = useState<Partial<PoolTable>>({
-    status: "ready",
-    tableType: {
-      type_name: "",
-      compatible_mode: []
-    }
-  })
+    status: "available",
+    store: ""
+  });
 
   useEffect(() => {
     if (table) {
       setTableData({
         status: table.status,
-        tableType: table.tableType
-      })
+        store: table.store
+      });
     }
-  }, [table])
+  }, [table]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    
-    if (name === "type_name") {
-      setTableData(prev => ({
-        ...prev,
-        tableType: {
-          ...prev.tableType!,
-          type_name: value
-        }
-      }))
-    } else {
-      setTableData(prev => ({
-        ...prev,
-        [name]: value
-      }))
-    }
-  }
+    const { name, value } = e.target;
+    setTableData((prevData) => ({ ...prevData, [name]: value }));
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    onSubmit(tableData)
-  }
+    e.preventDefault();
+    onSubmit(tableData);
+  };
 
-  if (!table) return null
+  if (!table) return null;
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -98,20 +81,19 @@ export function EditTableModal({ isOpen, onClose, onSubmit, table }: EditTableMo
                       required
                     >
                       <option value="available">Available</option>
-                      <option value="ready">Ready</option>
-                      <option value="playing">Playing</option>
-                      <option value="finished">Finished</option>
+                      <option value="in_use">In Use</option>
+                      <option value="maintenance">Maintenance</option>
                     </select>
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="type_name" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                      Table Type
+                    <label htmlFor="store" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                      Store
                     </label>
                     <input
                       type="text"
-                      name="type_name"
-                      id="type_name"
-                      value={tableData.tableType?.type_name}
+                      name="store"
+                      id="store"
+                      value={tableData.store}
                       onChange={handleChange}
                       className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-gray-200"
                       required
@@ -139,5 +121,5 @@ export function EditTableModal({ isOpen, onClose, onSubmit, table }: EditTableMo
         </div>
       </Dialog>
     </Transition>
-  )
-} 
+  );
+}

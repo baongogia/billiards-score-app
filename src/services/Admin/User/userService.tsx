@@ -25,7 +25,7 @@ export interface User {
 
 export const fetchManagersWithoutStore = async (): Promise<User[]> => {
   try {
-    const response = await api.get("v1/stores/manager/withoutStore");
+    const response = await api.get("v1/stores/user/withoutStore");
     const data = response.data as { data: User[] };
     return data.data.filter(user => user.role === "manager" && user.status === "active");
   } catch (error) {
@@ -88,7 +88,7 @@ export const fetchFilteredUsers = async (
   sortBy?: string,
   sortDirection?: string
 ): Promise<{
-  length: number; data: User[]; pagination: { totalItem: number } 
+  length: number; data: User[]; pagination: { totalItem: number }
 }> => {
   try {
     const params = new URLSearchParams();
@@ -104,6 +104,7 @@ export const fetchFilteredUsers = async (
     console.log("API Response:", response.data); // Thêm log để kiểm tra response
 
     return {
+      length: response.data.data?.length || 0,
       data: response.data.data || [],
       pagination: {
         totalItem: response.data.pagination?.totalItem || 0

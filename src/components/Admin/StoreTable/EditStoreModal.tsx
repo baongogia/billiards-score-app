@@ -19,7 +19,7 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
 
   if (!isOpen || !selectedStore) return null;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setStoreData((prevData) => ({ ...prevData, [name]: value }));
   };
@@ -67,6 +67,30 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
                 className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
                 required
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+              <input
+                type="text"
+                name="location"
+                value={storeData.location || ""}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+              <select
+                name="isDeleted"
+                value={storeData.isDeleted ? "inactive" : "active"}
+                onChange={(e) => handleChange({ ...e, target: { ...e.target, value: (e.target.value === "inactive").toString() } })}
+                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                required
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
             </div>
           </div>
           <div className="mt-6 flex justify-end space-x-4">

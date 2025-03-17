@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { Search, Plus } from "lucide-react"
+import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react"
 import {
   fetchManagersWithoutStore,
   fetchUserProfile,
@@ -12,7 +12,6 @@ import {
 } from "../../../services/Admin/User/userService"
 import DeleteConfirmationModal from "./DeleteConfirmationModal"
 import ManagersModal from "./ManagersWithoutStoreModal"
-import Pagination from "./Pagination" // Import component mới
 
 export default function UserTable() {
   const [users, setUsers] = useState<User[]>([])
@@ -30,7 +29,7 @@ export default function UserTable() {
   const [sortBy, setSortBy] = useState("createdAt")
   const [sortDirection, setSortDirection] = useState("asc")
   const [currentPage, setCurrentPage] = useState(1)
-  const pageSize = 10
+  const pageSize = 20
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -43,7 +42,7 @@ export default function UserTable() {
           currentPage,
           pageSize,
           sortBy,
-          sortDirection
+          sortDirection,
         )
 
         console.log("API Response:", response)
@@ -55,6 +54,14 @@ export default function UserTable() {
         setUsers(userData)
         setTotalItems(total)
         setIsLoading(false)
+
+        // Add this after the API call in the useEffect
+        console.log("Pagination debug:", {
+          totalItems,
+          totalPages,
+          currentPage,
+          pageSize,
+        })
       } catch (error) {
         console.error("Error fetching users:", error)
         setIsLoading(false)
@@ -95,15 +102,7 @@ export default function UserTable() {
       await deleteUser(userToDelete)
       setIsDeleteModalOpen(false)
 
-      const response = await fetchFilteredUsers(
-        searchTerm,
-        role,
-        status,
-        currentPage,
-        pageSize,
-        sortBy,
-        sortDirection
-      )
+      const response = await fetchFilteredUsers(searchTerm, role, status, currentPage, pageSize, sortBy, sortDirection)
 
       const userData = response.data.data || response || []
       const total = response.pagination.totalItem || response.length || 0
@@ -133,7 +132,81 @@ export default function UserTable() {
   const getStatusIndicator = (status: string) => {
     return status.toLowerCase() === "active" ? "bg-green-500" : "bg-gray-400"
   }
+  const totalPages = Math.ceil(totalItems / pageSize)
 
+  const renderPagination = () => {
+    if (totalPages <= 0 || !totalItems) return null
+
+    const pages = []
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      pages.push(1)
+      if (currentPage > 3) pages.push("...")
+
+      const startPage = Math.max(2, currentPage - 1)
+      const endPage = Math.min(totalPages - 1, currentPage + 1)
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i)
+      }
+
+      if (currentPage < totalPages - 2) pages.push("...")
+      pages.push(totalPages)
+    }
+
+    return (
+      <div className="flex items-center justify-between px-4 py-5 mt-6">
+        <div className="hidden sm:block">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            Showing <span className="font-medium">{Math.min(totalItems, 1 + (currentPage - 1) * pageSize)}</span> to{" "}
+            <span className="font-medium">{Math.min(currentPage * pageSize, totalItems)}</span> of{" "}
+            <span className="font-medium">{totalItems}</span> results
+          </p>
+        </div>
+        <div className="flex gap-1 mx-auto sm:mx-0">
+          <button
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            disabled={currentPage === 1}
+            className="relative inline-flex items-center justify-center w-10 h-10 rounded-lg text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          {pages.map((page, index) =>
+            page === "..." ? (
+              <span
+                key={`ellipsis-${index}`}
+                className="relative inline-flex items-center justify-center w-10 h-10 text-gray-500 dark:text-gray-400"
+              >
+                ...
+              </span>
+            ) : (
+              <button
+                key={`page-${page}`}
+                onClick={() => typeof page === "number" && setCurrentPage(page)}
+                className={`relative inline-flex items-center justify-center w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                  currentPage === page
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                }`}
+              >
+                {page}
+              </button>
+            ),
+          )}
+          <button
+            onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            disabled={currentPage === totalPages || totalPages === 0}
+            className="relative inline-flex items-center justify-center w-10 h-10 rounded-lg text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
       {/* Header Section */}
@@ -279,7 +352,7 @@ export default function UserTable() {
                         <div className="relative">
                           {user.avatar ? (
                             <img
-                              src={user.avatar}
+                              src={user.avatar || "/placeholder.svg"}
                               alt={user.name}
                               className="w-10 h-10 rounded-full object-cover"
                             />
@@ -290,7 +363,7 @@ export default function UserTable() {
                           )}
                           <div
                             className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white dark:border-gray-800 ${getStatusIndicator(
-                              user.status || "inactive"
+                              user.status || "inactive",
                             )}`}
                           ></div>
                         </div>
@@ -305,7 +378,7 @@ export default function UserTable() {
                     <td className="py-4 px-5">
                       <span
                         className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getRoleBadgeClass(
-                          user.role
+                          user.role,
                         )}`}
                       >
                         {user.role?.charAt(0).toUpperCase() + user.role?.slice(1)}
@@ -346,19 +419,10 @@ export default function UserTable() {
       </div>
 
       {/* Pagination */}
-      <Pagination
-        currentPage={currentPage}
-        totalItems={totalItems}
-        pageSize={pageSize}
-        onPageChange={setCurrentPage}
-      />
+      {renderPagination()}
 
       {/* Managers Modal */}
-      <ManagersModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        managers={managersWithoutStore}
-      />
+      <ManagersModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} managers={managersWithoutStore} />
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
@@ -369,3 +433,4 @@ export default function UserTable() {
     </div>
   )
 }
+

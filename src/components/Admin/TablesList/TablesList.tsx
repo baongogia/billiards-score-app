@@ -1,6 +1,6 @@
 // TablesList.tsx
 import { useState, useEffect } from "react";
-import { Search, ChevronLeft, ChevronRight, Edit, Trash2, Plus, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit, Trash2, Plus, Eye } from "lucide-react";
 import { fetchPoolTables, PoolTable, deletePoolTable, createPoolTable, updatePoolTable } from "../../../services/Admin/Tables/poolTableService";
 import ViewTableModal from "./ViewTableModal";
 import { CreateTableModal } from "./CreateTableModal";
@@ -33,7 +33,7 @@ export default function TablesList() {
     }
   };
 
-  const handleCreateTable = async (tableData: any) => {
+  const handleCreateTable = async (tableData: PoolTable) => {
     try {
       await createPoolTable(tableData);
       await loadTables();
