@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import "./index.scss";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Form } from "antd";
 import { login } from "../../services/auth/authService";
 import { toast } from "react-toastify";
@@ -19,6 +19,7 @@ export default function Login() {
       localStorage.setItem("token", data.access_token);
       auth?.login(data.access_token, data.user);
       // Decode JWT
+
       const base64Url = data.access_token.split(".")[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       const payload = JSON.parse(window.atob(base64));
@@ -52,6 +53,25 @@ export default function Login() {
       }
     }
   }, [navigate]);
+
+  const [searchParams] = useSearchParams();
+  const userEncoded = searchParams.get("user");
+  const token = searchParams.get("token");
+
+  useEffect(() => {
+    if (userEncoded) {
+      try {
+        const user = JSON.parse(
+          decodeURIComponent(decodeURIComponent(userEncoded))
+        );
+        console.log("User Data:", user);
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("token", token || "");
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, [userEncoded, token]);
 
   const onFinish = async (values: any) => {
     await fetchData(values.email, values.password);
