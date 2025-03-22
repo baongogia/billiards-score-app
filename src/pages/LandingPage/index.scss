@@ -24,7 +24,6 @@ $text-color: #ffffffdd;
   left: 0;
   top: 0;
   color: $text-color;
-
   padding-left: 16px;
 }
 
@@ -33,6 +32,7 @@ $text-color: #ffffffdd;
   font-size: 13px;
   font-weight: 500;
 }
+
 .content-place {
   font-weight: 500;
 }
@@ -61,6 +61,7 @@ $text-color: #ffffffdd;
     height: 46px;
 
     overflow: hidden;
+
     .text {
       padding-top: 16px;
       font-size: 20px;
@@ -84,6 +85,7 @@ $text-color: #ffffffdd;
     font-size: 72px;
     font-family: "Oswald", sans-serif;
   }
+
   .title-box-1,
   .title-box-2 {
     margin-top: 2px;
@@ -91,16 +93,19 @@ $text-color: #ffffffdd;
     overflow: hidden;
     // background-color: blue;
   }
-  > .desc {
+
+  >.desc {
     margin-top: 16px;
     width: 500px;
   }
-  > .cta {
+
+  >.cta {
     width: 500px;
     margin-top: 24px;
     display: flex;
     align-items: center;
-    > .bookmark {
+
+    >.bookmark {
       border: none;
       background-color: $primary-color;
       width: 36px;
@@ -109,12 +114,14 @@ $text-color: #ffffffdd;
       color: white;
       display: grid;
       place-items: center;
+
       svg {
         width: 20px;
         height: 20px;
       }
     }
-    > .discover {
+
+    >.discover {
       border: 1px solid #ffffff;
       background-color: transparent;
       height: 36px;
@@ -134,7 +141,7 @@ $text-color: #ffffffdd;
   top: 0px;
   display: inline-flex;
 
-  > .arrow {
+  >.arrow {
     z-index: 60;
     width: 50px;
     height: 50px;
@@ -142,9 +149,11 @@ $text-color: #ffffffdd;
     border: 2px solid #ffffff55;
     display: grid;
     place-items: center;
+
     &:nth-child(2) {
       margin-left: 20px;
     }
+
     svg {
       width: 24px;
       height: 24px;
@@ -160,10 +169,12 @@ $text-color: #ffffffdd;
     height: 50px;
     display: flex;
     align-items: center;
+
     .progress-sub-background {
       width: 500px;
       height: 3px;
       background-color: #ffffff33;
+
       .progress-sub-foreground {
         height: 3px;
         background-color: $primary-color;

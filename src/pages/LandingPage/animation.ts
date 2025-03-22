@@ -11,6 +11,7 @@ const safeGSAP = (selector: string, options: any) => {
     console.warn(`GSAP target ${selector} not found.`);
   }
 };
+
 // Data
 const data = [
   {
@@ -64,8 +65,7 @@ const _ = (id: any) => document.getElementById(id);
 const cards = data
   .map(
     (i, index) =>
-      `<div class="card bg-cover bg-center bg-no-repeat" id="card${index}" style="background-image:url(${
-        i.image ? i.image : ""
+      `<div class="card bg-cover bg-center bg-no-repeat" id="card${index}" style="background-image:url(${i.image ? i.image : ""
       })"></div>`
   )
   .join("");
@@ -420,6 +420,44 @@ async function loadImage(src: any) {
   });
 }
 
+function simplifiedSlideShow() {
+  let currentIndex = 0;
+  const totalSlides = data.length;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  // Apply full-screen dimensions to all cards and contents
+  for (let i = 0; i < totalSlides; i++) {
+    gsap.set(`#card${i}`, {
+      opacity: 0,
+      width: viewportWidth,
+      height: viewportHeight
+    });
+    gsap.set(`#card-content-${i}`, {
+      opacity: 0,
+      top: "5%",
+      fontSize: "30%",
+      // You can add additional styling if needed, such as positioning or font-size adjustments for mobile
+    });
+    gsap.set(`#card-content-${i} .content-place`, { fontSize: "1.6rem" });
+    gsap.set(`#card-content-${i} .content-title-1`, { fontSize: "2rem" });
+    gsap.set(`#card-content-${i} .content-title-2`, { fontSize: "2rem" });
+  }
+  gsap.set(`#card0`, { opacity: 1 });
+  gsap.set(`#card-content-0`, { opacity: 1 });
+
+
+
+  // Rotate slides every 3 seconds (adjust duration as needed)
+  setInterval(() => {
+    gsap.to(`#card${currentIndex}`, { opacity: 0, duration: 0.5 });
+    gsap.to(`#card-content-${currentIndex}`, { opacity: 0, duration: 0.5 });
+    currentIndex = (currentIndex + 1) % totalSlides;
+    gsap.to(`#card${currentIndex}`, { opacity: 1, duration: 0.5 });
+    gsap.to(`#card-content-${currentIndex}`, { opacity: 1, duration: 0.5 });
+  }, 3000);
+}
+
 async function loadImages() {
   const promises = data.map(({ image }) => loadImage(image));
   return Promise.all(promises);
@@ -432,9 +470,17 @@ async function start() {
     if (demoElement) {
       demoElement.innerHTML = cards + cardContents;
       demoElement.style.opacity = "1";
+      if (window.innerWidth < 768) {
+        demoElement.style.zIndex = "0";
+        demoElement.style.pointerEvents = "none";
+      }
     }
-    init();
-    loop();
+    if (window.innerWidth < 768) {
+      simplifiedSlideShow();
+    } else {
+      init();
+      loop();
+    }
   } catch (error) {
     console.error("One or more images failed to load", error);
   }

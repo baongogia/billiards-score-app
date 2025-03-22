@@ -83,7 +83,7 @@ export default function LandingPage() {
       <div className="pagination" id="pagination"></div>
       <div className="cover"></div>
       {/* Button */}
-      <div className="absolute w-full h-full z-50 top-[69vh] left-[3.8vw] flex space-x-4">
+      <div className="absolute w-full h-full z-100 top-[77vh] left-[3.8vw] flex space-x-4">
         <div className="w-34 h-14 border-white border-1">
           <div
             className="w-full h-full bg-[rgba(0,0,0,0.2)] text-white flex justify-center items-center
@@ -105,11 +105,10 @@ export default function LandingPage() {
       </div>
       {/* Overlay */}
       <div
-        className={`overlay absolute w-full h-full z-50  flex justify-center items-center transition-all duration-300 ${
-          overLayer
+        className={`overlay absolute w-full h-full z-50  flex justify-center items-center transition-all duration-300 ${overLayer
             ? "bg-[rgba(0,0,0,0.6)] pointer-events-auto"
             : "bg-[rgba(0,0,0,0)] pointer-events-none opacity-0"
-        }`}
+          }`}
       >
         {tableId && <GuestCard id={tableId} />}
       </div>
