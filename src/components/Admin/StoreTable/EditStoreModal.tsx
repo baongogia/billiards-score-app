@@ -69,17 +69,6 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
-              <input
-                type="text"
-                name="location"
-                value={storeData.location || ""}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
-                required
-              />
-            </div>
-            <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
               <select
                 name="isDeleted"
