@@ -1,18 +1,36 @@
-import { useContext, useRef, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import "./index.scss";
 import { FaUserPen } from "react-icons/fa6";
 import { AuthContext } from "../../context/AuthContext";
 import { IoMdArrowRoundBack } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { findUser } from "../../services/auth/authService";
+import { toast } from "react-toastify";
 
 export default function MemberProfile() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [allUserData, setAllUserData] = useState<any>(null);
+  const userId = useParams().id;
+  console.log(allUserData?.avatar);
 
+  const fetchUserData = useCallback(async () => {
+    try {
+      if (!userId) {
+        throw new Error("User ID is undefined");
+      }
+      const res = await findUser(userId);
+      const allUserData = res.data.data;
+      setAllUserData(allUserData);
+    } catch (error: any) {
+      toast.error(error);
+    }
+  }, [userId]);
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
   // Lấy ảnh từ LocalStorage nếu có, nếu không dùng ảnh mặc định
-  const [profileImage, setProfileImage] = useState<string>(
-    localStorage.getItem("profileImage") ||
-      "https://images.pexels.com/photos/6253978/pexels-photo-6253978.jpeg?auto=compress&cs=tinysrgb&w=800"
-  );
+  const [profileImage, setProfileImage] = useState<string>("");
 
   // Khi click vào ảnh -> mở file input
   const handleImageClick = () => {
@@ -60,13 +78,13 @@ export default function MemberProfile() {
     <div>
       <div
         style={{
-          backgroundImage: `url(" https://images.pexels.com/photos/7403772/pexels-photo-7403772.jpeg")`,
+          backgroundImage: `url("https://images.pexels.com/photos/7403772/pexels-photo-7403772.jpeg")`,
         }}
         className="wrapper bg-cover bg-center bg-no-repeat"
       >
         <div className="profile-card js-profile-card">
           <div className="profile-card__img">
-            <img src={profileImage} alt="Profile" />
+            <img src={allUserData?.avatar || profileImage} alt="Profile" />
           </div>
           <input
             type="file"

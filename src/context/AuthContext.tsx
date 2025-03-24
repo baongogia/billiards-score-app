@@ -4,6 +4,8 @@ interface User {
   name: string;
   email: string;
   avatar: string;
+  role: string | undefined;
+  _id: string;
 }
 
 interface AuthContextType {
@@ -16,6 +18,7 @@ interface AuthContextType {
   }) => void;
   login: (token: string, user: User) => void;
   logout: () => void;
+  isLoading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -26,6 +29,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+
+    if (token && user) {
+      login(token, user);
+    }
+    setIsLoading(false); // Đánh dấu đã xử lý xong
+  }, []);
 
   // ✅ Khi component mount, lấy lại `token` và `user` từ `localStorage`
   useEffect(() => {
@@ -93,7 +107,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, user, isAuthenticated, setAuthState, login, logout }}
+      value={{
+        token,
+        user,
+        isAuthenticated,
+        setAuthState,
+        login,
+        logout,
+        isLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>

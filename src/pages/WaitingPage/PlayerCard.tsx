@@ -1,8 +1,11 @@
 interface PlayerCardProps {
   className?: string;
   name: string;
+  data?: {
+    avatar: string;
+  };
 }
-export default function PlayerCard({ className, name }: PlayerCardProps) {
+export default function PlayerCard({ className, name, data }: PlayerCardProps) {
   return (
     <div
       style={{
@@ -16,9 +19,12 @@ export default function PlayerCard({ className, name }: PlayerCardProps) {
       {/* Avatar Container */}
       <div
         style={{
-          backgroundImage: `url("https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/474094aUF/anh-dep-doremon_033145831.png")`,
+          backgroundImage: `url("${
+            data?.avatar ||
+            "https://images.pexels.com/photos/5986316/pexels-photo-5986316.jpeg?auto=compress&cs=tinysrgb&w=1200"
+          }")`,
         }}
-        className="relative w-full h-full bg-contain bg-no-repeat bg-center rounded-xl flex justify-end items-end shadow-lg"
+        className="relative w-full h-full bg-cover bg-no-repeat bg-center rounded-xl flex justify-end items-end shadow-lg"
       >
         {/* Name Tag */}
         <div className="absolute bottom-0 w-full h-14 bg-[rgba(255,255,255,0.15)] backdrop-blur-md rounded-b-xl flex justify-center items-center uppercase text-white font-bold text-lg shadow-md">

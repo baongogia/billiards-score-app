@@ -1,46 +1,49 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "./index.scss";
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+import { useGame } from "../../context/GameContext";
+import { findUser } from "../../services/auth/authService";
+import { useCallback } from "react";
+import { RiLogoutBoxFill } from "react-icons/ri";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
   const tableId = localStorage.getItem("tableId");
+  const id = auth?.user?._id;
+  const { setGameState } = useGame();
+
+  const [isGameStateSet, setIsGameStateSet] = useState(false);
+  const [allUserData, setAllUserData] = useState<any>(null);
+  // Get user data
+  const fetchUserData = useCallback(async () => {
+    try {
+      if (!auth?.user?._id) {
+        throw new Error("User ID is undefined");
+      }
+      const res = await findUser(auth.user._id);
+      const allUserData = res.data.data;
+      setAllUserData(allUserData);
+    } catch (error: any) {
+      toast.error(error);
+    }
+  }, [auth]);
+  // Get tableId from URL params
   useEffect(() => {
     if (tableId) {
       localStorage.setItem("tableId", tableId);
     }
-  }, [tableId]);
+    fetchUserData();
+  }, [tableId, fetchUserData]);
   // Kiểm tra xem người dùng đã đăng nhập chưa
-  if (!auth?.token) {
-    navigate(`/${tableId}`);
-    toast.success("Log out successfully!");
-  } else {
-    console.log("User authenticated");
-  }
-  // Profile image
-  const [profileImage, setProfileImage] = useState<string>(
-    localStorage.getItem("profileImage") ||
-      "https://images.pexels.com/photos/6253978/pexels-photo-6253978.jpeg?auto=compress&cs=tinysrgb&w=800"
-  );
-
-  // Theo dõi khi ảnh thay đổi trong LocalStorage
   useEffect(() => {
-    const updateProfileImage = () => {
-      setProfileImage(
-        localStorage.getItem("profileImage") || "default-avatar.png"
-      );
-    };
-
-    // Lắng nghe sự kiện storage khi localStorage thay đổi
-    window.addEventListener("storage", updateProfileImage);
-
-    return () => {
-      window.removeEventListener("storage", updateProfileImage);
-    };
-  }, []);
+    if (!auth?.isLoading && !auth?.isAuthenticated) {
+      navigate(`/${tableId}`);
+    }
+  }, [auth?.isLoading, auth?.isAuthenticated, tableId, navigate]);
   // Xử lý khi người dùng đăng nhập
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -59,8 +62,17 @@ const HomePage = () => {
       }
     }
   }, [auth, navigate]);
-  // Handle start game
 
+  // Set game state when user is authenticated
+  useEffect(() => {
+    if (auth?.user && !isGameStateSet && allUserData) {
+      setGameState({
+        playerName: allUserData?.name,
+      });
+      setIsGameStateSet(true);
+    }
+  }, [auth?.user, isGameStateSet, setGameState, allUserData]);
+  // Handle start game
   const handleStartGame = async () => {
     navigate(`/WaitingPage/${tableId}`);
   };
@@ -78,7 +90,7 @@ const HomePage = () => {
               </a>
             </li>
             <li>
-              <a className="header-menu-tab" href="/MemberProfile">
+              <a className="header-menu-tab" href={`/MemberProfile/${id}`}>
                 <span className="icon fontawesome-user scnd-font-color"></span>
                 Account
               </a>
@@ -107,9 +119,16 @@ const HomePage = () => {
               </a>
             </p>
             <div
-              onClick={auth?.logout}
+              onClick={() => {
+                navigate(`/MemberProfile/${id}`);
+              }}
               className="profile-picture small-profile-picture cursor-pointer bg-cover bg-center bg-no-repeat"
-              style={{ backgroundImage: `url(${profileImage})` }}
+              style={{
+                backgroundImage: `url(${
+                  allUserData?.avatar ||
+                  "https://images.pexels.com/photos/5986316/pexels-photo-5986316.jpeg?auto=compress&cs=tinysrgb&w=800"
+                })`,
+              }}
             ></div>
           </div>
         </header>
@@ -139,16 +158,18 @@ const HomePage = () => {
                   </a>
                 </li>
                 <li>
-                  <a className="menu-box-tab" href="/MemberProfile">
+                  <a className="menu-box-tab" href={`/MemberProfile/${id}`}>
                     <span className="icon entypo-cog scnd-font-color"></span>
                     Account Settings
                   </a>
                 </li>
-                <li>
-                  <a className="menu-box-tab" href="#13">
-                    <span className="icon entypo-chart-line scnd-font-color"></span>
-                    Statistics
-                  </a>
+                <li onClick={auth?.logout}>
+                  <div className="menu-box-tab scnd-font-color ml-4.5 cursor-pointer">
+                    <div className="flex items-center gap-5">
+                      <RiLogoutBoxFill size={25} />
+                      <>Log out</>
+                    </div>
+                  </div>
                 </li>
               </ul>
             </div>

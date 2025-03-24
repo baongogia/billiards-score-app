@@ -33,14 +33,10 @@ const router = createBrowserRouter([
   { path: "/WaitingPage", element: <WaitingPage /> },
   {
     path: "/HomePage/*",
-    element: (
-      // <ProtectedRoute allowedRoles={["user"]}>
-      <HomePage />
-      // </ProtectedRoute>
-    ),
+    element: <HomePage />,
   },
   { path: "/GamePlay", element: <GamePlay /> },
-  { path: "/MemberProfile", element: <MemberProfile /> },
+  { path: "/MemberProfile/:id", element: <MemberProfile /> },
   {
     path: "/admin",
     element: (
