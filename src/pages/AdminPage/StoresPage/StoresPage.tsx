@@ -70,7 +70,13 @@ const StoreManagement: React.FC = () => {
   const handleSaveStore = async (storeData: Partial<Store>) => {
     if (selectedStore) {
       try {
-        const updatedStore = await updateStore(selectedStore._id, storeData.name || selectedStore.name);
+        const updatedStore = await updateStore(
+          selectedStore._id,
+          storeData.name || selectedStore.name,
+          storeData.address || selectedStore.address,
+          storeData.manager || selectedStore.manager,
+          storeData.isDeleted !== undefined ? storeData.isDeleted : selectedStore.isDeleted,
+        );
         setStores(stores.map((store) => (store._id === selectedStore._id ? updatedStore : store)));
         setIsEditModalOpen(false);
       } catch (error) {

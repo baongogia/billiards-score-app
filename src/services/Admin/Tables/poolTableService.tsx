@@ -55,6 +55,7 @@ export const fetchPoolTableById = async (id: string): Promise<PoolTable> => {
 export const createPoolTable = async (poolTableData: PoolTableRequest): Promise<PoolTable> => {
   try {
     const response = await api.post<{ data: PoolTable }>("v1/pooltables", poolTableData);
+    console.log("create success");
     return response.data.data;
   } catch (error) {
     console.error("Error creating pool table:", error);
@@ -66,6 +67,7 @@ export const createPoolTable = async (poolTableData: PoolTableRequest): Promise<
 export const updatePoolTable = async (id: string, poolTableData: Partial<PoolTableRequest>): Promise<PoolTable> => {
   try {
     const response = await api.put<{ data: PoolTable }>(`v1/pooltables/${id}`, poolTableData);
+    console.log("update success");
     return response.data.data;
   } catch (error) {
     console.error("Error updating pool table:", error);
@@ -77,6 +79,7 @@ export const updatePoolTable = async (id: string, poolTableData: Partial<PoolTab
 export const deletePoolTable = async (id: string): Promise<void> => {
   try {
     await api.delete(`v1/pooltables/${id}`);
+    console.log("delete success");
   } catch (error) {
     console.error("Error deleting pool table:", error);
     throw error;
@@ -87,6 +90,7 @@ export const deletePoolTable = async (id: string): Promise<void> => {
 export const fetchPoolTablesByStoreId = async (storeId: string): Promise<PoolTable[]> => {
   try {
     const response = await api.get<{ data: PoolTable[] }>(`v1/pooltables/store/${storeId}`);
+    console.log("get table in store success");
     return response.data.data;
   } catch (error) {
     console.error("Error fetching pool tables by store ID:", error);

@@ -81,7 +81,7 @@ export function CreateTableModal({ isOpen, onClose, onSubmit }: CreateTableModal
                 </Dialog.Title>
                 <form onSubmit={handleSubmit} className="mt-4">
                   <div className="mb-4">
-                    <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                    <label htmlFor="status" className="block text-sm font-medium text-black">
                       Status
                     </label>
                     <select
@@ -98,7 +98,7 @@ export function CreateTableModal({ isOpen, onClose, onSubmit }: CreateTableModal
                     </select>
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="type_name" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                    <label htmlFor="type_name" className="block text-sm font-medium text-black">
                       Table Type
                     </label>
                     <input
@@ -112,7 +112,7 @@ export function CreateTableModal({ isOpen, onClose, onSubmit }: CreateTableModal
                     />
                   </div>
                   <div className="mb-4">
-                    <label htmlFor="store" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                    <label htmlFor="store" className="block text-sm font-medium text-black">
                       Store ID
                     </label>
                     <input

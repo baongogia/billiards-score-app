@@ -13,6 +13,7 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
 
   useEffect(() => {
     if (selectedStore) {
+      console.log("Selected Store:", selectedStore);
       setStoreData(selectedStore);
     }
   }, [selectedStore]);
@@ -26,6 +27,7 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Store Data to Save:", storeData);
     onSave(storeData);
   };
 
@@ -36,7 +38,7 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+              <label className="block text-sm font-medium text-black">Name</label>
               <input
                 type="text"
                 name="name"
@@ -47,7 +49,7 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
+              <label className="block text-sm font-medium text-black">Address</label>
               <input
                 type="text"
                 name="address"
@@ -58,7 +60,7 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Manager</label>
+              <label className="block text-sm font-medium text-black">Manager ID</label>
               <input
                 type="text"
                 name="manager"
@@ -69,11 +71,11 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+              <label className="block text-sm font-medium text-black">Status</label>
               <select
                 name="isDeleted"
                 value={storeData.isDeleted ? "inactive" : "active"}
-                onChange={(e) => handleChange({ ...e, target: { ...e.target, value: (e.target.value === "inactive").toString() } })}
+                onChange={handleChange}
                 className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
                 required
               >

@@ -4,11 +4,9 @@ import { PoolTable } from "../Tables/poolTableService";
 export interface Store {
   _id: string;
   name: string;
-  status: string;
   address: string;
   manager: string;
   isDeleted: boolean;
-  location: string; // Added location field
 }
 
 export const fetchStores = async (): Promise<Store[]> => {
@@ -16,6 +14,7 @@ export const fetchStores = async (): Promise<Store[]> => {
     const response = await api.get<{ data: Store[] }>("v1/stores", {
       params: { action: "findAll" },
     });
+    console.log("get success");
     return response.data.data.filter(store => !store.isDeleted);
   } catch (error) {
     console.error("Error fetching stores:", error);
@@ -26,6 +25,7 @@ export const fetchStores = async (): Promise<Store[]> => {
 export const fetchStoreById = async (id: string): Promise<Store> => {
   try {
     const response = await api.get<{ data: Store }>(`v1/stores/${id}`);
+    console.log("get id  success");
     return response.data.data;
   } catch (error) {
     console.error("Error fetching store by ID:", error);
@@ -36,18 +36,25 @@ export const fetchStoreById = async (id: string): Promise<Store> => {
 export const deleteStore = async (storeId: string): Promise<void> => {
   try {
     await api.delete(`v1/stores/${storeId}`);
+    console.log("delete success");
   } catch (error) {
     console.error("Error deleting store:", error);
     throw error;
   }
 };
 
-export const updateStore = async (storeId: string, newName: string): Promise<Store> => {
+export const updateStore = async (storeId: string, newName: string, newAddress: string, newManager: string, newIsDeleted: boolean): Promise<Store> => {
   try {
     const response = await api.put(
       `v1/stores/${storeId}`,
-      { name: newName }
+      { 
+        name: newName,
+        address: newAddress,
+        manager: newManager,
+        isDeleted: newIsDeleted
+      }
     );
+    console.log("update success");
     return response.data as Store;
   } catch (error) {
     console.error("Error updating store:", error);
@@ -58,6 +65,7 @@ export const updateStore = async (storeId: string, newName: string): Promise<Sto
 export const fetchInactiveStores = async (): Promise<Store[]> => {
   try {
     const response = await api.get<{ data: Store[] }>("v1/stores/showDeleted");
+    console.log("get manager success");
     return response.data.data;
   } catch (error) {
     console.error("Error fetching inactive stores:", error);

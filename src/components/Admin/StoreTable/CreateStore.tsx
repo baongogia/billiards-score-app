@@ -35,7 +35,7 @@ const CreateStore: React.FC = () => {
 
         <div className="space-y-6">
           <label className="block">
-            <span className="text-gray-700 dark:text-gray-300 font-semibold">Store Name</span>
+            <span className="text-black font-semibold">Store Name</span>
             <input
               type="text"
               value={newStoreName}
@@ -46,7 +46,7 @@ const CreateStore: React.FC = () => {
           </label>
 
           <label className="block">
-            <span className="text-gray-700 dark:text-gray-300 font-semibold">Store Address</span>
+            <span className="text-black font-semibold">Store Address</span>
             <input
               type="text"
               value={newStoreAddress}
@@ -57,7 +57,7 @@ const CreateStore: React.FC = () => {
           </label>
 
           <label className="block">
-            <span className="text-gray-700 dark:text-gray-300 font-semibold">Store Manager ID</span>
+            <span className="text-black font-semibold">Store Manager ID</span>
             <input
               type="text"
               value={newStoreManager}

@@ -7,7 +7,7 @@ interface Store {
   name: string
   status: string
   address: string
-  manager: string
+  managerID: string
 }
 
 interface StoresTableProps {
@@ -56,7 +56,7 @@ const StoresTable: React.FC<StoresTableProps> = ({ stores, onUpdateStore, onDele
               <span className="block font-bold text-lg mb-2">{store.name}</span>
               <span className="block mb-1"><strong>Status:</strong> {store.status}</span>
               <span className="block mb-1 truncate"><strong>Address:</strong> {store.address}</span>
-              <span className="block mb-1"><strong>Manager:</strong> {store.manager}</span>
+              <span className="block mb-1"><strong>ManagerID:</strong> {store.managerID}</span>
               <div className="flex justify-end mt-4 space-x-2">
                 <button
                   onClick={() => handleViewStore(store)}
