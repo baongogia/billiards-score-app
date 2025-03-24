@@ -11,17 +11,17 @@ export interface User {
   avatar?: string;
 }
 
-// export const fetchUsers = async (): Promise<User[]> => {
-//   try {
-//     const response = await api.get("v1/users/find");
-//     console.log("API Response:", response.data.data); // Log để kiểm tra
-//     const data = response.data as { data: User[] };
-//     return data.data.filter(user => (user.role === "manager" || user.role === "admin") && user.status === "active");
-//   } catch (error) {
-//     console.error("Error fetching users:", error);
-//     throw error;
-//   }
-// };
+export const fetchUsers = async (): Promise<User[]> => {
+  try {
+    const response = await api.get("v1/users/find");
+    console.log("API Response:", response.data.data); // Log để kiểm tra
+    const data = response.data as { data: User[] };
+    return data.data; // Return the data without filtering
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+};
 
 export const fetchManagersWithoutStore = async (): Promise<User[]> => {
   try {
@@ -37,9 +37,20 @@ export const fetchManagersWithoutStore = async (): Promise<User[]> => {
 export const fetchUserProfile = async (id: string): Promise<User> => {
   try {
     const response = await api.get(`v1/users/${id}`);
+    console.log("Get profile success");
     return response.data.data;
   } catch (error) {
     console.error("Error fetching user profile:", error);
+    throw error;
+  }
+};
+
+export const updateUser = async (id: string, userData: Partial<User>): Promise<User> => {
+  try {
+    const response = await api.put(`v1/users/${id}`, userData);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error updating user:", error);
     throw error;
   }
 };

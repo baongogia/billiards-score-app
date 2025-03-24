@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { fetchUserProfile, type User } from "../../../services/Admin/User/userService"
+import { fetchUserProfile, updateUser, type User } from "../../../services/Admin/User/userService"
 import { ArrowLeft } from "lucide-react"
+import EditUserProfileModal from "./EditUserProfileModal"
+import { uploadAvatar } from "../../../services/Admin/User/avatarService" // Import the uploadAvatar function
 
 export default function UserProfile() {
   const { id } = useParams<{ id: string }>()
@@ -11,6 +13,7 @@ export default function UserProfile() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -31,6 +34,33 @@ export default function UserProfile() {
 
     loadUserProfile()
   }, [id])
+
+  const handleSaveUser = async (userData: Partial<User>) => {
+    if (user) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { _id, avatar, deletedAt, createdAt, updatedAt, __v, ...filteredData } = userData
+        console.log("Data sent to API:", filteredData) // Kiểm tra dữ liệu trước khi gửi
+        const updatedUser = await updateUser(user._id, filteredData)
+        setUser(updatedUser)
+        setIsEditModalOpen(false)
+      } catch (error) {
+        console.error("Error updating user:", error)
+      }
+    }
+  }
+
+  const handleChangeAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0] && user) {
+      const file = event.target.files[0]
+      try {
+        const updatedUser = await uploadAvatar(user._id, file)
+        setUser(updatedUser)
+      } catch (error) {
+        console.error("Error uploading avatar:", error)
+      }
+    }
+  }
 
   if (loading) {
     return (
@@ -113,9 +143,9 @@ export default function UserProfile() {
     
     switch (role.toLowerCase()) {
       case "admin":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400"
-      case "moderator":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+      case "manager":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
       case "user":
         return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
       default:
@@ -138,10 +168,19 @@ export default function UserProfile() {
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-32 flex items-center justify-center relative">
           <div className="absolute -bottom-16">
             <div className="relative">
-              <img
-                src={user.avatar || "/placeholder.svg"}
-                alt={`${user.name}'s avatar`}
-                className="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-gray-800"
+              <label htmlFor="avatarInput">
+                <img
+                  src={user.avatar || "/placeholder.svg"}
+                  alt={`${user.name}'s avatar`}
+                  className="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-gray-800 cursor-pointer"
+                />
+              </label>
+              <input
+                type="file"
+                id="avatarInput"
+                accept="image/*"
+                className="hidden"
+                onChange={handleChangeAvatar}
               />
               <div
                 className={`absolute bottom-3 right-3 w-4 h-4 rounded-full border-2 border-white ${
@@ -244,8 +283,24 @@ export default function UserProfile() {
               </div>
             </div>
           </div>
+
+          <div className="text-center mt-6">
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+            >
+              Edit Profile
+            </button>
+          </div>
         </div>
       </div>
+
+      <EditUserProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSaveUser}
+        user={user}
+      />
     </div>
   )
 }

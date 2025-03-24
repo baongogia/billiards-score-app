@@ -22,7 +22,14 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setStoreData((prevData) => ({ ...prevData, [name]: value }));
+    if (name === "status") {
+      setStoreData((prevData) => ({
+        ...prevData,
+        isDeleted: value === "inactive",
+      }));
+    } else {
+      setStoreData((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -73,7 +80,7 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
             <div>
               <label className="block text-sm font-medium text-black">Status</label>
               <select
-                name="isDeleted"
+                name="status"
                 value={storeData.isDeleted ? "inactive" : "active"}
                 onChange={handleChange}
                 className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"

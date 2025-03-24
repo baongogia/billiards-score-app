@@ -29,27 +29,27 @@ const StoreManagement: React.FC = () => {
   const [isTablesModalOpen, setIsTablesModalOpen] = useState(false);
   const [selectedTableStoreId, setSelectedTableStoreId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadStores = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetchFilteredStores(
-          searchTerm,
-          status,
-          currentPage,
-          pageSize,
-          sortBy,
-          sortDirection
-        );
-        setStores(response.data);
-        setTotalItems(response.pagination.totalItem);
-      } catch (error) {
-        console.error("Error fetching stores:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const loadStores = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetchFilteredStores(
+        searchTerm,
+        status,
+        currentPage,
+        pageSize,
+        sortBy,
+        sortDirection
+      );
+      setStores(response.data);
+      setTotalItems(response.pagination.totalItem);
+    } catch (error) {
+      console.error("Error fetching stores:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadStores();
   }, [searchTerm, status, currentPage, sortBy, sortDirection]);
 
@@ -79,6 +79,7 @@ const StoreManagement: React.FC = () => {
         );
         setStores(stores.map((store) => (store._id === selectedStore._id ? updatedStore : store)));
         setIsEditModalOpen(false);
+        loadStores(); // Reload stores after updating
       } catch (error) {
         console.error("Error updating store:", error);
       }
@@ -318,7 +319,10 @@ const StoreManagement: React.FC = () => {
       <EditStoreModal
         isOpen={isEditModalOpen}
         selectedStore={selectedStore}
-        onClose={() => setIsEditModalOpen(false)}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          loadStores(); // Reload stores after closing the modal
+        }}
         onSave={handleSaveStore}
       />
 

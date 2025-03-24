@@ -208,12 +208,12 @@ export default function UserTable() {
     )
   }
   return (
-    <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
+    <div className="p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
       {/* Header Section */}
       <div className="flex flex-col gap-6 mb-8">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">User Management</h2>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <button
               onClick={() => navigate("/admin/register")}
               className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
@@ -229,68 +229,68 @@ export default function UserTable() {
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 justify-start">
-          <div className="relative lg:col-span-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-3 w-full border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-gray-700 dark:text-gray-200 transition-all"
-            />
-          </div>
+      {/* Filters */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 justify-start">
+        <div className="relative sm:col-span-2">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 pr-4 py-3 w-full border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-gray-700 dark:text-gray-200 transition-all"
+          />
+        </div>
 
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+        >
+          <option value="">All Roles</option>
+          <option value="admin">Admin</option>
+          <option value="manager">Manager</option>
+          <option value="user">User</option>
+        </select>
+
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+        >
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+
+        <div className="flex gap-2">
           <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
           >
-            <option value="">All Roles</option>
-            <option value="admin">Admin</option>
-            <option value="manager">Manager</option>
-            <option value="user">User</option>
+            <option value="createdAt">Created At</option>
+            <option value="name">Name</option>
+            <option value="email">Email</option>
           </select>
 
           <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+            value={sortDirection}
+            onChange={(e) => setSortDirection(e.target.value)}
+            className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
           >
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
           </select>
-
-          <div className="flex gap-2">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-            >
-              <option value="createdAt">Created At</option>
-              <option value="name">Name</option>
-              <option value="email">Email</option>
-            </select>
-
-            <select
-              value={sortDirection}
-              onChange={(e) => setSortDirection(e.target.value)}
-              className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-            >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
-          </div>
         </div>
       </div>
 
       {/* Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse table-auto min-w-[800px]">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-700">
                 <th className="text-left py-4 px-5 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -307,6 +307,9 @@ export default function UserTable() {
                 </th>
                 <th className="text-left py-4 px-5 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Role
+                </th>
+                <th className="text-left py-4 px-5 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Status
                 </th>
                 <th className="text-right py-4 px-5 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Actions
@@ -330,6 +333,9 @@ export default function UserTable() {
                       </td>
                       <td className="py-4 px-5">
                         <div className="h-6 w-40 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="h-6 w-20 bg-gray-200 dark:bg-gray-600 rounded"></div>
                       </td>
                       <td className="py-4 px-5">
                         <div className="h-6 w-20 bg-gray-200 dark:bg-gray-600 rounded"></div>
@@ -361,15 +367,9 @@ export default function UserTable() {
                               {user.name?.charAt(0)}
                             </div>
                           )}
-                          <div
-                            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white dark:border-gray-800 ${getStatusIndicator(
-                              user.status || "inactive",
-                            )}`}
-                          ></div>
                         </div>
                         <div>
                           <div className="font-medium text-gray-900 dark:text-white">{user.name}</div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">{user.status || "N/A"}</div>
                         </div>
                       </div>
                     </td>
@@ -383,6 +383,16 @@ export default function UserTable() {
                       >
                         {user.role?.charAt(0).toUpperCase() + user.role?.slice(1)}
                       </span>
+                    </td>
+                    <td className="py-4 px-5">
+                      <div className="flex items-center">
+                        <div
+                          className={`w-3 h-3 rounded-full mr-2 ${getStatusIndicator(user.status || "inactive")}`}
+                        ></div>
+                        <span className="text-gray-600 dark:text-gray-300">
+                          {user.status?.charAt(0).toUpperCase() + user.status?.slice(1) || "Inactive"}
+                        </span>
+                      </div>
                     </td>
                     <td className="py-4 px-5 text-right">
                       <div className="flex justify-end gap-2">
@@ -404,11 +414,13 @@ export default function UserTable() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-8 px-5 text-center text-gray-500 dark:text-gray-400">
-                    <div className="flex flex-col items-center">
+                  <td colSpan={7} className="py-8 px-5 text-center text-gray-500 dark:text-gray-400">
+                    <div className="flex flex-col items-center p-4">
                       <Search className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" />
                       <p className="text-lg font-medium">No users found</p>
-                      <p className="text-sm">Try adjusting your search or filter to find what you're looking for.</p>
+                      <p className="text-sm text-center">
+                        Try adjusting your search or filter to find what you're looking for.
+                      </p>
                     </div>
                   </td>
                 </tr>

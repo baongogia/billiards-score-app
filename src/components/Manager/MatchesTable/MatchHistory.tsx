@@ -1,70 +1,82 @@
-import React, { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
-import { fetchMatches, MatchData } from "../../../services/Admin/Matches/matchesService";
+import React, { useState, useEffect } from 'react';
+import { MatchData, fetchMatches } from '../../../services/Admin/Matches/matchesService';
+import { Store, fetchStores } from '../../../services/Admin/Store/storeService';
+import { PoolTable, fetchPoolTablesByStoreId } from '../../../services/Admin/Tables/poolTableService';
+import { useAuth } from '../../../context/AuthContext';
 
-export default function MatchHistory() {
+const MatchHistory = () => {
   const [matches, setMatches] = useState<MatchData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const loadMatches = async () => {
       try {
-        const matches = await fetchMatches();
-        setMatches(matches);
+        if (!user) return;
+
+        // Tìm store của manager
+        const storesData = await fetchStores();
+        const managerStore = storesData.find(store => store.manager === user._id);
+
+        if (managerStore) {
+          // Lấy danh sách bàn của store
+          const storeTables = await fetchPoolTablesByStoreId(managerStore._id);
+          
+          // Lấy tất cả matches
+          const allMatches = await fetchMatches();
+          
+          // Lọc matches thuộc các bàn của store
+          const storeMatches = allMatches.filter(match => 
+            storeTables.some(table => table._id === match.pooltable)
+          );
+          
+          setMatches(storeMatches);
+        } else {
+          setError("No store found for this manager.");
+        }
       } catch (error) {
-        console.error("Error fetching matches:", error);
+        console.error("Error loading matches:", error);
+        setError("Failed to load matches");
+      } finally {
+        setLoading(false);
       }
     };
 
     loadMatches();
-  }, []);
+  }, [user]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
-    <div className="min-h-screen bg-black bg-opacity-80 text-white">
-      {/* Background image with overlay */}
-      <div
-        className="absolute inset-0 -z-10 bg-cover bg-center opacity-30"
-        style={{ backgroundImage: "url('/placeholder.svg?height=800&width=600')" }}
-      />
-
-      {/* Header */}
-      <div className="p-4 flex items-center">
-        <button className="p-2">
-          <ArrowLeft size={24} />
-        </button>
-        <h1 className="text-center flex-1 text-3xl font-bold tracking-wider">MATCH HISTORY</h1>
-      </div>
-
-      {/* Recent Games Section */}
-      <div className="px-4 pb-6">
-        <div className="bg-white bg-opacity-10 rounded-lg overflow-hidden">
-          <div className="bg-[#5d2e2e] py-3 px-4 text-center font-medium text-2xl">RECENT GAMES</div>
-
-          {/* Table Header */}
-          <div className="grid grid-cols-5 text-lg font-medium py-2 px-3 border-b border-gray-700">
-            <div>Mode Game</div>
-            <div className="text-center">Pool Table</div>
-            <div className="text-center">Status</div>
-            <div className="text-center">End At</div>
-            <div className="text-center">Created At</div>
-          </div>
-
-          {/* Match Rows */}
-          {matches.map((match, index) => (
-            <div
-              key={match._id}
-              className={`grid grid-cols-5 text-lg py-2 px-3 ${
-                index < matches.length - 1 ? "border-b border-gray-700" : ""
-              }`}
-            >
-              <div className="text-center">{match.mode_game}</div>
-              <div className="text-center">{match.pooltable}</div>
-              <div className="text-center">{match.status}</div>
-              <div className="text-center">{new Date(match.endAt).toLocaleString()}</div>
-              <div className="text-center">{new Date(match.createdAt).toLocaleString()}</div>
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Match History</h2>
+      <div className="space-y-4">
+        {matches.map((match) => (
+          <div key={match._id} className="bg-white p-4 rounded-lg shadow">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="font-medium">Match ID: {match._id}</p>
+                <p className="text-sm text-gray-500">Mode: {match.mode_game}</p>
+              </div>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                match.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                match.status === 'playing' ? 'bg-blue-100 text-blue-800' :
+                'bg-green-100 text-green-800'
+              }`}>
+                {match.status}
+              </span>
             </div>
-          ))}
-        </div>
+            <div className="mt-2 text-sm text-gray-600">
+              <p>Started: {new Date(match.createdAt).toLocaleString()}</p>
+              {match.endAt && <p>Ended: {new Date(match.endAt).toLocaleString()}</p>}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
-}
+};
+
+export default MatchHistory;
