@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { MatchData, fetchMatches } from '../../../services/Admin/Matches/matchesService';
-import { Store, fetchStores } from '../../../services/Admin/Store/storeService';
-import { PoolTable, fetchPoolTablesByStoreId } from '../../../services/Admin/Tables/poolTableService';
+import { fetchStores } from '../../../services/Admin/Store/storeService';
+import { fetchPoolTablesByStoreId } from '../../../services/Admin/Tables/poolTableService';
 import { useAuth } from '../../../context/AuthContext';
 
 const MatchHistory = () => {

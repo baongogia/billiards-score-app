@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import{ useState, useEffect } from 'react';
 import { PoolTable, fetchPoolTablesByStoreId } from '../../../services/Admin/Tables/poolTableService';
-import { Store, fetchStores } from '../../../services/Admin/Store/storeService';
+import { fetchStores } from '../../../services/Admin/Store/storeService';
 import { useAuth } from '../../../context/AuthContext';
 
 const TableList = () => {
