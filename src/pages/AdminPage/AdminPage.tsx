@@ -1,19 +1,30 @@
 import React, { useState, useEffect } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  Legend,
+} from "recharts";
 import AdminLayout from "./AdminLayout";
-import { Table, Users, DollarSign, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchUsers, User } from "../../services/Admin/User/userService";
-import { MatchData } from "../../services/Admin/Matches/matchesService";
 import { fetchPoolTables, PoolTable } from "../../services/Admin/Tables/poolTableService";
-import { fetchMatches } from "../../services/Admin/Matches/matchesService";
-import { fetchStores, Store } from "../../services/Admin/Store/storeService";
+import { fetchMatches, MatchData } from "../../services/Admin/Matches/matchesService";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const AdminPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [tables, setTables] = useState<PoolTable[]>([]);
   const [matches, setMatches] = useState<MatchData[]>([]);
-  const [stores, setStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [currentPageTables, setCurrentPageTables] = useState(1);
   const [currentPageMatches, setCurrentPageMatches] = useState(1);
   const itemsPerPage = 5;
@@ -21,17 +32,15 @@ const AdminPage = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [usersData, tablesData, matchesData, storesData] = await Promise.all([
+        const [usersData, tablesData, matchesData] = await Promise.all([
           fetchUsers(),
           fetchPoolTables(),
           fetchMatches(),
-          fetchStores(),
         ]);
 
         setUsers(usersData);
         setTables(tablesData);
         setMatches(matchesData);
-        setStores(storesData);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -42,11 +51,37 @@ const AdminPage = () => {
     loadData();
   }, []);
 
+  const inUseTabless = tables.filter((table) => table.status === "in_use");
+  const availableTables = tables.filter((table) => table.status === "available");
+  const maintenanceTables = tables.filter((table) => table.status === "maintenance");
+
+  const chartData = [
+    { name: "In Use", value: inUseTabless.length },
+    { name: "Available", value: availableTables.length },
+    { name: "Maintenance", value: maintenanceTables.length },
+  ];
+
+  const matchesData = matches.reduce(
+    (acc, match) => {
+      if (match.status === "pending") acc.pending += 1;
+      if (match.status === "playing") acc.playing += 1;
+      if (match.status === "finished") acc.completed += 1;
+      return acc;
+    },
+    { pending: 0, playing: 0, completed: 0 }
+  );
+
+  const matchesChartData = [
+    { name: "Pending", value: matchesData.pending },
+    { name: "Playing", value: matchesData.playing },
+    { name: "finished", value: matchesData.completed },
+  ];
+
   const inUseTables = tables.filter((table) => table.status === "in_use");
   const pendingOrPlayingMatches = matches.filter(
     (match) => match.status === "pending" || match.status === "playing"
   );
-
+  
   // Pagination logic for tables
   const totalPagesTables = Math.ceil(inUseTables.length / itemsPerPage);
   const startIndexTables = (currentPageTables - 1) * itemsPerPage;
@@ -56,7 +91,7 @@ const AdminPage = () => {
   const totalPagesMatches = Math.ceil(pendingOrPlayingMatches.length / itemsPerPage);
   const startIndexMatches = (currentPageMatches - 1) * itemsPerPage;
   const paginatedMatches = pendingOrPlayingMatches.slice(startIndexMatches, startIndexMatches + itemsPerPage);
-
+  
   return (
     <AdminLayout>
       {loading ? (
@@ -67,54 +102,83 @@ const AdminPage = () => {
         </div>
       ) : (
         <>
+          {/* Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="bg-white p-4 rounded-lg shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Total Tables</p>
-                  <p className="text-2xl font-bold mt-1">{tables.length}</p>
-                  <p className="text-xs text-gray-500 mt-1">{inUseTables.length} in use</p>
-                </div>
-                <div className="p-2 bg-blue-50 rounded-md">
-                  <Table size={20} className="text-blue-600" />
-                </div>
-              </div>
+              <h3 className="text-lg font-semibold">Total Users</h3>
+              <p className="text-2xl font-bold">{users.length}</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold">Total Tables</h3>
+              <p className="text-2xl font-bold">{tables.length}</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold">Total Matches</h3>
+              <p className="text-2xl font-bold">{matches.length}</p>
+            </div>
+          </div>
+
+          {/* Charts */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-4">Table Status</h3>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={80}
+                    fill="#8884d8"
+                    label={(entry) => entry.name}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={[
+                          "#4caf50",
+                          "#2196f3",
+                          "#ff9800",
+                        ][index % 3]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
 
             <div className="bg-white p-4 rounded-lg shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Active Members</p>
-                  <p className="text-2xl font-bold mt-1">{users.length}</p>
-                </div>
-                <div className="p-2 bg-green-50 rounded-md">
-                  <Users size={20} className="text-green-600" />
-                </div>
-              </div>
+              <h3 className="text-lg font-semibold mb-4">Matches Overview</h3>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={matchesChartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
 
             <div className="bg-white p-4 rounded-lg shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Total Stores</p>
-                  <p className="text-2xl font-bold mt-1">{stores.length}</p>
-                </div>
-                <div className="p-2 bg-purple-50 rounded-md">
-                  <DollarSign size={20} className="text-purple-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-lg shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Total Matches</p>
-                  <p className="text-2xl font-bold mt-1">{matches.length}</p>
-                </div>
-                <div className="p-2 bg-orange-50 rounded-md">
-                  <Clock size={20} className="text-orange-600" />
-                </div>
-              </div>
+              <h3 className="text-lg font-semibold mb-4">User Growth</h3>
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart
+                  data={users.map((user, index) => ({
+                    name: `User ${index + 1}`,
+                    value: index + 1,
+                  }))}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="value" stroke="#82ca9d" />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
 

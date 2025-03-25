@@ -27,51 +27,53 @@ const CreateStore: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl transform transition-all duration-300">
-        <h2 className="text-3xl font-extrabold text-center text-gray-800 dark:text-white mb-8">
+    <div className="flex justify-center items-center w-full min-h-screen bg-[#111111]">
+      <div className="w-full max-w-md bg-[#394264] p-8 rounded-xl shadow-2xl">
+        <h2 className="text-3xl font-bold text-center text-white mb-4">
           Create New Store
         </h2>
-
         <div className="space-y-6">
-          <label className="block">
-            <span className="text-black font-semibold">Store Name</span>
+          <label className="block text-sm font-medium text-white mb-2">
+            Store Name <span className="text-red-500">*</span>
             <input
               type="text"
               value={newStoreName}
               onChange={(e) => setNewStoreName(e.target.value)}
-              className="mt-2 block w-full h-12 px-4 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:text-white transition duration-200 ease-in-out"
+              className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
               placeholder="Enter store name"
+              required
             />
           </label>
 
-          <label className="block">
-            <span className="text-black font-semibold">Store Address</span>
+          <label className="block text-sm font-medium text-white mb-2">
+            Store Address <span className="text-red-500">*</span>
             <input
               type="text"
               value={newStoreAddress}
               onChange={(e) => setNewStoreAddress(e.target.value)}
-              className="mt-2 block w-full h-12 px-4 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:text-white transition duration-200 ease-in-out"
+              className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
               placeholder="Enter store address"
+              required
             />
           </label>
 
-          <label className="block">
-            <span className="text-black font-semibold">Store Manager ID</span>
+          <label className="block text-sm font-medium text-white mb-2">
+            Store Manager ID <span className="text-red-500">*</span>
             <input
               type="text"
               value={newStoreManager}
               onChange={(e) => setNewStoreManager(e.target.value)}
-              className="mt-2 block w-full h-12 px-4 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:text-white transition duration-200 ease-in-out"
+              className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
               placeholder="Enter store manager ID"
+              required
             />
           </label>
 
-          <div className="flex justify-between">
+          <div className="space-y-4">
             <button
               onClick={handleCreateStore}
               disabled={isSubmitting}
-              className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 text-white bg-teal-600 rounded-md shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center">
@@ -96,7 +98,7 @@ const CreateStore: React.FC = () => {
             </button>
             <button
               onClick={() => navigate("/admin/stores")}
-              className="ml-4 w-full h-12 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
+              className="w-full py-3 px-4 text-teal-700 bg-[#394264] rounded-md shadow-sm hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500"
             >
               Back to Stores
             </button>
@@ -142,7 +144,7 @@ const CreateStore: React.FC = () => {
 
               <button
                 onClick={() => navigate("/admin/stores")}
-                className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
+                className="w-full py-3 px-4 text-white bg-green-600 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 OK
               </button>

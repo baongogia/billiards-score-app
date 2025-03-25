@@ -7,10 +7,10 @@ import {
   fetchMatchById,
   MatchData,
 } from "../../../services/Admin/Matches/matchesService";
-import { Plus, Search, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, ChevronLeft, ChevronRight, Edit, Trash2, Eye } from "lucide-react";
 import CreateMatchModal from "./CreateMatchModal";
 import EditMatchModal from "./EditMatchModal";
-// import ViewMatchModal from "./ViewMatchModal";
+import ViewMatchModal from "./ViewMatchModal";
 
 const MatchTable: React.FC = () => {
   const [matches, setMatches] = useState<MatchData[]>([]);
@@ -18,6 +18,7 @@ const MatchTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState<boolean>(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -111,20 +112,20 @@ const MatchTable: React.FC = () => {
   };
 
   // Handle viewing match details
-  // const handleViewMatch = async (id: string) => {
-  //   try {
-  //     const match = await fetchMatchById(id);
-  //     console.log("Fetched match for view:", match);
-  //     setSelectedMatch(match);
-  //     setIsViewModalOpen(true);
-  //   } catch (error) {
-  //     console.error("Error fetching match for view:", error);
-  //   }
-  // };
+  const handleViewMatch = async (id: string) => {
+    try {
+      const match = await fetchMatchById(id);
+      console.log("Fetched match for view:", match);
+      setSelectedMatch(match);
+      setIsViewModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching match for view:", error);
+    }
+  };
 
   // Filter matches based on search term
   const filteredMatches = matches.filter((match) =>
-    match.mode_game.toLowerCase().includes(searchTerm.toLowerCase())
+    match.mode_game?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Calculate pagination
@@ -201,12 +202,12 @@ const MatchTable: React.FC = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  {/* <button
+                  <button
                     onClick={() => handleViewMatch(match._id)}
                     className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
                   >
                     <Eye className="h-5 w-5" />
-                  </button> */}
+                  </button>
                   <button
                     onClick={() => handleEditMatch(match._id)}
                     className="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 mr-4"
@@ -275,11 +276,11 @@ const MatchTable: React.FC = () => {
         onSave={handleUpdateMatchStatus}
       />
 
-      {/* <ViewMatchModal
+      <ViewMatchModal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         match={selectedMatch}
-      /> */}
+      />
     </div>
   );
 };

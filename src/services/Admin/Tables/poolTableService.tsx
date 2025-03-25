@@ -89,8 +89,8 @@ export const deletePoolTable = async (id: string): Promise<void> => {
 // Fetch pool tables by store ID
 export const fetchPoolTablesByStoreId = async (storeId: string): Promise<PoolTable[]> => {
   try {
-    const response = await api.get<{ data: PoolTable[] }>(`v1/pooltables/store/${storeId}`);
-    console.log("get table in store success");
+    const response = await api.get<{ data: PoolTable[] }>(`v1/stores/viewPooltable/${storeId}`);
+    console.log("get table in store success");  
     return response.data.data;
   } catch (error) {
     console.error("Error fetching pool tables by store ID:", error);

@@ -24,7 +24,7 @@ const ViewTableModal: React.FC<ViewTableModalProps> = ({ isOpen, onClose, table 
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
+          <div className="fixed inset-0 bg-black bg-opacity-50" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -38,38 +38,38 @@ const ViewTableModal: React.FC<ViewTableModalProps> = ({ isOpen, onClose, table 
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
+              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-[#394264] p-8 text-left align-middle shadow-xl transition-all">
+                <Dialog.Title as="h3" className="text-4xl font-bold text-center text-white mb-6">
                   Table Details
                 </Dialog.Title>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="mt-4 space-y-4">
+                  <p className="text-lg text-white">
                     <strong>ID:</strong> {table._id}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-lg text-white">
                     <strong>Status:</strong> {table.status}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-lg text-white">
                     <strong>Type:</strong> {table.tableType.type_name}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-lg text-white">
                     <strong>Compatible Modes:</strong> {table.tableType.compatible_mode.join(", ")}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-lg text-white">
                     <strong>Store:</strong> {table.store}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-lg text-white">
                     <strong>Created At:</strong> {new Date(table.createdAt).toLocaleDateString()}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-lg text-white">
                     <strong>QR Code:</strong>
                   </p>
-                  <img src={table.qrCodeImg} alt="QR Code" className="w-24 h-24 object-contain" />
+                  <img src={table.qrCodeImg} alt="QR Code" className="w-48 h-48 object-contain" />
                 </div>
-                <div className="mt-4">
+                <div className="mt-6 flex justify-center">
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="inline-flex justify-center rounded-md border border-transparent bg-teal-600 px-6 py-3 text-lg font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
                     onClick={onClose}
                   >
                     Close

@@ -1,40 +1,67 @@
-import{ useState, useEffect } from 'react';
-import { PoolTable, fetchPoolTablesByStoreId } from '../../../services/Admin/Tables/poolTableService';
+import { useState, useEffect } from 'react';
+import { PoolTable, fetchPoolTablesByStoreId, updatePoolTable } from '../../../services/Admin/Tables/poolTableService';
 import { fetchStores } from '../../../services/Admin/Store/storeService';
 import { useAuth } from '../../../context/AuthContext';
+import { EditTableModal } from '../../../components/Admin/TablesList/EditTableModal';
+import ViewTableModal from '../../../components/Admin/TablesList/ViewTableModal';
 
 const TableList = () => {
   const [tables, setTables] = useState<PoolTable[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedTable, setSelectedTable] = useState<PoolTable | null>(null);
   const { user } = useAuth();
 
-  useEffect(() => {
-    const loadTables = async () => {
-      try {
-        if (!user) return;
-        
-        // Tìm store của manager đang đăng nhập
-        const storesData = await fetchStores();
-        const managerStore = storesData.find(store => store.manager === user._id);
-        
-        if (managerStore) {
-          // Lấy danh sách bàn của store
-          const storeTables = await fetchPoolTablesByStoreId(managerStore._id);
-          setTables(storeTables);
-        } else {
-          setError("No store found for this manager.");
-        }
-      } catch (error) {
-        console.error("Error loading tables:", error);
-        setError("Failed to load tables");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadTables = async () => {
+    try {
+      if (!user) return;
 
+      // Tìm store của manager đang đăng nhập
+      const storesData = await fetchStores();
+      const managerStore = storesData.find(store => store.manager === user._id);
+
+      if (managerStore) {
+        // Lấy danh sách bàn của store
+        const response = await fetchPoolTablesByStoreId(managerStore._id);
+        const storeTables = response.tables;
+        setTables(storeTables);
+      } else {
+        setError("Manager no store manager!");
+      }
+    } catch (error) {
+      console.error("Error loading tables:", error);
+      setError("Failed to load tables");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadTables();
   }, [user]);
+
+  const handleEditClick = (table: PoolTable) => {
+    setSelectedTable(table);
+    setIsEditModalOpen(true);
+  };
+
+  const handleViewClick = (table: PoolTable) => {
+    setSelectedTable(table);
+    setIsViewModalOpen(true);
+  };
+
+  const handleEditSubmit = async (tableData: Partial<PoolTable>) => {
+    if (!selectedTable?._id) return;
+    try {
+      await updatePoolTable(selectedTable._id, tableData);
+      await loadTables(); // Refresh the table list after updating
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Error updating table:", error);
+    }
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -49,10 +76,11 @@ const TableList = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Table ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {tables.map((table) => (
+            {Array.isArray(tables) && tables.map((table) => (
               <tr key={table._id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{table._id}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{table.tableType.type_name}</td>
@@ -65,11 +93,38 @@ const TableList = () => {
                     {table.status}
                   </span>
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <button
+                    onClick={() => handleEditClick(table)}
+                    className="text-blue-600 hover:text-blue-900 mr-4"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleViewClick(table)}
+                    className="text-blue-600 hover:text-blue-900"
+                  >
+                    View
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <EditTableModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSubmit={handleEditSubmit}
+        table={selectedTable}
+      />
+
+      <ViewTableModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        table={selectedTable}
+      />
     </div>
   );
 };

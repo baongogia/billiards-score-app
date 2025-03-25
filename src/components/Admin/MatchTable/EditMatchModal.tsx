@@ -13,8 +13,8 @@ const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, selectedMatch, 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
-        <h2 className="text-xl font-bold mb-4">Edit Match Status</h2>
+      <div className="bg-[#394264] p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <h2 className="text-3xl font-bold text-center text-white mb-4">Edit Match Status</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -24,33 +24,61 @@ const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, selectedMatch, 
             };
             onSave(matchData);
           }}
+          className="space-y-6"
         >
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-              <select
-                name="status"
-                defaultValue={selectedMatch.status}
-                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
-                required
-              >
-                <option value="active">Active</option>
-                <option value="pending">Pending</option>
-                <option value="finished">Finished</option>
-              </select>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Status <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="status"
+              defaultValue={selectedMatch.status}
+              className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+              required
+            >
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+              <option value="finished">Finished</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Mode Game <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="mode_game"
+              defaultValue={selectedMatch.mode_game}
+              className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+              required
+            >
+              <option value="8-ball">8 Ball</option>
+              <option value="9-ball">9 Ball</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Pool Table <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="pooltable"
+              defaultValue={selectedMatch.pooltable}
+              placeholder="Enter pool table ID"
+              className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+              required
+            />
           </div>
           <div className="mt-6 flex justify-end space-x-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+              className="px-4 py-2 text-teal-700 bg-[#394264] rounded-md shadow-sm hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-4 py-2 text-white bg-teal-600 rounded-md shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
             >
               Update Status
             </button>
