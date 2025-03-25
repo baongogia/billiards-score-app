@@ -8,14 +8,10 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { toast } from "react-toastify";
 import { AuthContext } from "../../context/AuthContext";
-import {
-  // createNewMatch,
-  getTableById,
-} from "../../services/Admin/Matches/matchesService";
+import { getTableById } from "../../services/Admin/Matches/matchesService";
 import { useGame } from "../../context/GameContext";
-import { io } from "socket.io-client";
 import { findUser } from "../../services/auth/authService";
-const socket = io(import.meta.env.VITE_HOST_API);
+import { useSocket } from "../../hooks/useSocket";
 
 interface GameState {
   playerName: string;
@@ -29,8 +25,8 @@ interface GameState {
 export default function WaitingPage() {
   const navigate = useNavigate();
   const { tableId } = useParams();
+  const { socket } = useSocket();
   const auth = useContext(AuthContext);
-
   const [tableData, setTableData] = useState<any>(null);
   const [players, setPlayers] = useState<string[]>([]);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -38,11 +34,42 @@ export default function WaitingPage() {
   const [showAddPartnerModal, setShowAddPartnerModal] = useState(false);
   const [newPartnerName, setNewPartnerName] = useState("");
   const [partnerName, setPartnerName] = useState("");
-  const [gameMode, setGameMode] = useState("");
-  console.log(gameMode);
   const { playerName, setGameState } = useGame();
   const [storedPlayerName, setStoredPlayerName] = useState<string | null>(null);
   const [allUserData, setAllUserData] = useState<any>(null);
+  const [matchData, setMatchData] = useState<any>(null);
+  console.log("Match Data:", matchData);
+
+  useEffect(() => {
+    socket.on("roomCreated", (data: any) => {
+      const { roomId, matchId } = data;
+      setMatchData(data);
+      console.log("Room Created:", roomId, matchId);
+      toast.success("Room created successfully!");
+      localStorage.setItem("matchData", JSON.stringify(data));
+    });
+
+    return () => {
+      socket.off("roomCreated");
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    // Kiểm tra xem dữ liệu đã được lưu trữ trong localStorage hay chưa
+    const savedMatchData = localStorage.getItem("matchData");
+    if (savedMatchData) {
+      const parsedMatchData = JSON.parse(savedMatchData);
+      setMatchData(parsedMatchData); // Cập nhật state với dữ liệu đã lưu
+    }
+
+    // Kiểm tra tên người chơi từ localStorage
+    const savedPlayerName = localStorage.getItem("playerName");
+    if (savedPlayerName && storedPlayerName !== savedPlayerName) {
+      setStoredPlayerName(savedPlayerName);
+      setGameState({ playerName: savedPlayerName });
+    }
+  }, [storedPlayerName, setGameState]);
+
   // Get user data
   const fetchUserData = useCallback(async () => {
     try {
@@ -63,39 +90,15 @@ export default function WaitingPage() {
     timeLimit: 60,
     firstTurn: "player1",
   });
-  // Socket connection
-  const createMatchAcc = () => {
-    const data = {
-      pooltable: tableId,
-      mode_game: gameSettings.gameType,
-    };
-
-    // Gửi yêu cầu tạo trận đấu đến server
-    socket.emit("createRoom", data);
-    socket.emit("getPlayers", {
-      roomId: tableId,
-      playerName: playerName || storedPlayerName,
-    });
-
-    // Lắng nghe sự kiện "roomCreated" từ server
-    socket.once("roomCreated", (data: any) => {
-      console.log("Create room success:", data);
-      toast.success("Fetch data");
-      if (data) {
-        toast.success("Match created successfully!");
-      } else {
-        toast.error("Failed to create match.");
-      }
-    });
-  };
   // Get player name
   useEffect(() => {
     if (playerName) {
       localStorage.setItem("playerName", playerName);
     }
     setPlayers([playerName]);
+
     fetchUserData();
-  }, [playerName, fetchUserData]);
+  }, [playerName, fetchUserData, socket]);
 
   useEffect(() => {
     const savedPlayerName = localStorage.getItem("playerName");
@@ -121,28 +124,13 @@ export default function WaitingPage() {
       fetchTableById(tableId);
     }
   }, [tableId, gameSettings.gameType]);
-
   // Create match
-  const createMatch = async () => {
-    // try {
-    //   if (tableId && gameSettings.gameType) {
-    //     await createNewMatch("ready", gameMode, tableId);
-    //   } else {
-    //     toast.error("Table ID is undefined");
-    //   }
-    // } catch (error) {
-    //   console.error("Error creating match", error);
-    //   toast.error("Error creating match");
-    // }
-    createMatchAcc();
-  };
 
   const handleCreateMatch = (value: string) => {
     setGameSettings({
       ...gameSettings,
       gameType: value,
     });
-    setGameMode(value);
   };
 
   // Disable scroll
@@ -309,9 +297,6 @@ export default function WaitingPage() {
                 onClick={() => {
                   setGameState(gameSettings);
                   setShowSetupModal(false);
-                  if (auth?.token) {
-                    createMatch();
-                  }
                 }}
               >
                 Save

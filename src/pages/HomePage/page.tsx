@@ -8,6 +8,7 @@ import { useGame } from "../../context/GameContext";
 import { findUser } from "../../services/auth/authService";
 import { useCallback } from "react";
 import { RiLogoutBoxFill } from "react-icons/ri";
+import { useSocket } from "../../hooks/useSocket";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -15,7 +16,6 @@ const HomePage = () => {
   const tableId = localStorage.getItem("tableId");
   const id = auth?.user?._id;
   const { setGameState } = useGame();
-
   const [isGameStateSet, setIsGameStateSet] = useState(false);
   const [allUserData, setAllUserData] = useState<any>(null);
   // Get user data
@@ -73,7 +73,15 @@ const HomePage = () => {
     }
   }, [auth?.user, isGameStateSet, setGameState, allUserData]);
   // Handle start game
+  const { createMatchAccount } = useSocket();
+
   const handleStartGame = async () => {
+    if (tableId) {
+      createMatchAccount(tableId);
+      toast.success("Match started successfully");
+    } else {
+      toast.error("Table ID is missing");
+    }
     navigate(`/WaitingPage/${tableId}`);
   };
 

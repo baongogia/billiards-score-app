@@ -1,65 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { io, Socket } from "socket.io-client";
 
-const socket: Socket = io(import.meta.env.VITE_HOST_API, {
-  autoConnect: false,
-});
-if (!socket.connected) {
-  socket.connect();
-}
-interface RoomUpdateData {
-  players: string[];
-}
+const socket: Socket = io("wss://swd392sp25.com:8000");
 
 export const useSocket = () => {
-  const [players, setPlayers] = useState<string[]>([]);
-
   useEffect(() => {
+    // Lắng nghe sự kiện kết nối
     socket.on("connect", () => {
       toast.success("Connected to the socket server!");
     });
 
-    socket.on("room_update", (data: RoomUpdateData) => {
-      setPlayers(data.players);
-    });
-
+    // Cleanup khi component unmounts để tránh rò rỉ bộ nhớ
     return () => {
-      socket.off("room_update");
-    };
-  }, []);
-  useEffect(() => {
-    socket.on("connect", () => {
-      toast.success("Connected to the socket server!");
-    });
-
-    socket.on("room_update", (data: any) => {
-      setPlayers(data.players);
-    });
-
-    return () => {
-      socket.off("room_update");
+      socket.off("connect");
     };
   }, []);
 
-  // Hàm gửi yêu cầu tạo phòng
-  const createMatchAcc = (pooltable: string, mode_game: string) => {
-    socket.emit("createRoom", {
-      pooltable, // ID của bảng pooltable
-      mode_game, // Chế độ game (ví dụ: 8-ball)
+  const createMatchAccount = (pooltable: string) => {
+    socket.emit("createRoom", { pooltable });
+
+    socket.on("roomCreated", (data: any) => {
+      const { roomId, matchId } = data;
+      console.log("Room Created:", roomId, matchId);
+      toast.success(
+        `Room created successfully! Room ID: ${roomId}, Match ID: ${matchId}`
+      );
     });
   };
-
-  // Hàm rời phòng
-  const leaveRoom = (roomId: string) => {
-    socket.emit("leave_room", { roomId });
-  };
-
-  // Hàm kết thúc trận
-  const endMatch = (roomId: string) => {
-    socket.emit("end_match", { roomId });
-  };
-
-  return { socket, createMatchAcc, leaveRoom, endMatch, players };
+  return { socket, createMatchAccount };
 };
