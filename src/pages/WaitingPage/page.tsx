@@ -5,7 +5,7 @@ import PlayerCard from "./PlayerCard";
 import BidaTable from "../../components/BidaTable/page";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
+import { QRCodeCanvas } from "qrcode.react";
 import { toast } from "react-toastify";
 import { AuthContext } from "../../context/AuthContext";
 import { getTableById } from "../../services/Admin/Matches/matchesService";
@@ -24,7 +24,7 @@ interface GameState {
 
 export default function WaitingPage() {
   const navigate = useNavigate();
-  const { tableId } = useParams();
+  const { tableId, matchId } = useParams();
   const { socket } = useSocket();
   const auth = useContext(AuthContext);
   const [tableData, setTableData] = useState<any>(null);
@@ -39,6 +39,16 @@ export default function WaitingPage() {
   const [allUserData, setAllUserData] = useState<any>(null);
   const [matchData, setMatchData] = useState<any>(null);
   console.log("Match Data:", matchData);
+  // const host = "http://localhost:3003";
+  const serverhost = "https://billiards-score-app.vercel.app";
+  const matchLink = `${serverhost}/WaitingPage/${tableId}/${matchData?.matchId}`;
+
+  useEffect(() => {
+    if (matchId) {
+      // socket.emit("joinRoom", { matchId, playerName });
+      toast.success("You have joined the room!");
+    }
+  }, [matchId, playerName, socket]);
 
   useEffect(() => {
     socket.on("roomCreated", (data: any) => {
@@ -215,12 +225,11 @@ export default function WaitingPage() {
       {/* Invite Modal */}
       {showInviteModal && (
         <div className="absolute w-full h-full bg-[rgba(0,0,0,0.7)] flex justify-center items-center">
-          <div className="bg-[rgba(255,255,255,0.5)] backdrop-blur-md  p-5 rounded-lg w-80 text-white">
+          <div className="bg-[rgba(255,255,255,0.5)] backdrop-blur-md  p-5 rounded-lg w-72 text-white">
             <h2 className="text-xl font-bold mb-3">Invite Player</h2>
-            <div
-              style={{ backgroundImage: `url(${tableData.qrCodeImg})` }}
-              className="w-70 h-70 bg-cover bg-center mb-3 rounded-lg"
-            ></div>
+            <div className="object-cover w-full mb-4">
+              <QRCodeCanvas value={matchLink} size={250} />
+            </div>
             <button
               className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-700 transition cursor-pointer"
               onClick={() => setShowInviteModal(false)}

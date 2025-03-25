@@ -29,7 +29,7 @@ const router = createBrowserRouter([
   { path: "/:tableId", element: <LandingPage /> },
   { path: "/", element: <LandingPage /> },
   { path: "/login", element: <Login /> },
-  { path: "/WaitingPage/:tableId", element: <WaitingPage /> },
+  { path: "/WaitingPage/:tableId/:matchId?", element: <WaitingPage /> },
   { path: "/WaitingPage", element: <WaitingPage /> },
   {
     path: "/HomePage/*",
