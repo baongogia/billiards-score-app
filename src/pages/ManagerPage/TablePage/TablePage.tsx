@@ -1,5 +1,6 @@
+import React from "react";
 import ManagerLayout from "../ManagerLayout";
-import TableList from "../../../components/Admin/TablesList/TablesList";
+import TableList from "../../../components/Manager/TableManager/TableList";
 
 const TablePage = () => {
   return (

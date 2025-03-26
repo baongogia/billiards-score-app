@@ -9,7 +9,7 @@ export interface TableType {
 
 export interface PoolTable {
   _id: string; // Sử dụng _id thay vì id để khớp với response
-  status: "available" | "occupied" | "maintenance";
+  status: "available" | "in_use" | "maintenance";
   tableType: TableType;
   store: string;
   deletedAt: null | string;
@@ -21,7 +21,7 @@ export interface PoolTable {
 
 // Request interface cho create/update
 export interface PoolTableRequest {
-  status: "available" | "occupied" | "maintenance";
+  status: "available" | "in_use" | "maintenance";
   tableType: {
     type_name: string;
     compatible_mode: string[];
@@ -79,6 +79,18 @@ export const deletePoolTable = async (id: string): Promise<void> => {
     await api.delete(`v1/pooltables/${id}`);
   } catch (error) {
     console.error("Error deleting pool table:", error);
+    throw error;
+  }
+};
+
+// Fetch pool tables by store ID
+export const fetchPoolTablesByStoreId = async (storeId: string): Promise<PoolTable[]> => {
+  try {
+    const response = await api.get<{ data: PoolTable[] }>(`v1/stores/viewPooltable/${storeId}`);
+    console.log("get table in store success");  
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching pool tables by store ID:", error);
     throw error;
   }
 };
