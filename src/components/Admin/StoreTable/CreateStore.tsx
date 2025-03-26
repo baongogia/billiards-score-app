@@ -4,24 +4,25 @@ import { createStore, Store } from "../../../services/Admin/Store/storeService";
 
 const CreateStore: React.FC = () => {
   const navigate = useNavigate();
-  const [newStoreName, setNewStoreName] = useState("");
-  const [newStoreAddress, setNewStoreAddress] = useState("");
-  const [newStoreManager, setNewStoreManager] = useState("");
+  const [formName, setFormName] = useState("");
+  const [formLocation, setFormLocation] = useState("");
+  const [formSupervisor, setFormSupervisor] = useState("");
+  const [createdStore, setCreatedStore] = useState<Store | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const [storeData, setStoreData] = useState<Store | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Prevent the default form submission behavior
 
-  const handleCreateStore = async () => {
-    if (newStoreName.trim() && newStoreAddress.trim() && newStoreManager.trim()) {
-      setIsSubmitting(true);
+    if (formName.trim() && formLocation.trim() && formSupervisor.trim()) {
+      setIsProcessing(true);
       try {
-        const store = await createStore(newStoreName, newStoreAddress, newStoreManager);
-        setStoreData(store);
-        console.log("Store created successfully:", store);
+        const newStore = await createStore(formName, formLocation, formSupervisor);
+        setCreatedStore(newStore);
+        console.log("Form submitted successfully:", newStore);
       } catch (error) {
-        console.error("Error creating store:", error);
+        console.error("Error submitting form:", error);
       } finally {
-        setIsSubmitting(false);
+        setIsProcessing(false);
       }
     }
   };
@@ -32,121 +33,138 @@ const CreateStore: React.FC = () => {
         <h2 className="text-3xl font-bold text-center text-white mb-4">
           Create New Store
         </h2>
-        <div className="space-y-6">
-          <label className="block text-sm font-medium text-white mb-2">
-            Store Name <span className="text-red-500">*</span>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Store Name <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
-              value={newStoreName}
-              onChange={(e) => setNewStoreName(e.target.value)}
+              value={formName}
+              onChange={(e) => setFormName(e.target.value)}
               className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-              placeholder="Enter store name"
+              placeholder="Store name"
               required
             />
-          </label>
+          </div>
 
-          <label className="block text-sm font-medium text-white mb-2">
-            Store Address <span className="text-red-500">*</span>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Location <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
-              value={newStoreAddress}
-              onChange={(e) => setNewStoreAddress(e.target.value)}
+              value={formLocation}
+              onChange={(e) => setFormLocation(e.target.value)}
               className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-              placeholder="Enter store address"
+              placeholder="Store location"
               required
             />
-          </label>
+          </div>
 
-          <label className="block text-sm font-medium text-white mb-2">
-            Store Manager ID <span className="text-red-500">*</span>
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Manager ID <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
-              value={newStoreManager}
-              onChange={(e) => setNewStoreManager(e.target.value)}
+              value={formSupervisor}
+              onChange={(e) => setFormSupervisor(e.target.value)}
               className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-              placeholder="Enter store manager ID"
+              placeholder="Manager ID"
               required
             />
-          </label>
+          </div>
 
-          <div className="space-y-4">
+          <div className="mt-6 flex justify-end space-x-4">
             <button
-              onClick={handleCreateStore}
-              disabled={isSubmitting}
-              className="w-full py-3 px-4 text-white bg-teal-600 rounded-md shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              type="button"
+              onClick={() => navigate("/admin/stores")}
+              className="px-4 py-2 text-teal-700 bg-[#394264] rounded-md shadow-sm hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500"
             >
-              {isSubmitting ? (
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isProcessing}
+              className="px-4 py-2 text-white bg-teal-600 rounded-md shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
+              {isProcessing ? (
                 <span className="flex items-center justify-center">
                   <svg
-                    className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
+                    className="animate-spin h-5 w-5 mr-2 text-white"
                     viewBox="0 0 24 24"
                   >
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
                     <path
                       className="opacity-75"
                       fill="currentColor"
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
+                    />
                   </svg>
-                  Creating...
+                  Processing...
                 </span>
               ) : (
-                "Create Store"
+                "Submit"
               )}
             </button>
-            <button
-              onClick={() => navigate("/admin/stores")}
-              className="w-full py-3 px-4 text-teal-700 bg-[#394264] rounded-md shadow-sm hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500"
-            >
-              Back to Stores
-            </button>
           </div>
-        </div>
+        </form>
 
-        {storeData && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 transition-opacity duration-300">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-8 transform transition-all duration-300 scale-100">
-              <div className="flex justify-center mb-6">
-                <div className="rounded-full bg-green-100 p-3">
+        {createdStore && (
+          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <div className="flex justify-center mb-4">
+                <div className="bg-green-100 p-2 rounded-full">
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-8 w-8 text-green-600"
+                    className="h-6 w-6 text-green-600"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
               </div>
 
-              <h3 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
-                Store Created Successfully
-              </h3>
+              <h2 className="text-xl font-semibold text-center mb-4">
+                Submission Successful
+              </h2>
 
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 mb-6 shadow-inner">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-gray-500 dark:text-gray-400 font-medium">Name:</div>
-                  <div className="text-gray-900 dark:text-white font-semibold text-right">{storeData.name}</div>
-
-                  <div className="text-gray-500 dark:text-gray-400 font-medium">Address:</div>
-                  <div className="text-gray-900 dark:text-white font-semibold text-right">{storeData.address}</div>
-
-                  <div className="text-gray-500 dark:text-gray-400 font-medium">Manager ID:</div>
-                  <div className="text-gray-900 dark:text-white font-semibold text-right">{storeData.manager}</div>
-
-                  <div className="text-gray-500 dark:text-gray-400 font-medium">Store ID:</div>
-                  <div className="text-gray-900 dark:text-white font-semibold text-right">{storeData._id}</div>
-                </div>
+              <div className="bg-gray-50 p-4 rounded-md space-y-2">
+                <p>
+                  <span className="font-medium">Name:</span> {createdStore.name}
+                </p>
+                <p>
+                  <span className="font-medium">Location:</span>{" "}
+                  {createdStore.address}
+                </p>
+                <p>
+                  <span className="font-medium">ManagerID:</span>{" "}
+                  {createdStore.manager}
+                </p>
+                <p>
+                  <span className="font-medium">ID:</span> {createdStore._id}
+                </p>
               </div>
 
               <button
                 onClick={() => navigate("/admin/stores")}
-                className="w-full py-3 px-4 text-white bg-green-600 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full mt-4 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
               >
-                OK
+                Close
               </button>
             </div>
           </div>

@@ -1,23 +1,17 @@
 import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import { PoolTableRequest } from "../../../services/Admin/Tables/poolTableService";
 
 interface CreateTableModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (tableData: {
-    status: string;
-    tableType: {
-      type_name: string;
-      compatible_mode: string[];
-    };
-    store: string;
-  }) => void;
+  onSubmit: (tableData: PoolTableRequest) => void;
 }
 
 export function CreateTableModal({ isOpen, onClose, onSubmit }: CreateTableModalProps) {
-  const [tableData, setTableData] = useState({
-    status: "",
+  const [tableData, setTableData] = useState<PoolTableRequest>({
+    status: "available",
     tableType: {
       type_name: "",
       compatible_mode: ["8-ball", "9-ball"],
@@ -36,10 +30,15 @@ export function CreateTableModal({ isOpen, onClose, onSubmit }: CreateTableModal
           type_name: value,
         },
       }));
-    } else {
+    } else if (name === "store") {
       setTableData((prev) => ({
         ...prev,
-        [name]: value,
+        store: value,
+      }));
+    } else if (name === "status") {
+      setTableData((prev) => ({
+        ...prev,
+        status: value as "available" | "in_use" | "maintenance",
       }));
     }
   };
@@ -95,7 +94,7 @@ export function CreateTableModal({ isOpen, onClose, onSubmit }: CreateTableModal
                       <option value="">Select status...</option>
                       <option value="available">Available</option>
                       <option value="in_use">In Use</option>
-                      <option value="finished">Finished</option>
+                      <option value="maintenance">Maintenance</option>
                     </select>
                   </div>
                   <div>

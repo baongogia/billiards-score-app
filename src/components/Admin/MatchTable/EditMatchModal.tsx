@@ -37,7 +37,7 @@ const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, selectedMatch, 
               required
             >
               <option value="active">Active</option>
-              <option value="pending">Pending</option>
+              <option value="playing">Playing</option>
               <option value="finished">Finished</option>
             </select>
           </div>

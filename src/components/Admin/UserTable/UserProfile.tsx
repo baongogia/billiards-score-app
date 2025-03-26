@@ -39,7 +39,7 @@ export default function UserProfile() {
     if (user) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { _id, avatar, deletedAt, createdAt, updatedAt, __v, ...filteredData } = userData
+        const { _id, avatar, ...filteredData } = userData
         console.log("Data sent to API:", filteredData) // Kiểm tra dữ liệu trước khi gửi
         const updatedUser = await updateUser(user._id, filteredData)
         setUser(updatedUser)

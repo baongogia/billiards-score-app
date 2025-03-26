@@ -57,8 +57,8 @@ export default function UserTable() {
 
         // Add this after the API call in the useEffect
         console.log("Pagination debug:", {
-          totalItems,
-          totalPages,
+          total,
+          totalPages: Math.ceil(total / pageSize),
           currentPage,
           pageSize,
         })
@@ -445,4 +445,3 @@ export default function UserTable() {
     </div>
   )
 }
-
