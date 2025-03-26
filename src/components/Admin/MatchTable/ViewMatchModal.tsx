@@ -43,23 +43,23 @@ const ViewMatchModal: React.FC<ViewMatchModalProps> = ({ isOpen, onClose, match 
                 </Dialog.Title>
                 <div className="mt-4">
                   <p className="text-lg text-gray-700">
-                    <strong>Match ID:</strong> {match._id}
+                    <strong>Match ID:</strong> {match.match._id}
                   </p>
                   <p className="text-lg text-gray-700">
-                    <strong>Mode:</strong> {match.mode_game}
+                    <strong>Mode:</strong> {match.match.mode_game}
                   </p>
                   <p className="text-lg text-gray-700">
-                    <strong>Table ID:</strong> {match.pooltable}
+                    <strong>Table ID:</strong> {match.match.pooltable}
                   </p>
                   <p className="text-lg text-gray-700">
-                    <strong>Status:</strong> {match.status}
+                    <strong>Status:</strong> {match.match.status}
                   </p>
                   <p className="text-lg text-gray-700">
-                    <strong>Started:</strong> {new Date(match.createdAt).toLocaleString()}
+                    <strong>Started:</strong> {new Date(match.match.createdAt).toLocaleString()}
                   </p>
                   {match.endAt && (
                     <p className="text-lg text-gray-700">
-                      <strong>Ended:</strong> {new Date(match.endAt).toLocaleString()}
+                      <strong>Ended:</strong> {new Date(match.match.endAt).toLocaleString()}
                     </p>
                   )}
                 </div>

@@ -160,7 +160,7 @@ export default function TablesList() {
           >
             <option value="">All Status</option>
             <option value="available">Available</option>
-            <option value="occupied">Occupied</option>
+            <option value="in_use">In Use</option>
             <option value="maintenance">Maintenance</option>
           </select>
 

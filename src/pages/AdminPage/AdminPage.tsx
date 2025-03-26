@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -12,7 +12,6 @@ import {
   Cell,
   LineChart,
   Line,
-  Legend,
 } from "recharts";
 import AdminLayout from "./AdminLayout";
 import { fetchUsers, User } from "../../services/Admin/User/userService";
@@ -63,25 +62,27 @@ const AdminPage = () => {
 
   const matchesData = matches.reduce(
     (acc, match) => {
+      if (match.status === "ready") acc.ready += 1;
       if (match.status === "pending") acc.pending += 1;
       if (match.status === "playing") acc.playing += 1;
       if (match.status === "finished") acc.completed += 1;
       return acc;
     },
-    { pending: 0, playing: 0, completed: 0 }
+    { pending: 0, playing: 0, completed: 0, ready: 0 }
   );
 
   const matchesChartData = [
+    { name: "Ready", value: matchesData.ready },
     { name: "Pending", value: matchesData.pending },
     { name: "Playing", value: matchesData.playing },
-    { name: "finished", value: matchesData.completed },
+    { name: "Finished", value: matchesData.completed },
   ];
 
   const inUseTables = tables.filter((table) => table.status === "in_use");
   const pendingOrPlayingMatches = matches.filter(
     (match) => match.status === "pending" || match.status === "playing"
   );
-  
+
   // Pagination logic for tables
   const totalPagesTables = Math.ceil(inUseTables.length / itemsPerPage);
   const startIndexTables = (currentPageTables - 1) * itemsPerPage;
@@ -91,7 +92,7 @@ const AdminPage = () => {
   const totalPagesMatches = Math.ceil(pendingOrPlayingMatches.length / itemsPerPage);
   const startIndexMatches = (currentPageMatches - 1) * itemsPerPage;
   const paginatedMatches = pendingOrPlayingMatches.slice(startIndexMatches, startIndexMatches + itemsPerPage);
-  
+
   return (
     <AdminLayout>
       {loading ? (
@@ -119,64 +120,133 @@ const AdminPage = () => {
           </div>
 
           {/* Charts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-4">Table Status</h3>
-              <ResponsiveContainer width="100%" height={200}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {/* Table Status Chart */}
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <h3 className="text-xl font-semibold mb-6 text-gray-800">Table Status</h3>
+              <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
                     data={chartData}
                     dataKey="value"
                     nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
                     outerRadius={80}
-                    fill="#8884d8"
-                    label={(entry) => entry.name}
+                    paddingAngle={5}
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                   >
                     {chartData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={[
-                          "#4caf50",
-                          "#2196f3",
-                          "#ff9800",
+                          "#10B981", // Emerald-500 for Available
+                          "#F59E0B", // Amber-500 for In Use
+                          "#EF4444", // Red-500 for Maintenance
                         ][index % 3]}
                       />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip
+                    formatter={(value, name) => [`${value} tables`, name]}
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      borderRadius: '6px',
+                      padding: '8px',
+                      border: 'none',
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
 
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-4">Matches Overview</h3>
-              <ResponsiveContainer width="100%" height={200}>
+            {/* Matches Overview Chart */}
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <h3 className="text-xl font-semibold mb-6 text-gray-800">Matches Overview</h3>
+              <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={matchesChartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="value" fill="#8884d8" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: '#4B5563' }}
+                    axisLine={{ stroke: '#9CA3AF' }}
+                  />
+                  <YAxis
+                    tick={{ fill: '#4B5563' }}
+                    axisLine={{ stroke: '#9CA3AF' }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      borderRadius: '6px',
+                      padding: '8px',
+                      border: 'none',
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                    }}
+                  />
+                  <Bar
+                    dataKey="value"
+                    fill="#6366F1"
+                    radius={[4, 4, 0, 0]}
+                    animationDuration={1500}
+                  >
+                    {matchesChartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={[
+                          "#A78BFA", // Violet-400 for Ready
+                          "#818CF8", // Indigo-400 for Pending
+                          "#6366F1", // Indigo-500 for Playing
+                          "#4F46E5", // Indigo-600 for Finished
+                        ][index % 4]}
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-4">User Growth</h3>
-              <ResponsiveContainer width="100%" height={200}>
+            {/* User Growth Chart */}
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <h3 className="text-xl font-semibold mb-6 text-gray-800">User Growth</h3>
+              <ResponsiveContainer width="100%" height={250}>
                 <LineChart
                   data={users.map((user, index) => ({
-                    name: `User ${index + 1}`,
+                    name: `Week ${index + 1}`,
                     value: index + 1,
                   }))}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="value" stroke="#82ca9d" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: '#4B5563' }}
+                    axisLine={{ stroke: '#9CA3AF' }}
+                  />
+                  <YAxis
+                    tick={{ fill: '#4B5563' }}
+                    axisLine={{ stroke: '#9CA3AF' }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      borderRadius: '6px',
+                      padding: '8px',
+                      border: 'none',
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#2DD4BF"
+                    strokeWidth={2}
+                    dot={{ fill: '#2DD4BF', stroke: '#2DD4BF', strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, stroke: '#14B8A6', strokeWidth: 2 }}
+                    animationDuration={2000}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -185,8 +255,8 @@ const AdminPage = () => {
           {/* Tables */}
           <div className="bg-white rounded-lg shadow mb-6">
             <div className="px-4 py-5 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">Tables Overview</h2>
-              <p className="text-sm text-gray-500">Current status of billiard tables across all locations</p>
+              <h2 className="text-lg font-medium text-gray-900">Tables Overview (Using)</h2>
+              <p className="text-sm text-gray-500">Current status in use of Pooltables across all locations</p>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -241,8 +311,8 @@ const AdminPage = () => {
                       key={i + 1}
                       onClick={() => setCurrentPageTables(i + 1)}
                       className={`relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                        currentPageTables === i + 1 
-                          ? "bg-blue-600 text-white" 
+                        currentPageTables === i + 1
+                          ? "bg-blue-600 text-white"
                           : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
                       }`}
                     >
@@ -260,9 +330,6 @@ const AdminPage = () => {
               </div>
             )}
             <div className="px-4 py-3 border-t border-gray-200 text-right">
-              <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
-                View All Tables
-              </button>
             </div>
           </div>
 
@@ -270,7 +337,7 @@ const AdminPage = () => {
           <div className="bg-white rounded-lg shadow">
             <div className="px-4 py-5 border-b border-gray-200">
               <h2 className="text-lg font-medium text-gray-900">Recent Matches</h2>
-              <p className="text-sm text-gray-500">Today's matches and results</p>
+              <p className="text-sm text-gray-500">Playing matches & Pending Matches</p>
             </div>
             <div className="p-4">
               <div className="space-y-4">
@@ -281,7 +348,7 @@ const AdminPage = () => {
                       <p className="text-sm text-gray-500">{match.createdAt}</p>
                     </div>
                     <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full 
+                      className={`px-2 py-1 text-xs font-semibold rounded-full
                       ${
                         match.status === "Completed"
                           ? "bg-gray-100 text-gray-800"
@@ -311,8 +378,8 @@ const AdminPage = () => {
                         key={i + 1}
                         onClick={() => setCurrentPageMatches(i + 1)}
                         className={`relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                          currentPageMatches === i + 1 
-                            ? "bg-blue-600 text-white" 
+                          currentPageMatches === i + 1
+                            ? "bg-blue-600 text-white"
                             : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
                         }`}
                       >
@@ -330,9 +397,6 @@ const AdminPage = () => {
                 </div>
               )}
               <div className="mt-4 text-right">
-                <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
-                  View All Matches
-                </button>
               </div>
             </div>
           </div>
