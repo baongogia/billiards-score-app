@@ -11,6 +11,7 @@ export const uploadAvatar = async (userId: string, file: File): Promise<User> =>
         "Content-Type": "multipart/form-data",
       },
     });
+    console.log("Change avatar success");
     return response.data.data;
   } catch (error) {
     console.error("Error uploading avatar:", error);

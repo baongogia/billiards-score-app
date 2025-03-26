@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { registerUser } from "../../../services/Admin/User/userService";
+import { registerUser, sendOtp } from "../../../services/Admin/User/userService";
 
 export function CreateUser() {
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
@@ -16,6 +17,7 @@ export function CreateUser() {
 
     const formData = {
       email,
+      otp,
       name,
       password,
       phone,
@@ -31,6 +33,20 @@ export function CreateUser() {
     } catch (error) {
       console.error("Registration error:", error);
       toast.error("Registration failed", {
+        position: "bottom-center",
+      });
+    }
+  };
+
+  const handleGetOtp = async () => {
+    try {
+      await sendOtp(email);
+      toast.success("OTP sent to your email", {
+        position: "top-center",
+      });
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      toast.error("Failed to send OTP", {
         position: "bottom-center",
       });
     }
@@ -60,11 +76,33 @@ export function CreateUser() {
             <label className="block text-sm font-medium text-white mb-2">
               Email Address <span className="text-red-500">*</span>
             </label>
+            <div className="flex space-x-2">
+              <input
+                type="email"
+                className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                placeholder="name@example.com"
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={handleGetOtp}
+                className="px-4 py-2 bg-teal-600 text-white rounded-md shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                Get OTP
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              OTP <span className="text-red-500">*</span>
+            </label>
             <input
-              type="email"
+              type="text"
               className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-              placeholder="name@example.com"
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter OTP"
+              onChange={(e) => setOtp(e.target.value)}
               required
             />
           </div>

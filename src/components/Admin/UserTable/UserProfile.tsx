@@ -184,7 +184,7 @@ export default function UserProfile() {
               />
               <div
                 className={`absolute bottom-3 right-3 w-4 h-4 rounded-full border-2 border-white ${
-                  user.status.toLowerCase() === "active" ? "bg-green-500" : "bg-gray-400"
+                  user.status?.toLowerCase() === "active" ? "bg-green-500" : "bg-gray-400"
                 }`}
               ></div>
             </div>
