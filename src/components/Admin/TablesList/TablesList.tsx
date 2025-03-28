@@ -225,16 +225,16 @@ export default function TablesList() {
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xl font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 ID
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xl font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xl font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Type
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xl font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -242,18 +242,18 @@ export default function TablesList() {
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {paginatedTables.map((table) => (
               <tr key={table._id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-xl text-gray-900 dark:text-gray-300">
                   {table._id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(table.status)}`}>
+                  <span className={`px-2 inline-flex text-xl leading-5 font-semibold rounded-full ${getStatusBadgeClass(table.status)}`}>
                     {table.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-xl text-gray-900 dark:text-gray-300">
                   {table.tableType.type_name}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <td className="px-6 py-4 whitespace-nowrap text-xl font-medium">
                   <button
                     onClick={() => openViewModal(table)}
                     className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4"
@@ -294,7 +294,7 @@ export default function TablesList() {
               <button
                 key={i + 1}
                 onClick={() => setCurrentPage(i + 1)}
-                className={`relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                className={`relative inline-flex items-center px-4 py-2 text-xl font-medium rounded-md ${
                   currentPage === i + 1 ? "bg-blue-600 text-white" : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
                 }`}
               >
