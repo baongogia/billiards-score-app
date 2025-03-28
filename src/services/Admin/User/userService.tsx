@@ -9,6 +9,10 @@ export interface User {
   role: string;
   status: string;
   avatar?: string;
+  deletedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
 
 export const fetchUsers = async (): Promise<User[]> => {
@@ -111,7 +115,7 @@ export const fetchFilteredUsers = async (
   sortBy?: string,
   sortDirection?: string
 ): Promise<{
-  length: number; data: User[]; pagination: { totalItem: number }
+  length: number; data: {data:User[]}; pagination: { totalItem: number }
 }> => {
   try {
     const params = new URLSearchParams();

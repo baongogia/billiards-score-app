@@ -51,8 +51,6 @@ export default function UserTable() {
         console.log("API Response:", response)
         const userData = response.data.data || response || []
         const total = response.pagination.totalItem || response.length || 0
-        console.log("Users:", userData)
-        console.log("Total Items:", total)
 
         setUsers(userData)
         setTotalItems(total)
