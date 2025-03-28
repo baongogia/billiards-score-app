@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 
 const MatchTable: React.FC = () => {
   const [matches, setMatches] = useState<MatchData[]>([]);
-  const [selectedMatch, setSelectedMatch] = useState<MatchData | null>(null);
+  const [selectedMatch, setSelectedMatch] = useState<{ match: MatchData } | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -29,6 +29,8 @@ const MatchTable: React.FC = () => {
     switch (status.toLowerCase()) {
       case "ready":
         return "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400";
+      case "active":
+        return "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400";
       case "playing":
         return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400";
       case "finished":
@@ -38,20 +40,12 @@ const MatchTable: React.FC = () => {
     }
   };
 
-  // Debug state changes for isEditModalOpen
-  useEffect(() => {
-    console.log("isEditModalOpen changed to:", isEditModalOpen);
-  }, [isEditModalOpen]);
-
   // Load matches on component mount
   useEffect(() => {
     const loadMatches = async () => {
       try {
         const matchesData = await fetchMatches();
         setMatches(matchesData);
-        toast.success("Matches loaded successfully", {
-          position: "top-right",
-        });
       } catch (error) {
         console.error("Error fetching matches:", error);
         toast.error("Failed to load matches", {
@@ -67,9 +61,9 @@ const MatchTable: React.FC = () => {
   const handleCreateMatch = async (matchData: Partial<MatchData>) => {
     try {
       const newMatch = await createMatch({
-        status: matchData.status || 'playing',
-        mode_game: matchData.mode_game || '',
-        pooltable: matchData.pooltable || ''
+        status: matchData.status || "playing",
+        mode_game: matchData.mode_game || "",
+        pooltable: matchData.pooltable || "",
       });
       setMatches((prevMatches) => [...prevMatches, newMatch]);
       setIsCreateModalOpen(false);
@@ -84,11 +78,37 @@ const MatchTable: React.FC = () => {
     }
   };
 
+  // Handle editing a match (similar to MatchHistory)
+  const handleEditMatch = async (id: string) => {
+    try {
+      const match = await fetchMatchById(id);
+      setSelectedMatch(match);
+      setIsEditModalOpen(true);
+      toast.success("Match loaded for editing", { position: "top-right" });
+    } catch (error) {
+      console.error("Error fetching match:", error);
+      toast.error("Failed to load match for editing", { position: "top-right" });
+    }
+  };
+
+  // Handle viewing match details (similar to MatchHistory)
+  const handleViewMatch = async (id: string) => {
+    try {
+      const match = await fetchMatchById(id);
+      setSelectedMatch(match);
+      setIsViewModalOpen(true);
+      toast.success("Match details loaded successfully", { position: "top-right" });
+    } catch (error) {
+      console.error("Error fetching match for view:", error);
+      toast.error("Failed to load match details", { position: "top-right" });
+    }
+  };
+
   // Handle updating an existing match
   const handleUpdateMatchStatus = async (matchData: Partial<MatchData>) => {
     if (!selectedMatch) return;
     try {
-      const updatedMatch = await updateMatch(selectedMatch._id, matchData);
+      const updatedMatch = await updateMatch(selectedMatch.match._id, matchData);
       setMatches((prevMatches) =>
         prevMatches.map((match) =>
           match._id === updatedMatch._id ? updatedMatch : match
@@ -124,42 +144,6 @@ const MatchTable: React.FC = () => {
     }
   };
 
-  // Handle opening the edit modal for a match
-  const handleEditMatch = async (id: string) => {
-    try {
-      const match = await fetchMatchById(id);
-      console.log("Fetched match data:", match);
-      setSelectedMatch(match);
-      setIsEditModalOpen(true);
-      toast.success("Match loaded for editing", {
-        position: "top-right",
-      });
-    } catch (error) {
-      console.error("Error fetching match:", error);
-      toast.error("Failed to load match for editing", {
-        position: "top-right",
-      });
-    }
-  };
-
-  // Handle viewing match details
-  const handleViewMatch = async (id: string) => {
-    try {
-      const match = await fetchMatchById(id);
-      console.log("Fetched match for view:", match);
-      setSelectedMatch(match);
-      setIsViewModalOpen(true);
-      toast.success("Match details loaded successfully", {
-        position: "top-right",
-      });
-    } catch (error) {
-      console.error("Error fetching match for view:", error);
-      toast.error("Failed to load match details", {
-        position: "top-right",
-      });
-    }
-  };
-
   // Filter matches based on search term
   const filteredMatches = matches.filter((match) =>
     match.mode_game?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -182,7 +166,7 @@ const MatchTable: React.FC = () => {
         </p>
       </div>
 
-      {/* Actions Section (Create Button and Search Bar) */}
+      {/* Actions Section */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <button
           onClick={() => setIsCreateModalOpen(true)}
@@ -306,18 +290,22 @@ const MatchTable: React.FC = () => {
         onSave={handleCreateMatch}
       />
 
-      <EditMatchModal
-        isOpen={isEditModalOpen}
-        selectedMatch={selectedMatch}
-        onClose={() => setIsEditModalOpen(false)}
-        onSave={handleUpdateMatchStatus}
-      />
+      {selectedMatch && (
+        <EditMatchModal
+          isOpen={isEditModalOpen}
+          selectedMatch={selectedMatch.match}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleUpdateMatchStatus}
+        />
+      )}
 
-      <ViewMatchModal
-        isOpen={isViewModalOpen}
-        onClose={() => setIsViewModalOpen(false)}
-        match={selectedMatch}
-      />
+      {selectedMatch && (
+        <ViewMatchModal
+          isOpen={isViewModalOpen}
+          onClose={() => setIsViewModalOpen(false)}
+          match={selectedMatch}
+        />
+      )}
     </div>
   );
 };
