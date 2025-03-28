@@ -279,6 +279,7 @@ export default function WaitingPage() {
             onClick={() => {
               navigate(auth?.token ? "/HomePage" : `/${tableId}`);
               setPlayers([]);
+              localStorage.removeItem("tableId");
             }}
           >
             Leave Room
