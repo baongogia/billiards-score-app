@@ -63,12 +63,6 @@ export default function WaitingPage() {
     }
   }, [auth]);
 
-  useEffect(() => {
-    if (!auth?.user) {
-      navigate("/login");
-    }
-  }, [auth, navigate]);
-
   //#region Game settings
   const [gameSettings, setGameSettings] = useState<Partial<GameState>>({
     gameType: "bida",
@@ -289,7 +283,7 @@ export default function WaitingPage() {
           <button
             className=" border-1 px-2 flex justify-center items-center uppercase font-bold  hover:bg-red-700 transition duration-300 cursor-pointer text-white rounded"
             onClick={() => {
-              navigate(auth?.token ? "/HomePage" : `/${tableId}`);
+              navigate(auth?.token ? "/HomePage" : '/');
               setPlayers([]);
               localStorage.removeItem("tableId");
             }}
