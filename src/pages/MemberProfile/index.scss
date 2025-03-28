@@ -11,16 +11,12 @@
 
 .wrapper {
   width: 100%;
-  width: 100%;
   height: auto;
   min-height: 100vh;
   padding: 50px 20px;
   padding-top: 100px;
   display: flex;
-  background-image: linear-gradient(-20deg, #ff2846 0%, #6944ff 100%);
-
-  display: flex;
-  background-image: linear-gradient(-20deg, #ff2846 0%, #6944ff 100%);
+  background: linear-gradient(135deg, #1e2a78 0%, #ff6b6b 100%);
 
   @media screen and (max-width: 768px) {
     height: auto;
@@ -34,8 +30,8 @@
   min-height: 460px;
   margin: auto;
   box-shadow: 0px 8px 60px -10px rgba(13, 28, 39, 0.6);
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.8); // Increased opacity for better readability
+  backdrop-filter: blur(10px); // Increased blur effect
   border-radius: 12px;
   max-width: 700px;
   position: relative;

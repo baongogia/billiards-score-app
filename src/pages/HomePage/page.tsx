@@ -91,10 +91,13 @@ const HomePage = () => {
         {/* Header */}
         <header className="block">
           <ul className="header-menu horizontal-list">
-            <li>
-              <a className="header-menu-tab" href="#1">
-                <span className="icon entypo-cog scnd-font-color"></span>
-                Settings
+          <li>
+              <a
+                className="header-menu-tab"
+                onClick={() => navigate(`/HistoryMatch/${id}`)}
+              >
+                <span className="icon fontawesome-star-empty scnd-font-color"></span>
+                History matches
               </a>
             </li>
             <li>
@@ -103,21 +106,27 @@ const HomePage = () => {
                 Account
               </a>
             </li>
-            <li className="opacity-0 md:opacity-100">
-              <a className="header-menu-tab" href="#3">
-                <span className="icon fontawesome-envelope scnd-font-color"></span>
-                Messages
-              </a>
-              <a className="header-menu-number" href="#4">
-                5
-              </a>
-            </li>
-            <li className="hidden md:block">
-              <a className="header-menu-tab" href="#5">
-                <span className="icon fontawesome-star-empty scnd-font-color"></span>
-                Favorites
-              </a>
-            </li>
+            {/* Conditionally render Admin or Manager button */}
+            {allUserData?.role === "admin" && (
+              <li>
+                <button
+                  onClick={() => navigate("/admin")}
+                  className="header-menu-tab bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Admin
+                </button>
+              </li>
+            )}
+            {allUserData?.role === "manager" && (
+              <li>
+                <button
+                  onClick={() => navigate("/manager")}
+                  className="header-menu-tab bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Manager
+                </button>
+              </li>
+            )}
           </ul>
           <div className="profile-menu">
             <p>

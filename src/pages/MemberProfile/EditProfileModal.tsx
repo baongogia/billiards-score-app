@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import { User } from "../../../services/Admin/User/userService";
+import { User } from "../../services/Admin/User/userService";
 import { toast } from "react-toastify";
 
-interface EditUserProfileModalProps {
+interface EditProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (userData: Partial<User>) => void;
   user: User | null;
 }
 
-const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({ isOpen, onClose, onSave, user }) => {
+const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onClose, onSave, user }) => {
   const [userData, setUserData] = useState<Partial<User>>({});
 
   useEffect(() => {
@@ -65,18 +65,12 @@ const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({ isOpen, onC
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-[#394264] p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-white"
-                >
-                  Edit User Profile
+                <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-white">
+                  Edit Profile
                 </Dialog.Title>
                 <form onSubmit={handleSubmit} className="mt-4 space-y-6">
                   <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-white mb-2"
-                    >
+                    <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
                       Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -90,10 +84,7 @@ const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({ isOpen, onC
                     />
                   </div>
                   <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-white mb-2"
-                    >
+                    <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
                       Email <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -107,10 +98,7 @@ const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({ isOpen, onC
                     />
                   </div>
                   <div>
-                    <label
-                      htmlFor="phone"
-                      className="block text-sm font-medium text-white mb-2"
-                    >
+                    <label htmlFor="phone" className="block text-sm font-medium text-white mb-2">
                       Phone
                     </label>
                     <input
@@ -121,45 +109,6 @@ const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({ isOpen, onC
                       onChange={handleChange}
                       className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                     />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="role"
-                      className="block text-sm font-medium text-white mb-2"
-                    >
-                      Role <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="role"
-                      id="role"
-                      value={userData.role || ""}
-                      onChange={handleChange}
-                      className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                      required
-                    >
-                      <option value="user">User</option>
-                      <option value="admin">Admin</option>
-                      <option value="manager">Manager</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="status"
-                      className="block text-sm font-medium text-white mb-2"
-                    >
-                      Status <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="status"
-                      id="status"
-                      value={userData.status || "inactive"} // Default to "inactive" if status is undefined
-                      onChange={handleChange}
-                      className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                      required
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
                   </div>
                   <div className="mt-4 space-y-4">
                     <button
@@ -186,4 +135,4 @@ const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({ isOpen, onC
   );
 };
 
-export default EditUserProfileModal;
+export default EditProfileModal;

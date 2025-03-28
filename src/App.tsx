@@ -4,6 +4,7 @@ import LandingPage from "./pages/LandingPage/page";
 import Login from "./pages/LoginPage/page";
 import WaitingPage from "./pages/WaitingPage/page";
 import GamePlay from "./pages/GamePlay/page";
+import HistoryMatch from "./pages/HistoryMatch/page";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
   },
   { path: "/GamePlay", element: <GamePlay /> },
   { path: "/MemberProfile/:id", element: <MemberProfile /> },
+  { path: "/HistoryMatch/:userId", element: <HistoryMatch />},
   {
     path: "/admin",
     element: (
