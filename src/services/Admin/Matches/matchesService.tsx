@@ -13,16 +13,18 @@ export interface MatchData {
 export const fetchMatches = async (): Promise<MatchData[]> => {
   try {
     const response = await api.get<{ data: MatchData[] }>("v1/matches");
+    console.log("Get match success");
     return response.data.data;
   } catch (error) {
     console.error("Error fetching matches:", error);
-    throw error;
+    throw new Error("Failed to fetch matches");
   }
 };
 
 export const fetchMatchById = async (id: string): Promise<MatchData> => {
   try {
     const response = await api.get<{ data: MatchData }>(`v1/matches/${id}`);
+    console.log("Get match by id success");
     return response.data.data;
   } catch (error) {
     console.error("Error fetching match:", error);
@@ -38,6 +40,7 @@ export const createMatch = async (
       "v1/matches",
       matchData
     );
+    console.log("Create match success");
     return response.data.data;
   } catch (error) {
     console.error("Error creating match:", error);
@@ -54,6 +57,7 @@ export const updateMatch = async (
       `v1/matches/${id}`,
       matchData
     );
+    console.log("Update match success");
     return response.data.data;
   } catch (error) {
     console.error("Error updating match:", error);
@@ -64,6 +68,7 @@ export const updateMatch = async (
 export const deleteMatch = async (id: string): Promise<void> => {
   try {
     await api.delete(`v1/matches/${id}`);
+    console.log("Delete match success");
   } catch (error) {
     console.error("Error deleting match:", error);
     throw error;

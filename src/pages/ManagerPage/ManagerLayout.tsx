@@ -3,7 +3,7 @@
 import type React from "react"
 import { useContext, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import { Users, User, Table, LogOut, Menu, X } from "lucide-react"
+import { User, Table, LogOut, Menu, X, DatabaseIcon, Table2Icon, LaptopMinimalCheck } from "lucide-react"
 import { AuthContext } from "../../context/AuthContext"
 
 const ManagerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -18,8 +18,9 @@ const ManagerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }
 
   const navItems = [
-    { path: "/manager", icon: Table, label: "Tables" },
-    { path: "/manager/matches", icon: Users, label: "Matches" },
+    { path: "/manager", icon: DatabaseIcon, label: "DashBoard" },
+    { path: "/manager/tables", icon: Table2Icon, label: "Tables" },
+    { path: "/manager/matches", icon: LaptopMinimalCheck, label: "Matches" },
   ]
 
   const isActive = (path: string) => {

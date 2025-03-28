@@ -3,7 +3,7 @@
 import type React from "react"
 import { useContext, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import { Users, User, Store, LogOut, Menu, X, Database, LaptopMinimalCheck, Table } from "lucide-react"
+import {  User, Store, LogOut, Menu, X, Database, LaptopMinimalCheck, Table } from "lucide-react"
 import { AuthContext } from "../../context/AuthContext"
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -20,7 +20,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navItems = [
     { path: "/admin", icon: Database, label: "Dashboard" },
     { path: "/admin/users", icon: User, label: "Users" },
-    { path: "/admin/members", icon: Users, label: "Members" },
     { path: "/admin/stores", icon: Store, label: "Stores" },
     { path: "/admin/matches", icon: LaptopMinimalCheck, label: "Matches" },
     { path: "/admin/tables", icon: Table, label: "Tables" },

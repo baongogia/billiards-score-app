@@ -1,29 +1,27 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { registerUser } from "../../../services/Admin/User/userService";
+import { registerUser, sendOtp } from "../../../services/Admin/User/userService";
 
-export function Register() {
+export function CreateUser() {
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const [role, setRole] = useState("user");
   const navigate = useNavigate();
-
-  // Set default values for role and status
-  const role = "manager";
-
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = {
       email,
+      otp,
       name,
       password,
       phone,
       role,
-
     };
 
     try {
@@ -40,106 +38,136 @@ export function Register() {
     }
   };
 
-  return (
-    <div className="relative flex w-full h-screen overflow-hidden bg-gray-900 z-1 dark:bg-gray-900">
-      <div className="flex flex-col flex-1 p-4 rounded-2xl sm:rounded-none sm:border-0 sm:p-6">
-        <div className="w-full max-w-md pt-5 mx-auto sm:py-8">
-          <Link
-            to="/admin/users"
-            className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-          >
-            <svg
-              className="stroke-current"
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-            >
-              <path
-                d="M12.7083 5L7.5 10.2083L12.7083 15.4167"
-                stroke=""
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Back to list User
-          </Link>
-        </div>
-        <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto p-2">
-          <form onSubmit={handleRegister} className="space-y-3">
-            <div className="mb-3 p-2">
-              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Name<span className="text-error-500">*</span>
-              </label>
-              <input
-                type="text"
-                className="w-full px-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
-                placeholder="Name"
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
+  const handleGetOtp = async () => {
+    try {
+      await sendOtp(email);
+      toast.success("OTP sent to your email", {
+        position: "top-center",
+      });
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      toast.error("Failed to send OTP", {
+        position: "bottom-center",
+      });
+    }
+  };
 
-            <div className="mb-3 p-2">
-              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email address<span className="text-error-500">*</span>
-              </label>
+  return (
+    <div className="flex justify-center items-center w-full min-h-screen bg-[#111111]">
+      <div className="w-full max-w-md bg-[#394264] p-8 rounded-xl shadow-2xl">
+        <h2 className="text-3xl font-bold text-center text-white mb-4">
+          Create New User
+        </h2>
+        <form onSubmit={handleRegister} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Full Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+              placeholder="Enter full name"
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Email Address <span className="text-red-500">*</span>
+            </label>
+            <div className="flex space-x-2">
               <input
                 type="email"
-                className="w-full px-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
-                placeholder="Enter email"
+                className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                placeholder="name@example.com"
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-            </div>
-
-            <div className="mb-3 p-2">
-              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password<span className="text-error-500">*</span>
-              </label>
-              <input
-                type="password"
-                className="w-full px-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
-                placeholder="Enter password"
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="mb-3 p-2">
-              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Phone<span className="text-error-500">*</span>
-              </label>
-              <input
-                type="text"
-                className="w-full px-2 py-1 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
-                placeholder="Enter phone number"
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="d-grid">
               <button
-                type="submit"
-                className="w-full px-3 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                type="button"
+                onClick={handleGetOtp}
+                className="px-4 py-2 bg-teal-600 text-white rounded-md shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
               >
-                Sign Up
+                Get OTP
               </button>
             </div>
-          </form>
-          <button
-            onClick={() => navigate("/admin/users")}
-            className="mt-4 w-full px-3 py-2 text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
-          >
-            Back to User List
-          </button>
-        </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              OTP <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+              placeholder="Enter OTP"
+              onChange={(e) => setOtp(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Password <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="password"
+              className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+              placeholder="Create a strong password"
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Phone Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+              placeholder="Enter phone number"
+              onChange={(e) => setPhone(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Role <span className="text-red-500">*</span>
+            </label>
+            <select
+              className="w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required
+            >
+              <option value="manager">Manager</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+
+          <div className="space-y-4">
+            <button
+              type="submit"
+              className="w-full py-3 px-4 text-white bg-teal-600 rounded-md shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
+              Sign Up
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/admin/users")}
+              className="w-full py-3 px-4 text-teal-700 bg-[#394264] rounded-md shadow-sm hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500"
+            >
+              Back to User List
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
 }
 
-export default Register;
+export default CreateUser;

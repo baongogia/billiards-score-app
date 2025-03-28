@@ -8,6 +8,15 @@ password 123
 admin: Tri@gmail.com
 password 123
 
+Trang lỗi
+
+UserTable (component/admin)
+UserProfile (component/admin)
+ViewMatchModal (component/admin)
+ManagerPage
+TablesList (component/manager)
+MatchHistory (component/manager)
+
 
 # React + TypeScript + Vite
 
