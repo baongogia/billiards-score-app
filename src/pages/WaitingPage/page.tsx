@@ -23,6 +23,7 @@ interface GameState {
 }
 
 export default function WaitingPage() {
+  // #region State and Context
   const navigate = useNavigate();
   const { tableId, matchId } = useParams();
   const { socket } = useSocket();
@@ -38,48 +39,16 @@ export default function WaitingPage() {
   const [storedPlayerName, setStoredPlayerName] = useState<string | null>(null);
   const [allUserData, setAllUserData] = useState<any>(null);
   const [matchData, setMatchData] = useState<any>(null);
-  console.log("Match Data:", matchData);
-  // const host = "http://localhost:3003";
-  const serverhost = "https://billiards-score-app.vercel.app";
+  const [showGuestNameModal, setShowGuestNameModal] = useState(false);
+  const [guestNameInput, setGuestNameInput] = useState("");
+  const [hostName, setHostName] = useState<string | null>(
+    `${auth?.token ? playerName : guestNameInput}`
+  );
+  const [hostAvatar, setHostAvatar] = useState<string>("");
+  const serverhost = "http://localhost:3003";
+  // const serverhost = "https://billiards-score-app.vercel.app";
   const matchLink = `${serverhost}/WaitingPage/${tableId}/${matchData?.matchId}`;
-
-  useEffect(() => {
-    if (matchId) {
-      // socket.emit("joinRoom", { matchId, playerName });
-      toast.success("You have joined the room!");
-    }
-  }, [matchId, playerName, socket]);
-
-  useEffect(() => {
-    socket.on("roomCreated", (data: any) => {
-      const { roomId, matchId } = data;
-      setMatchData(data);
-      console.log("Room Created:", roomId, matchId);
-      toast.success("Room created successfully!");
-      localStorage.setItem("matchData", JSON.stringify(data));
-    });
-
-    return () => {
-      socket.off("roomCreated");
-    };
-  }, [socket]);
-
-  useEffect(() => {
-    // Kiểm tra xem dữ liệu đã được lưu trữ trong localStorage hay chưa
-    const savedMatchData = localStorage.getItem("matchData");
-    if (savedMatchData) {
-      const parsedMatchData = JSON.parse(savedMatchData);
-      setMatchData(parsedMatchData); // Cập nhật state với dữ liệu đã lưu
-    }
-
-    // Kiểm tra tên người chơi từ localStorage
-    const savedPlayerName = localStorage.getItem("playerName");
-    if (savedPlayerName && storedPlayerName !== savedPlayerName) {
-      setStoredPlayerName(savedPlayerName);
-      setGameState({ playerName: savedPlayerName });
-    }
-  }, [storedPlayerName, setGameState]);
-
+  // #endregion
   // Get user data
   const fetchUserData = useCallback(async () => {
     try {
@@ -94,21 +63,23 @@ export default function WaitingPage() {
     }
   }, [auth]);
 
-  // Game settings
+  //#region Game settings
   const [gameSettings, setGameSettings] = useState<Partial<GameState>>({
     gameType: "bida",
     timeLimit: 60,
     firstTurn: "player1",
   });
+
   // Get player name
   useEffect(() => {
     if (playerName) {
       localStorage.setItem("playerName", playerName);
+      if (!matchId) {
+        setPlayers([playerName]);
+      }
     }
-    setPlayers([playerName]);
-
     fetchUserData();
-  }, [playerName, fetchUserData, socket]);
+  }, [playerName, fetchUserData, socket, matchId]);
 
   useEffect(() => {
     const savedPlayerName = localStorage.getItem("playerName");
@@ -135,7 +106,6 @@ export default function WaitingPage() {
     }
   }, [tableId, gameSettings.gameType]);
   // Create match
-
   const handleCreateMatch = (value: string) => {
     setGameSettings({
       ...gameSettings,
@@ -150,6 +120,116 @@ export default function WaitingPage() {
       document.body.style.overflow = "auto";
     };
   }, []);
+  // #endregion
+  // Socket waiting room
+  useEffect(() => {
+    // Show guest name modal if no player name is set - guest
+    const storedGuestName = localStorage.getItem("guestName");
+    if (!auth?.token && !playerName) {
+      if (storedGuestName) {
+        setGuestNameInput(storedGuestName);
+      } else {
+        setShowGuestNameModal(true);
+      }
+      return;
+    }
+    // Handle player join room - guest
+    if (matchId) {
+      socket.emit("joinRoom", { matchId, guestName: playerName });
+      socket.on("waitingRoomPlayers", (data: any) => {
+        if (data) {
+          setHostName(data.hostName);
+          setHostAvatar(data.hostImg);
+          const names =
+            data.players?.map((p: any) => p.name).filter(Boolean) || [];
+          const uniqueNames = Array.from(new Set([data.hostName, ...names]));
+          setPlayers(uniqueNames);
+          const otherPlayers = uniqueNames.filter(
+            (name) => name !== playerName
+          );
+          if (otherPlayers.length > 0) {
+            setGameState({
+              playerName,
+              partnerName: otherPlayers[0],
+            });
+          }
+        } else {
+          toast.error("Error fetching waiting room players");
+        }
+      });
+      socket.on("roomJoined", (data) => {
+        if (data?.guestName) {
+          setPlayers((prev) => {
+            if (!prev.includes(data.guestName)) {
+              return [...prev, data.guestName];
+            }
+            return prev;
+          });
+          toast.success(`${data.guestName} joined the room!`);
+        }
+      });
+
+      // Handle player join room - host
+    } else {
+      socket.emit("createRoom", { tableId });
+      socket.on("roomCreated", (data: any) => {
+        setMatchData(data);
+        setHostName(playerName);
+        setPlayers([playerName]);
+        localStorage.setItem("matchData", JSON.stringify(data));
+        if (data.matchId && playerName && allUserData?.avatar) {
+          socket.emit("getWaitingRoomPlayers", {
+            matchId: data.matchId,
+            hostName: playerName,
+            hostImg: allUserData.avatar,
+          });
+          toast.success("Waiting room created!");
+        } else {
+          console.warn("Missing data to emit getWaitingRoomPlayers:", {
+            matchId: data.matchId,
+            playerName,
+            avatar: allUserData?.avatar,
+          });
+        }
+      });
+      socket.on("userJoined", (data: any) => {
+        setPlayers([playerName, data.guestName]);
+        toast.success(`${data.guestName} joined the room!`);
+        socket.emit("getWaitingRoomPlayers", {
+          matchId: matchData.matchId,
+          hostName: playerName,
+          hostImg: allUserData.avatar,
+        });
+      });
+    }
+    return () => {
+      socket.off("roomCreated");
+      socket.off("roomJoined");
+      socket.off("userJoined");
+    };
+  }, [
+    auth?.token,
+    matchId,
+    playerName,
+    setGameState,
+    socket,
+    tableId,
+    allUserData,
+    matchData,
+    hostName,
+  ]);
+
+  // Socket events start match
+  useEffect(() => {
+    socket.on("startGame", () => {
+      navigate(`/GamePlay/${matchId || matchData?.matchId}`);
+      toast.success("Match started!");
+    });
+
+    return () => {
+      socket.off("startGame");
+    };
+  }, [socket, navigate, matchId, matchData?.matchId]);
 
   return (
     <div className="relative w-[100vw] bg-green-950 h-[100vh] flex justify-center items-center">
@@ -171,25 +251,30 @@ export default function WaitingPage() {
               Invite
             </button>
           )}
+
           <button
             className=" border-1 px-2 flex justify-center items-center uppercase font-bold  hover:bg-yellow-500 transition duration-300 cursor-pointer text-white rounded"
             onClick={() => setShowSetupModal(true)}
           >
             Setup
           </button>
-          {/* ${
-              partnerName
-                ? "bg-green-500 hover:bg-green-700 cursor-pointer"
-                : "bg-gray-500 cursor-not-allowed"
-            } */}
+
           <button
-            className={` border-1 px-2 flex justify-center items-center uppercase font-bold text-white text-nowrap rounded  hover:bg-green-700 cursor-pointer`}
-            onClick={() => navigate("/GamePlay")}
-            // onClick={() => partnerName && navigate("/GamePlay")}
-            // disabled={!partnerName}
+            className={`border-1 px-2 flex justify-center items-center uppercase font-bold text-white text-nowrap rounded ${
+              players.length === 2
+                ? "hover:bg-green-700 cursor-pointer"
+                : "bg-gray-500 cursor-not-allowed"
+            }`}
+            disabled={players.length < 2}
+            onClick={() => {
+              if (players.length > 1 && matchData?.matchId) {
+                socket.emit("startGame", { matchId: matchData.matchId });
+              }
+            }}
           >
             Start Match
           </button>
+
           <button
             className=" border-1 px-2 flex justify-center items-center uppercase font-bold  hover:bg-red-700 transition duration-300 cursor-pointer text-white rounded"
             onClick={() => {
@@ -199,14 +284,6 @@ export default function WaitingPage() {
           >
             Leave Room
           </button>
-          {!auth?.token && (
-            <button
-              className="px-2 border-1 flex justify-center items-center uppercase font-bold hover:bg-purple-700 transition duration-300 cursor-pointer text-white rounded"
-              onClick={() => setShowAddPartnerModal(true)}
-            >
-              Add Partner
-            </button>
-          )}
         </div>
       </div>
 
@@ -214,12 +291,21 @@ export default function WaitingPage() {
       <div className="relative grid grid-cols-2 w-screen h-screen pointer-events-none">
         <PlayerCard
           className="player-1 text-center"
-          name={`${playerName || storedPlayerName} (HOST)`}
+          name={`${hostName} (HOST)`}
           data={allUserData}
+          avatar={hostAvatar}
         />
         {players.length > 1 && (
           <PlayerCard className="player-2" name={players[1]} />
         )}
+        {players.length > 2 && (
+          <PlayerCard className="player-3" name={players[2]} />
+        )}
+        {players.length > 3 && (
+          <PlayerCard className="player-4" name={players[3]} />
+        )}
+
+        {players.length > 4 && toast.warning("Full room!")}
       </div>
 
       {/* Invite Modal */}
@@ -227,9 +313,16 @@ export default function WaitingPage() {
         <div className="absolute w-full h-full bg-[rgba(0,0,0,0.7)] flex justify-center items-center">
           <div className="bg-[rgba(255,255,255,0.5)] backdrop-blur-md  p-5 rounded-lg w-72 text-white">
             <h2 className="text-xl font-bold mb-3">Invite Player</h2>
-            <div className="object-cover w-full mb-4">
-              <QRCodeCanvas value={matchLink} size={250} />
-            </div>
+            {matchData?.matchId ? (
+              <div className="object-cover w-full mb-4">
+                <QRCodeCanvas value={matchLink} size={250} />
+                <div className="h-4 bg-amber-300 p-2 rounded-4xl">
+                  {matchLink}
+                </div>
+              </div>
+            ) : (
+              <Loading />
+            )}
             <button
               className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-700 transition cursor-pointer"
               onClick={() => setShowInviteModal(false)}
@@ -361,9 +454,53 @@ export default function WaitingPage() {
         </div>
       )}
 
+      {/* Guest Name Modal */}
+      {showGuestNameModal && (
+        <div className="absolute w-full h-full bg-[rgba(0,0,0,0.7)] flex justify-center items-center">
+          <div className="bg-[rgba(255,255,255,0.5)] backdrop-blur-md p-5 rounded-lg w-80 text-white">
+            <h2 className="text-xl font-bold mb-3">Enter Your Name</h2>
+            <input
+              type="text"
+              className="w-full p-2 border rounded text-black mb-3"
+              placeholder="Your name"
+              value={guestNameInput}
+              onChange={(e) => setGuestNameInput(e.target.value)}
+            />
+            <div className="flex justify-between">
+              <button
+                className="w-[48%] bg-green-500 text-white py-2 rounded hover:bg-green-700 transition cursor-pointer"
+                onClick={() => {
+                  if (guestNameInput.trim()) {
+                    setGameState({ playerName: guestNameInput });
+                    localStorage.setItem("playerName", guestNameInput);
+                    setShowGuestNameModal(false);
+                    localStorage.setItem("guestName", guestNameInput);
+                  }
+                }}
+              >
+                Join
+              </button>
+              <button
+                className="w-[48%] bg-red-500 text-white py-2 rounded hover:bg-red-700 transition cursor-pointer"
+                onClick={() => {
+                  setGuestNameInput("");
+                  setShowGuestNameModal(false);
+                  navigate(`/${tableId}`);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Style */}
       <style>{`
         .player-1 { position: absolute; bottom: 25px; left: 25px; }
         .player-2 { position: absolute; bottom: 25px; right: 25px; }
+        .player-3 { position: absolute; top: 25px; right: 25px; }
+        .player-4 { position: absolute; top: 25px; left: 25px; }
       `}</style>
     </div>
   );

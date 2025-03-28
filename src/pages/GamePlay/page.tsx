@@ -5,10 +5,11 @@ import "./index.scss";
 import { useGame } from "../../context/GameContext";
 import { ForwardIcon, UndoIcon } from "lucide-react";
 import { GiPauseButton, GiPlayButton } from "react-icons/gi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { findUser } from "../../services/auth/authService";
 import { toast } from "react-toastify";
+import { useSocket } from "../../hooks/useSocket";
 
 const GamePlay: React.FC = () => {
   const {
@@ -19,6 +20,8 @@ const GamePlay: React.FC = () => {
     partnerName,
     setGameState,
   } = useGame();
+  const { matchId } = useParams();
+  const { socket } = useSocket();
   const [currentPlayer, setCurrentPlayer] = useState(
     firstTurn === "player1" ? 1 : 2
   );
@@ -64,6 +67,7 @@ const GamePlay: React.FC = () => {
     }
     fetchUserData();
   }, [tableId, fetchUserData]);
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -91,6 +95,11 @@ const GamePlay: React.FC = () => {
 
   const handleBallClick = (ball: number) => {
     if (!balls.includes(ball) || winner) return;
+    socket.emit("pottedBall", {
+      matchId,
+      ballIndex: ball,
+      ballType: "default",
+    });
     setBalls((prevBalls) => prevBalls.filter((b) => b !== ball));
     setHistory((prev) => [...prev, { player: currentPlayer as 1 | 2, ball }]);
 
@@ -101,6 +110,73 @@ const GamePlay: React.FC = () => {
     if (gameType === "9-ball" && ball === 9) {
       setWinner(`🎉 ${currentPlayer === 1 ? playerName : partnerName} Wins!`);
     }
+  };
+
+  // #region Socket events
+  // Socket lắng nghe sự kiện "ballPottedUpdate"
+  useEffect(() => {
+    socket.on("ballPottedUpdate", (data: any) => {
+      if (data?.ballIndex !== undefined) {
+        setBalls((prevBalls) => prevBalls.filter((b) => b !== data.ballIndex));
+        setHistory((prev) => [
+          ...prev,
+          { player: currentPlayer as 1 | 2, ball: data.ballIndex },
+        ]);
+      }
+    });
+
+    return () => {
+      socket.off("ballPottedUpdate");
+    };
+  }, [currentPlayer, socket]);
+
+  // Lắng nghe sự kiện waitingRoomPlayers từ server
+  const [hostName, setHostName] = useState<string | null>("");
+  const [hostAvatar, setHostAvatar] = useState<string>("");
+  const [player, setPlayer] = useState<{ name: string }[] | null>(null);
+
+  useEffect(() => {
+    const handler = (data: any) => {
+      console.log("[waitingRoomPlayers] received:", data);
+
+      // Nếu là host (allUserData trùng với hostName) → set host
+      if (allUserData?.name === data.hostName) {
+        setHostName(data.hostName);
+        setHostAvatar(data.hostImg);
+      }
+
+      // Nếu là guest (khác host) → vẫn set host
+      if (!allUserData || allUserData?.name !== data.hostName) {
+        setHostName(data.hostName);
+        setHostAvatar(data.hostImg);
+      }
+
+      setPlayer(data.players);
+    };
+
+    socket.on("waitingRoomPlayers", handler);
+    return () => {
+      socket.off("waitingRoomPlayers", handler);
+    };
+  }, [socket, allUserData]);
+
+  useEffect(() => {
+    if (!matchId) return;
+
+    if (allUserData) {
+      socket.emit("getWaitingRoomPlayers", {
+        matchId,
+        hostName: allUserData?.name,
+        hostImg: allUserData?.avatar,
+      });
+    } else {
+      socket.emit("getWaitingRoomPlayers", { matchId });
+    }
+  }, [matchId, allUserData, socket]);
+  // #endregion
+
+  const handlePause = () => {
+    setPaused((prev) => !prev);
   };
 
   const handleUndo = () => {
@@ -114,10 +190,6 @@ const GamePlay: React.FC = () => {
     }
   };
 
-  const handlePause = () => {
-    setPaused((prev) => !prev);
-  };
-
   const handleRestart = () => {
     setBalls(
       gameType === "8-ball"
@@ -128,7 +200,7 @@ const GamePlay: React.FC = () => {
     setTimer(timeLimit);
     setHistory([]);
   };
-  // md:w-[45%]
+
   return (
     <div className="flex items-center justify-center h-screen bg-green-950">
       <div className="absolute top-30 md:top-10">
@@ -148,6 +220,7 @@ const GamePlay: React.FC = () => {
           >
             <img
               src={
+                hostAvatar ||
                 allUserData?.avatar ||
                 "https://images.pexels.com/photos/5986316/pexels-photo-5986316.jpeg?auto=compress&cs=tinysrgb&w=1200"
               }
@@ -157,7 +230,7 @@ const GamePlay: React.FC = () => {
               style={{ textShadow: "black 1px 0 10px;" }}
               className="player-info"
             >
-              <p>{playerName || storedPlayerName}</p>
+              <p>{hostName || storedPlayerName}</p>
             </div>
           </div>
 
@@ -173,7 +246,7 @@ const GamePlay: React.FC = () => {
               alt="P2"
             />
             <div className="player-info">
-              <p>{partnerName}</p>
+              <p>{player?.[1]?.name}</p>
             </div>
           </div>
         </div>
@@ -225,7 +298,11 @@ const GamePlay: React.FC = () => {
             </h2>
             <div className="flex gap-2">
               <button
-                onClick={() => navigate(`/WaitingPage/${tableId}`)}
+                onClick={() =>
+                  navigate(
+                    `/WaitingPage/${tableId}/${!auth?.token ? matchId : ""}`
+                  )
+                }
                 className="w-full bg-red-600 text-white py-2 rounded hover:bg-green-700 transition cursor-pointer"
               >
                 Thoát
