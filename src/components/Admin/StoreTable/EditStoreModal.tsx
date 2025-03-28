@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Store } from "../../../services/Admin/Store/storeService";
+import toast from "react-hot-toast";
 
 interface EditStoreModalProps {
   isOpen: boolean;
@@ -34,8 +35,18 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ isOpen, selectedStore, 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Store Data to Save:", storeData);
-    onSave(storeData);
+    try {
+      console.log("Store Data to Save:", storeData);
+      onSave(storeData);
+      toast.success("Store updated successfully", {
+        position: "top-right",
+      });
+    } catch (error) {
+      console.error("Error updating store:", error);
+      toast.error("Failed to update store", {
+        position: "top-right",
+      });
+    }
   };
 
   return (

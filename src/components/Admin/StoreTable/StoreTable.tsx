@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Eye, Edit, Trash2 } from "lucide-react";
 import StoreProfileModal from "./StoreProfileModal";
+import { toast } from "react-toastify";
 
 interface Store {
   _id: string
@@ -21,9 +22,18 @@ const StoresTable: React.FC<StoresTableProps> = ({ stores, onUpdateStore, onDele
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const handleViewStore = (store: Store) => {
-    console.log("📌 Viewing store:", store) // Debug log
-    setSelectedStore(store)
-    setIsModalOpen(true)
+    try {
+      console.log("📌 Viewing store:", store)
+      setSelectedStore(store)
+      setIsModalOpen(true)
+      toast.success("Store details loaded successfully", {
+        position: "top-right",
+      });
+    } catch {
+      toast.error("Failed to load store details", {
+        position: "top-right",
+      });
+    }
   }
 
   const handleCloseModal = () => {
@@ -31,21 +41,36 @@ const StoresTable: React.FC<StoresTableProps> = ({ stores, onUpdateStore, onDele
     setSelectedStore(null)
   }
 
-  // const getStatusBadge = (status: string) => {
-  //   const statusLower = status.toLowerCase()
+  const handleUpdateStore = async (storeId: string) => {
+    try {
+      const newName = prompt("Enter new name", selectedStore?.name);
+      if (newName) {
+        await onUpdateStore(storeId, newName);
+        toast.success("Store updated successfully", {
+          position: "top-right",
+        });
+      }
+    } catch {
+      toast.error("Failed to update store", {
+        position: "top-right",
+      });
+    }
+  }
 
-  //   const baseClasses = "px-2.5 py-0.5 text-xs font-medium rounded-full"
-
-  //   if (statusLower === "active") {
-  //     return `${baseClasses} bg-emerald-900/60 text-emerald-300 border border-emerald-500/30`
-  //   } else if (statusLower === "inactive") {
-  //     return `${baseClasses} bg-red-900/60 text-red-300 border border-red-500/30`
-  //   } else if (statusLower === "pending") {
-  //     return `${baseClasses} bg-amber-900/60 text-amber-300 border border-amber-500/30`
-  //   } else {
-  //     return `${baseClasses} bg-blue-900/60 text-blue-300 border border-blue-500/30`
-  //   }
-  // }
+  const handleDeleteStore = async (storeId: string) => {
+    if (window.confirm("Are you sure you want to delete this store?")) {
+      try {
+        await onDeleteStore(storeId);
+        toast.success("Store deleted successfully", {
+          position: "top-right",
+        });
+      } catch {
+        toast.error("Failed to delete store", {
+          position: "top-right",
+        });
+      }
+    }
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -66,48 +91,36 @@ const StoresTable: React.FC<StoresTableProps> = ({ stores, onUpdateStore, onDele
                   <Eye className="h-5 w-5" />
                 </button>
                 <button
-                  onClick={() => {
-                    const newName = prompt("Enter new name", store.name);
-                    if (newName) onUpdateStore(store._id, newName);
-                  }}
+                  onClick={() => handleUpdateStore(store._id)}
                   className="text-yellow-400 hover:text-yellow-300 p-2 hover:bg-gray-700 rounded-full transition-colors"
                   title="Edit Store"
                 >
                   <Edit className="h-5 w-5" />
                 </button>
                 <button
-                  onClick={() => onDeleteStore(store._id)}
+                  onClick={() => handleDeleteStore(store._id)}
                   className="text-red-400 hover:text-red-300 p-2 hover:bg-gray-700 rounded-full transition-colors"
                   title="Delete Store"
                 >
                   <Trash2 className="h-5 w-5" />
                 </button>
               </div>
-
-              {/* Bottom accent */}
-              <div className="h-1 w-full bg-gradient-to-r from-indigo-600 to-purple-600 absolute bottom-0 left-0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
             </div>
           ))
         ) : (
           <div className="col-span-full flex flex-col items-center justify-center py-20 bg-[#111827] rounded-2xl border border-gray-800">
-            <div className="relative w-24 h-24 mb-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full animate-pulse"></div>
-              <div className="absolute inset-0 flex items-center justify-center text-4xl">📦</div>
-            </div>
-            <p className="text-white text-xl font-medium mb-2">No stores found</p>
-            <p className="text-gray-400 text-sm max-w-xs text-center">
-              Your store collection is empty. Add your first store to get started.
-            </p>
+            <p className="text-gray-400 text-lg">No stores found</p>
           </div>
         )}
       </div>
-
-      {/* Store Profile Modal */}
-      {selectedStore && (
-        <StoreProfileModal storeId={selectedStore._id} isOpen={isModalOpen} onClose={handleCloseModal} />
-      )}
+      
+      <StoreProfileModal
+        storeId={selectedStore?._id || null}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default StoresTable
+export default StoresTable;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { User } from "../../../services/Admin/User/userService";
+import { toast } from "react-toastify"
 
 interface EditUserProfileModalProps {
   isOpen: boolean;
@@ -26,7 +27,13 @@ const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({ isOpen, onC
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(userData);
+    try {
+      onSave(userData);
+    } catch {
+      toast.error("Failed to save changes",  {
+        position: "top-center",
+      })
+    }
   };
 
   if (!user) return null;

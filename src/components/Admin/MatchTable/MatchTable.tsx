@@ -11,6 +11,7 @@ import { Plus, Search, ChevronLeft, ChevronRight, Edit, Trash2, Eye } from "luci
 import CreateMatchModal from "./CreateMatchModal";
 import EditMatchModal from "./EditMatchModal";
 import ViewMatchModal from "./ViewMatchModal";
+import { toast } from "react-toastify";
 
 const MatchTable: React.FC = () => {
   const [matches, setMatches] = useState<MatchData[]>([]);
@@ -48,8 +49,14 @@ const MatchTable: React.FC = () => {
       try {
         const matchesData = await fetchMatches();
         setMatches(matchesData);
+        toast.success("Matches loaded successfully", {
+          position: "top-right",
+        });
       } catch (error) {
         console.error("Error fetching matches:", error);
+        toast.error("Failed to load matches", {
+          position: "top-right",
+        });
       }
     };
 
@@ -66,8 +73,14 @@ const MatchTable: React.FC = () => {
       });
       setMatches((prevMatches) => [...prevMatches, newMatch]);
       setIsCreateModalOpen(false);
+      toast.success("Match created successfully", {
+        position: "top-right",
+      });
     } catch (error) {
       console.error("Error creating match:", error);
+      toast.error("Failed to create match", {
+        position: "top-right",
+      });
     }
   };
 
@@ -82,8 +95,14 @@ const MatchTable: React.FC = () => {
         )
       );
       setIsEditModalOpen(false);
+      toast.success("Match updated successfully", {
+        position: "top-right",
+      });
     } catch (error) {
       console.error("Error updating match status:", error);
+      toast.error("Failed to update match", {
+        position: "top-right",
+      });
     }
   };
 
@@ -93,8 +112,14 @@ const MatchTable: React.FC = () => {
       try {
         await deleteMatch(id);
         setMatches((prevMatches) => prevMatches.filter((match) => match._id !== id));
+        toast.success("Match deleted successfully", {
+          position: "top-right",
+        });
       } catch (error) {
         console.error("Error deleting match:", error);
+        toast.error("Failed to delete match", {
+          position: "top-right",
+        });
       }
     }
   };
@@ -106,8 +131,14 @@ const MatchTable: React.FC = () => {
       console.log("Fetched match data:", match);
       setSelectedMatch(match);
       setIsEditModalOpen(true);
+      toast.success("Match loaded for editing", {
+        position: "top-right",
+      });
     } catch (error) {
       console.error("Error fetching match:", error);
+      toast.error("Failed to load match for editing", {
+        position: "top-right",
+      });
     }
   };
 
@@ -118,8 +149,14 @@ const MatchTable: React.FC = () => {
       console.log("Fetched match for view:", match);
       setSelectedMatch(match);
       setIsViewModalOpen(true);
+      toast.success("Match details loaded successfully", {
+        position: "top-right",
+      });
     } catch (error) {
       console.error("Error fetching match for view:", error);
+      toast.error("Failed to load match details", {
+        position: "top-right",
+      });
     }
   };
 

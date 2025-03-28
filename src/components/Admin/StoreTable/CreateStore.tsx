@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createStore, Store } from "../../../services/Admin/Store/storeService";
+import { toast } from "react-toastify";
 
 const CreateStore: React.FC = () => {
   const navigate = useNavigate();
@@ -11,16 +12,20 @@ const CreateStore: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent the default form submission behavior
-
+    e.preventDefault();
     if (formName.trim() && formLocation.trim() && formSupervisor.trim()) {
       setIsProcessing(true);
       try {
         const newStore = await createStore(formName, formLocation, formSupervisor);
         setCreatedStore(newStore);
-        console.log("Form submitted successfully:", newStore);
+        toast.success("Store created successfully", {
+          position: "top-right",
+        });
       } catch (error) {
         console.error("Error submitting form:", error);
+        toast.error("Failed to create store", {
+          position: "top-right",
+        });
       } finally {
         setIsProcessing(false);
       }

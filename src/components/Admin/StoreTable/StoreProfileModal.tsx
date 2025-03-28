@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchStoreById, Store } from "../../../services/Admin/Store/storeService";
+import { toast } from "react-toastify";
 
 interface StoreProfileModalProps {
   storeId: string | null;
@@ -15,10 +16,15 @@ const StoreProfileModal: React.FC<StoreProfileModalProps> = ({ storeId, isOpen, 
       if (storeId) {
         try {
           const fetchedStore = await fetchStoreById(storeId);
-          console.log("Fetched Store:", fetchedStore); // Debugging log
           setStore(fetchedStore);
+          toast.success("Store details loaded successfully", {
+            position: "top-right",
+          });
         } catch (error) {
           console.error("Error fetching store by ID:", error);
+          toast.error("Failed to load store details", {
+            position: "top-right",
+          });
         }
       }
     };

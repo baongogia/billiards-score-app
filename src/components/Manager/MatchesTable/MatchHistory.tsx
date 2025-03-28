@@ -5,6 +5,7 @@ import { fetchPoolTablesByStoreId } from '../../../services/Admin/Tables/poolTab
 import { useAuth } from '../../../context/AuthContext';
 import EditMatchModal from '../../Admin/MatchTable/EditMatchModal';
 import ViewMatchModal from '../../Admin/MatchTable/ViewMatchModal';
+import { toast } from "react-toastify";
 
 const MatchHistory = () => {
   const [matches, setMatches] = useState<MatchData[]>([]);
@@ -44,13 +45,22 @@ const MatchHistory = () => {
             console.log("Filtered store matches:", storeMatches);
           } else {
             setError("Failed to load tables");
+            toast.error("Failed to load tables data", {
+              position: "top-right",
+            });
           }
         } else {
           setError("No matches in store");
+          toast.error("No matches found in store", {
+            position: "top-right",
+          });
         }
       } catch (error) {
         console.error("Error loading matches:", error);
         setError("Failed to load matches");
+        toast.error("Failed to load match history", {
+          position: "top-right",
+        });
       } finally {
         setLoading(false);
       }
@@ -65,14 +75,45 @@ const MatchHistory = () => {
   };
 
   const handleViewClick = (match: MatchData) => {
-    setSelectedMatch(match);
-    setIsViewModalOpen(true);
+    try {
+      if (match) {
+        setSelectedMatch(match);
+        setIsViewModalOpen(true);
+        toast.success("Match details loaded successfully", {
+          position: "top-right",
+        });
+      }
+    } catch (error) {
+      console.error("Error viewing match:", error);
+      toast.error("Failed to load match details", {
+        position: "top-right",
+      });
+    }
   };
 
+  // Update handleEditSubmit function
   const handleEditSubmit = (matchData: Partial<MatchData>) => {
-    // Handle updating the match here
-    console.log("Updated match data:", matchData);
-    setIsEditModalOpen(false);
+    try {
+      // Handle updating the match here
+      console.log("Updated match data:", matchData);
+      setIsEditModalOpen(false);
+      toast.success("Match updated successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+      });
+    } catch (error) {
+      console.error("Error updating match:", error);
+      toast.error("Failed to update match", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+      });
+    }
   };
 
   if (loading) return <div>Loading...</div>;
@@ -129,10 +170,14 @@ const MatchHistory = () => {
         />
       )}
 
-      {selectedMatch && (
+      // Update the ViewMatchModal render section
+      {isViewModalOpen && selectedMatch && (
         <ViewMatchModal
           isOpen={isViewModalOpen}
-          onClose={() => setIsViewModalOpen(false)}
+          onClose={() => {
+            setIsViewModalOpen(false);
+            setSelectedMatch(null);
+          }}
           match={selectedMatch}
         />
       )}

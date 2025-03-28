@@ -3,6 +3,7 @@ import { Dialog } from '@headlessui/react';
 import { X, ChevronRight, ChevronLeft } from 'lucide-react';
 import { PoolTable } from '../../../services/Admin/Tables/poolTableService';
 import { fetchStorePoolTables } from '../../../services/Admin/Store/storeService';
+import { toast } from 'react-toastify';
 
 interface StoreTablesModalProps {
   isOpen: boolean;
@@ -26,10 +27,26 @@ const StoreTablesModal: React.FC<StoreTablesModalProps> = ({ isOpen, onClose, st
         setError(null);
         const data = await fetchStorePoolTables(storeId);
         setTables(data || []);
+        toast.success("Store tables loaded successfully", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       } catch (err) {
         setError('Failed to load tables. Please try again.');
         console.error('Error loading tables:', err);
         setTables([]);
+        toast.error("Failed to load store tables", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       } finally {
         setLoading(false);
       }

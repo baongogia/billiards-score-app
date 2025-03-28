@@ -6,6 +6,7 @@ import { fetchUserProfile, updateUser, type User } from "../../../services/Admin
 import { ArrowLeft } from "lucide-react"
 import EditUserProfileModal from "./EditUserProfileModal"
 import { uploadAvatar } from "../../../services/Admin/User/avatarService" // Import the uploadAvatar function
+import { toast } from "react-toastify"
 
 export default function UserProfile() {
   const { id } = useParams<{ id: string }>()
@@ -39,13 +40,19 @@ export default function UserProfile() {
     if (user) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { _id, avatar, ...filteredData } = userData
+        const { _id, avatar, deletedAt, createdAt, updatedAt, __v, ...filteredData } = userData
         console.log("Data sent to API:", filteredData) // Kiểm tra dữ liệu trước khi gửi
         const updatedUser = await updateUser(user._id, filteredData)
         setUser(updatedUser)
         setIsEditModalOpen(false)
+        toast.success("Profile updated successfully", {
+          position: "top-right",
+        })
       } catch (error) {
         console.error("Error updating user:", error)
+        toast.error("Failed to update profile", {
+          position: "top-right",
+        })
       }
     }
   }
@@ -56,8 +63,14 @@ export default function UserProfile() {
       try {
         const updatedUser = await uploadAvatar(user._id, file)
         setUser(updatedUser)
+        toast.success("Avatar updated successfully", {
+          position: "top-right",
+        })
       } catch (error) {
         console.error("Error uploading avatar:", error)
+        toast.error("Failed to update avatar", {
+          position: "top-right",
+        })
       }
     }
   }

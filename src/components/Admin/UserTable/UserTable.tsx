@@ -13,6 +13,9 @@ import {
 import DeleteConfirmationModal from "./DeleteConfirmationModal"
 import ManagersModal from "./ManagersWithoutStoreModal"
 
+// Add this import at the top
+import { toast } from "react-toastify"
+
 export default function UserTable() {
   const [users, setUsers] = useState<User[]>([])
   const [totalItems, setTotalItems] = useState(0)
@@ -76,8 +79,14 @@ export default function UserTable() {
       const managers = await fetchManagersWithoutStore()
       setManagersWithoutStore(managers)
       setIsModalOpen(true)
+      toast.success("Successfully loaded managers without store", {
+        position: "top-right",
+      })
     } catch (error) {
       console.error("Error fetching managers without store:", error)
+      toast.error("Failed to load managers without store", {
+        position: "top-right",
+      })
     }
   }
 
@@ -85,8 +94,14 @@ export default function UserTable() {
     try {
       await fetchUserProfile(id)
       navigate(`/admin/user/${id}`)
+      toast.success("Successfully loaded user profile", {
+        position: "top-right",
+      })
     } catch (error) {
       console.error("Error fetching user profile:", error)
+      toast.error("Failed to load user profile", {
+        position: "top-right",
+      })
     }
   }
 
@@ -101,6 +116,9 @@ export default function UserTable() {
     try {
       await deleteUser(userToDelete)
       setIsDeleteModalOpen(false)
+      toast.success("User deleted successfully", {
+        position: "top-right",
+      })
 
       const response = await fetchFilteredUsers(searchTerm, role, status, currentPage, pageSize, sortBy, sortDirection)
 
@@ -115,6 +133,9 @@ export default function UserTable() {
       }
     } catch (error) {
       console.error("Error deleting user:", error)
+      toast.error("Failed to delete user", {
+        position: "top-right",
+      })
     }
   }
 

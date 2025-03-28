@@ -5,6 +5,7 @@ import { fetchPoolTables, PoolTable, deletePoolTable, createPoolTable, updatePoo
 import ViewTableModal from "./ViewTableModal";
 import { CreateTableModal } from "./CreateTableModal";
 import { EditTableModal } from "./EditTableModal";
+import { toast } from "react-toastify"
 
 export default function TablesList() {
   const [tables, setTables] = useState<PoolTable[]>([]);
@@ -30,6 +31,9 @@ export default function TablesList() {
       setTables(data);
     } catch (error) {
       console.error("Error fetching tables:", error);
+      toast.error("Failed to load tables", {
+        position: "top-right",
+      });
     }
   };
 
@@ -38,8 +42,14 @@ export default function TablesList() {
       await createPoolTable(tableData);
       await loadTables();
       setIsCreateModalOpen(false);
+      toast.success("Table created successfully", {
+        position: "top-right",
+      });
     } catch (error) {
       console.error("Error creating table:", error);
+      toast.error("Failed to create table", {
+        position: "top-right",
+      });
     }
   };
 
@@ -49,8 +59,14 @@ export default function TablesList() {
       await updatePoolTable(selectedTable._id, tableData);
       await loadTables();
       setIsEditModalOpen(false);
+      toast.success("Table updated successfully", {
+        position: "top-center",
+      });
     } catch (error) {
       console.error("Error updating table:", error);
+      toast.error("Failed to update table", {
+        position: "top-center",
+      });
     }
   };
 
@@ -59,8 +75,14 @@ export default function TablesList() {
       try {
         await deletePoolTable(tableId);
         await loadTables();
+        toast.success("Table deleted successfully", {
+          position: "top-center",
+        });
       } catch (error) {
         console.error("Error deleting table:", error);
+        toast.error("Failed to delete table", {
+          position: "top-center",
+        });
       }
     }
   };

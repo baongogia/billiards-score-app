@@ -4,6 +4,7 @@ import { fetchStores } from '../../../services/Admin/Store/storeService';
 import { useAuth } from '../../../context/AuthContext';
 import { EditTableModal } from '../../../components/Admin/TablesList/EditTableModal';
 import ViewTableModal from '../../../components/Admin/TablesList/ViewTableModal';
+import { toast } from "react-toastify";
 
 const TableList = () => {
   const [tables, setTables] = useState<PoolTable[]>([]);
@@ -29,10 +30,16 @@ const TableList = () => {
         setTables(storeTables);
       } else {
         setError("Manager no store manager!");
+        toast.error("No store found for this manager", {
+          position: "top-right",
+        });
       }
     } catch (error) {
       console.error("Error loading tables:", error);
       setError("Failed to load tables");
+      toast.error("Failed to load tables", {
+        position: "top-right",
+      });
     } finally {
       setLoading(false);
     }
@@ -58,8 +65,14 @@ const TableList = () => {
       await updatePoolTable(selectedTable._id, tableData);
       await loadTables(); // Refresh the table list after updating
       setIsEditModalOpen(false);
+      toast.success("Table updated successfully", {
+        position: "top-right",
+      });
     } catch (error) {
       console.error("Error updating table:", error);
+      toast.error("Failed to update table", {
+        position: "top-right",
+      });
     }
   };
 
