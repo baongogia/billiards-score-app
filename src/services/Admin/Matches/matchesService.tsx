@@ -1,5 +1,6 @@
 import api from "../../api";
 
+
 export interface MatchData {
   _id: string;
   status: string;
@@ -21,9 +22,9 @@ export const fetchMatches = async (): Promise<MatchData[]> => {
   }
 };
 
-export const fetchMatchById = async (id: string): Promise<MatchData> => {
+export const fetchMatchById = async (id: string): Promise<{match:MatchData}> => {
   try {
-    const response = await api.get<{ data: MatchData }>(`v1/matches/${id}`);
+    const response = await api.get(`v1/matches/${id}`);
     console.log("Get match by id success");
     return response.data.data;
   } catch (error) {

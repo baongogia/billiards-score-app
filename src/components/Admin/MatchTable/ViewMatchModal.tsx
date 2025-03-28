@@ -1,14 +1,36 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { MatchData } from '../../../services/Admin/Matches/matchesService';
+import { Team, fetchTeamMatch } from '../../../services/Admin/Teams/teamService';
 
 interface ViewMatchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  match: MatchData | null;
+  match: {match: MatchData} | null;
 }
 
 const ViewMatchModal: React.FC<ViewMatchModalProps> = ({ isOpen, onClose, match }) => {
+  console.log("Match data:", match);
+  
+  const [teams, setTeams] = useState<Team[]>([]);
+
+  useEffect(() => {
+    const loadTeams = async () => {
+      if (match?.match?._id) {
+        try {
+          const teamsData = await fetchTeamMatch(match.match._id);
+          setTeams(teamsData);
+          console.log("Teams loaded:", teamsData);
+        } catch (error) {
+          console.error("Error loading teams:", error);
+          setTeams([]);
+        }
+      }
+    };
+
+    loadTeams();
+  }, [match]);
+
   if (!isOpen || !match) return null;
 
   return (
@@ -57,11 +79,37 @@ const ViewMatchModal: React.FC<ViewMatchModalProps> = ({ isOpen, onClose, match 
                   <p className="text-lg text-gray-700">
                     <strong>Started:</strong> {new Date(match.match.createdAt).toLocaleString()}
                   </p>
-                  {match.endAt && (
+                  {match.match.updatedAt && (
                     <p className="text-lg text-gray-700">
-                      <strong>Ended:</strong> {new Date(match.match.endAt).toLocaleString()}
+                      <strong>Ended:</strong> {new Date(match.match.updatedAt).toLocaleString()}
                     </p>
                   )}
+
+                  {/* Add Teams Section */}
+                  <div className="mt-6">
+                    <h4 className="text-xl font-semibold mb-4">Players</h4>
+                    {teams.length > 0 ? (
+                      teams.map((team) => (
+                        <div key={team._id} className="mb-4 p-4 bg-gray-50 rounded-lg">
+                          <p className="text-lg text-gray-700">
+                            <strong>Players</strong>{' '}
+                            {team.members.map(member => member.name).join(', ')}
+                          </p>
+                          <p className="text-lg text-gray-700">
+                            <strong>Score:</strong> {team.result.score}
+                          </p>
+                          <p className="text-lg text-gray-700">
+                            <strong>Foul Count:</strong> {team.result.foulCount}
+                          </p>
+                          <p className="text-lg text-gray-700">
+                            <strong>Strokes:</strong> {team.result.strokes}
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-lg text-gray-500">No teams found for this match</p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="mt-6">
