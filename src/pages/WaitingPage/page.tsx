@@ -73,7 +73,7 @@ export default function WaitingPage() {
   // Get player name
   useEffect(() => {
     if (playerName) {
-      localStorage.setItem("playerName", playerName);
+      localStorage.setItem("userName", playerName);
       if (!matchId) {
         setPlayers([playerName]);
       }
@@ -82,7 +82,7 @@ export default function WaitingPage() {
   }, [playerName, fetchUserData, socket, matchId]);
 
   useEffect(() => {
-    const savedPlayerName = localStorage.getItem("playerName");
+    const savedPlayerName = localStorage.getItem("userName");
     if (savedPlayerName && storedPlayerName !== savedPlayerName) {
       setStoredPlayerName(savedPlayerName);
       setGameState({ playerName: savedPlayerName });
@@ -260,11 +260,10 @@ export default function WaitingPage() {
           </button>
 
           <button
-            className={`border-1 px-2 flex justify-center items-center uppercase font-bold text-white text-nowrap rounded ${
-              players.length === 2
-                ? "hover:bg-green-700 cursor-pointer"
-                : "bg-gray-500 cursor-not-allowed"
-            }`}
+            className={`border-1 px-2 flex justify-center items-center uppercase font-bold text-white text-nowrap rounded ${players.length === 2
+              ? "hover:bg-green-700 cursor-pointer"
+              : "bg-gray-500 cursor-not-allowed"
+              }`}
             disabled={players.length < 2}
             onClick={() => {
               if (players.length > 1 && matchData?.matchId) {
