@@ -63,12 +63,24 @@ export default function WaitingPage() {
     }
   }, [auth]);
 
+  useEffect(() => {
+    if (!auth?.user) {
+      navigate("/login");
+    }
+  }, [auth, navigate]);
+
   //#region Game settings
   const [gameSettings, setGameSettings] = useState<Partial<GameState>>({
     gameType: "bida",
     timeLimit: 60,
     firstTurn: "player1",
   });
+
+  useEffect(() => {
+    if (tableId) {
+      localStorage.setItem("tableId", tableId);
+    }
+  }, [tableId]);
 
   // Get player name
   useEffect(() => {

@@ -8,12 +8,10 @@ import { useGame } from "../../context/GameContext";
 import { findUser } from "../../services/auth/authService";
 import { useCallback } from "react";
 import { RiLogoutBoxFill } from "react-icons/ri";
-import { useSocket } from "../../hooks/useSocket";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
-  const tableId = localStorage.getItem("tableId");
   const id = auth?.user?._id;
   const { setGameState } = useGame();
   const [isGameStateSet, setIsGameStateSet] = useState(false);
@@ -31,19 +29,28 @@ const HomePage = () => {
       toast.error(error);
     }
   }, [auth]);
-  // Get tableId from URL params
+
+  // Fetch user data when component mounts
   useEffect(() => {
-    if (tableId) {
-      localStorage.setItem("tableId", tableId);
-    }
     fetchUserData();
-  }, [tableId, fetchUserData]);
+  }, [fetchUserData]);
+
   // Kiểm tra xem người dùng đã đăng nhập chưa
   useEffect(() => {
-    if (!auth?.isLoading && !auth?.isAuthenticated) {
-      navigate(`/${tableId}`);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
     }
-  }, [auth?.isLoading, auth?.isAuthenticated, tableId, navigate]);
+  }, []);
+
+  // Kiểm tra xem người dùng đã tham gia phòng chưa
+  useEffect(() => {
+    const tableId = localStorage.getItem("tableId");
+    if (tableId) {
+      navigate(`/WaitingPage/${tableId}`);
+    }
+  }, [navigate]);
+
   // Xử lý khi người dùng đăng nhập
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -73,17 +80,6 @@ const HomePage = () => {
     }
   }, [auth?.user, isGameStateSet, setGameState, allUserData]);
   // Handle start game
-  const { createMatchAccount } = useSocket();
-
-  const handleStartGame = async () => {
-    if (tableId) {
-      createMatchAccount(tableId);
-      toast.success("Match started successfully");
-    } else {
-      toast.error("Table ID is missing");
-    }
-    navigate(`/WaitingPage/${tableId}`);
-  };
 
   return (
     <div className="w-[100vw] h-[100vh] bg-[#2c3e50]">
@@ -170,7 +166,7 @@ const HomePage = () => {
                     Account Settings
                   </a>
                 </li>
-                <li onClick={auth?.logout}>
+                <li onClick={() => auth?.logout(navigate)}>
                   <div className="menu-box-tab scnd-font-color ml-4.5 cursor-pointer">
                     <div className="flex items-center gap-5">
                       <RiLogoutBoxFill size={25} />
