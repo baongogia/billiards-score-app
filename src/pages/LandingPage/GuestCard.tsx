@@ -7,7 +7,7 @@ interface GuestCardProps {
 export const GuestCard: React.FC<GuestCardProps> = ({ id }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const navigate = useNavigate();
-  const { playerName, mode, gameType, setGameState } = useGame();
+  const { guestHost, mode, gameType, setGameState } = useGame();
 
   return (
     <div className="flex flex-col items-center">
@@ -108,9 +108,9 @@ export const GuestCard: React.FC<GuestCardProps> = ({ id }) => {
                   </div>
                   <input
                     placeholder="Enter your name"
-                    value={playerName}
+                    value={guestHost}
                     onChange={(e) =>
-                      setGameState({ playerName: e.target.value })
+                      setGameState({ guestHost: e.target.value })
                     }
                     style={{
                       width: "100%",

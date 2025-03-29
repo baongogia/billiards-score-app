@@ -45,8 +45,8 @@ export default function WaitingPage() {
     `${auth?.token ? playerName : guestNameInput}`
   );
   const [hostAvatar, setHostAvatar] = useState<string>("");
-  const serverhost = "http://localhost:3003";
-  // const serverhost = "https://billiards-score-app.vercel.app";
+  // const serverhost = "http://localhost:3003";
+  const serverhost = "https://billiards-score-app.vercel.app";
   const matchLink = `${serverhost}/WaitingPage/${tableId}/${matchData?.matchId}`;
   // #endregion
   // Get user data
@@ -316,9 +316,9 @@ export default function WaitingPage() {
             {matchData?.matchId ? (
               <div className="object-cover w-full mb-4">
                 <QRCodeCanvas value={matchLink} size={250} />
-                <div className="h-4 bg-amber-300 p-2 rounded-4xl">
+                {/* <div className="h-4 bg-amber-300 p-2 rounded-4xl">
                   {matchLink}
-                </div>
+                </div> */}
               </div>
             ) : (
               <Loading />

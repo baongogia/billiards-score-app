@@ -84,14 +84,16 @@ const GamePlay: React.FC = () => {
     if (paused || winner) return;
     const countdown = setInterval(() => {
       setTimer((prev) => {
-        if (prev > 0) return prev - 1;
-        clearInterval(countdown);
-        handleEndTurn();
-        return 0;
+        if (prev <= 1) {
+          clearInterval(countdown);
+          handleEndTurn(); // Chuyển lượt
+          return timeLimit; // Reset lại timer
+        }
+        return prev - 1;
       });
     }, 1000);
     return () => clearInterval(countdown);
-  }, [paused, currentPlayer, handleEndTurn, winner]);
+  }, [paused, currentPlayer, handleEndTurn, winner, timeLimit]);
 
   const handleBallClick = (ball: number) => {
     if (!balls.includes(ball) || winner) return;
@@ -246,7 +248,7 @@ const GamePlay: React.FC = () => {
               alt="P2"
             />
             <div className="player-info">
-              <p>{player?.[1]?.name}</p>
+              <p>{player?.[1]?.name || partnerName}</p>
             </div>
           </div>
         </div>
@@ -294,13 +296,15 @@ const GamePlay: React.FC = () => {
             <p className="text-lg text-white font-bold mb-3">{winner}</p>
             <h2 className="text-xl text-white font-bold mb-3">
               Người chiến thắng là:{" "}
-              {currentPlayer === 1 ? playerName : partnerName}
+              {currentPlayer === 1 ? hostName : player?.[1]?.name}
             </h2>
             <div className="flex gap-2">
               <button
                 onClick={() =>
                   navigate(
-                    `/WaitingPage/${tableId}/${!auth?.token ? matchId : ""}`
+                    !partnerName
+                      ? `/WaitingPage/${tableId}/${!auth?.token ? matchId : ""}`
+                      : `/WaitingPage/${tableId}`
                   )
                 }
                 className="w-full bg-red-600 text-white py-2 rounded hover:bg-green-700 transition cursor-pointer"
