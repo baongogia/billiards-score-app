@@ -5,26 +5,28 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { useGame } from "../../context/GameContext";
-import { findUser } from "../../services/auth/authService";
 import { useCallback } from "react";
 import { RiLogoutBoxFill } from "react-icons/ri";
+import { useSocket } from "../../hooks/useSocket";
+import { fetchUserProfileByEmail } from "../../services/Admin/User/userService";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
-  const id = auth?.user?._id;
+  const tableId = localStorage.getItem("tableId");
   const { setGameState } = useGame();
   const [isGameStateSet, setIsGameStateSet] = useState(false);
   const [allUserData, setAllUserData] = useState<any>(null);
+  const [id, setId] = useState("");
   // Get user data
   const fetchUserData = useCallback(async () => {
     try {
-      if (!auth?.user?._id) {
-        throw new Error("User ID is undefined");
+      if (!auth?.user?.email) {
+        throw new Error("Email is undefined");
       }
-      const res = await findUser(auth.user._id);
-      const allUserData = res.data.data;
-      setAllUserData(allUserData);
+      const res = await fetchUserProfileByEmail(auth.user.email);
+      setId(res._id);
+      setAllUserData(res);
     } catch (error: any) {
       toast.error(error);
     }
@@ -81,16 +83,22 @@ const HomePage = () => {
   }, [auth?.user, isGameStateSet, setGameState, allUserData]);
   // Handle start game
 
+  console.log("allUserData", allUserData);
+  
+
   return (
     <div className="w-[100vw] h-[100vh] bg-[#2c3e50]">
       <div className="main-body text-white">
         {/* Header */}
         <header className="block">
           <ul className="header-menu horizontal-list">
-            <li>
-              <a className="header-menu-tab" href="#1">
-                <span className="icon entypo-cog scnd-font-color"></span>
-                Settings
+          <li>
+              <a
+                className="header-menu-tab"
+                onClick={() => navigate(`/HistoryMatch/${id}`)}
+              >
+                <span className="icon fontawesome-star-empty scnd-font-color"></span>
+                History matches
               </a>
             </li>
             <li>
@@ -99,21 +107,27 @@ const HomePage = () => {
                 Account
               </a>
             </li>
-            <li className="opacity-0 md:opacity-100">
-              <a className="header-menu-tab" href="#3">
-                <span className="icon fontawesome-envelope scnd-font-color"></span>
-                Messages
-              </a>
-              <a className="header-menu-number" href="#4">
-                5
-              </a>
-            </li>
-            <li className="hidden md:block">
-              <a className="header-menu-tab" href="#5">
-                <span className="icon fontawesome-star-empty scnd-font-color"></span>
-                Favorites
-              </a>
-            </li>
+            {/* Conditionally render Admin or Manager button */}
+            {allUserData?.role === "admin" && (
+              <li>
+                <button
+                  onClick={() => navigate("/admin")}
+                  className="header-menu-tab bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Admin
+                </button>
+              </li>
+            )}
+            {allUserData?.role === "manager" && (
+              <li>
+                <button
+                  onClick={() => navigate("/manager")}
+                  className="header-menu-tab bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Manager
+                </button>
+              </li>
+            )}
           </ul>
           <div className="profile-menu">
             <p>
@@ -308,7 +322,31 @@ const HomePage = () => {
             <div
               className="profile flex items-center justify-center p-2 gap-2 w-full"
             >
-              Looks like you haven't joined any room yet. Scan the QR code on the table to start the fun.
+              <div
+                style={{
+                  backgroundImage: `url("https://images.pexels.com/photos/5986316/pexels-photo-5986316.jpeg?auto=compress&cs=tinysrgb&w=800")`,
+                }}
+                onClick={handleStartGame}
+                className="text-center h-full w-1/3 bg-[rgba(105,255,85,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white text-2xl shadow-2xl cursor-pointer  bg-cover bg-center"
+              >
+                New Game
+              </div>
+              <div
+                style={{
+                  backgroundImage: `url("https://images.pexels.com/photos/6503522/pexels-photo-6503522.jpeg?auto=compress&cs=tinysrgb&w=800")`,
+                }}
+                className="text-center h-full w-1/3 bg-[rgba(255,209,57,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white cursor-pointer bg-cover bg-center text-2xl shadow-2xl "
+              >
+                Create game
+              </div>
+              <div
+                style={{
+                  backgroundImage: `url("https://images.pexels.com/photos/7403806/pexels-photo-7403806.jpeg?auto=compress&cs=tinysrgb&w=800")`,
+                }}
+                className="text-center h-full w-1/3 bg-[rgba(85,255,229,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white cursor-pointer bg-cover bg-center text-2xl shadow-2xl"
+              >
+                Coming Soon
+              </div>
               {/*  */}
             </div>
           </div>

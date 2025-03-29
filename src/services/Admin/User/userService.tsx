@@ -51,7 +51,39 @@ export const fetchUserProfile = async (id: string): Promise<User> => {
   }
 };
 
+export const fetchUserProfileByEmail = async (email: string): Promise<User> => {
+  try {
+    const response = await api.get(`v1/users/email/${email}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    throw error;
+  }
+};
+
+export const updateAdmin = async (id: string, userData: Partial<User>): Promise<User> => {
+  try {
+    const response = await api.put(`v1/users/admin/${id}`, userData);
+    console.log("Update success");
+    return response.data.data;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+};
+
 export const updateUser = async (id: string, userData: Partial<User>): Promise<User> => {
+  try {
+    const response = await api.put(`v1/users/${id}`, userData);
+    console.log("Update success");
+    return response.data.data;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+};
+
+export const updatePassword = async (id: string, userData: Partial<User>): Promise<User> => {
   try {
     const response = await api.put(`v1/users/${id}`, userData);
     console.log("Update success");
@@ -141,4 +173,16 @@ export const fetchFilteredUsers = async (
     console.error("Error fetching filtered users:", error);
     throw error;
   }
+};
+
+interface ChangePasswordData {
+  password: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export const changePassword = async (userId: string, data: ChangePasswordData) => {
+  console.log('Changing password for user:', userId); // Debug log
+  const response = await api.put(`/v1/users/change-password/${userId}`, data);
+  return response.data;
 };

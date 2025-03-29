@@ -137,6 +137,7 @@ export default function Login() {
             onClick={() => {
               window.location.href =
                 "https://swd392sp25.com:8000/api/v1/auth/google";
+
             }}
             className="w-full border-1 border-black rounded-3xl p-2 text-center hover:bg-[rgba(0,0,0,0.5)] hover:text-white transition duration-300 cursor-pointer uppercase font-bold mt-2"
           >

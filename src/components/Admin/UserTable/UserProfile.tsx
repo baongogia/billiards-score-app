@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { fetchUserProfile, updateUser, type User } from "../../../services/Admin/User/userService"
+import { fetchUserProfile, updateAdmin, type User } from "../../../services/Admin/User/userService"
 import { ArrowLeft } from "lucide-react"
 import EditUserProfileModal from "./EditUserProfileModal"
 import { uploadAvatar } from "../../../services/Admin/User/avatarService" // Import the uploadAvatar function
 import { toast } from "react-toastify"
+import ChangePasswordModal from "./ChangePasswordModal";
 
 export default function UserProfile() {
   const { id } = useParams<{ id: string }>()
@@ -15,6 +16,15 @@ export default function UserProfile() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+
+  const handleOpenChangePassword = () => {
+    setIsChangePasswordOpen(true);
+  };
+
+  const handleCloseChangePassword = () => {
+    setIsChangePasswordOpen(false);
+  };
 
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -42,7 +52,7 @@ export default function UserProfile() {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { _id, avatar, deletedAt, createdAt, updatedAt, __v, ...filteredData } = userData
         console.log("Data sent to API:", filteredData) // Kiểm tra dữ liệu trước khi gửi
-        const updatedUser = await updateUser(user._id, filteredData)
+        const updatedUser = await updateAdmin(user._id, filteredData)
         setUser(updatedUser)
         setIsEditModalOpen(false)
         toast.success("Profile updated successfully", {
@@ -140,13 +150,9 @@ export default function UserProfile() {
       case "active":
         return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
       case "inactive":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
-      case "suspended":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+        return "bbg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
       default:
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+        return "bg-gray-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
     }
   }
 
@@ -197,7 +203,9 @@ export default function UserProfile() {
               />
               <div
                 className={`absolute bottom-3 right-3 w-4 h-4 rounded-full border-2 border-white ${
-                  user.status?.toLowerCase() === "active" ? "bg-green-500" : "bg-gray-400"
+                  user.status?.toLowerCase() === "active"
+                    ? "bg-green-500"
+                    : "bg-gray-400"
                 }`}
               ></div>
             </div>
@@ -207,7 +215,9 @@ export default function UserProfile() {
         {/* User info */}
         <div className="pt-20 pb-8 px-6">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{user.name}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {user.name}
+            </h2>
             <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
           </div>
 
@@ -231,8 +241,12 @@ export default function UserProfile() {
                 </svg>
               </div>
               <div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Phone</div>
-                <div className="text-sm font-medium text-gray-900 dark:text-gray-200">{user.phone}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                  Phone
+                </div>
+                <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                  {user.phone}
+                </div>
               </div>
             </div>
 
@@ -255,10 +269,14 @@ export default function UserProfile() {
                 </svg>
               </div>
               <div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Role</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                  Role
+                </div>
                 <div className="mt-1">
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(
+                      user.role
+                    )}`}
                   >
                     {user.role}
                   </span>
@@ -285,10 +303,14 @@ export default function UserProfile() {
                 </svg>
               </div>
               <div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Account Status</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                  Account Status
+                </div>
                 <div className="mt-1">
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(user.status)}`}
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                      user.status
+                    )}`}
                   >
                     {user.status}
                   </span>
@@ -297,14 +319,25 @@ export default function UserProfile() {
             </div>
           </div>
 
-          <div className="text-center mt-6">
+          <div className="text-center mt-6 flex justify-center space-x-4">
             <button
               onClick={() => setIsEditModalOpen(true)}
               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
             >
               Edit Profile
             </button>
+            <button
+              onClick={handleOpenChangePassword}
+              className="px-4 py-2 bg-red-600 text-white rounded-md"
+            >
+              Change Password
+            </button>
           </div>
+          <ChangePasswordModal
+            isOpen={isChangePasswordOpen}
+            onClose={handleCloseChangePassword}
+            userId={user._id}
+          />
         </div>
       </div>
 
@@ -315,5 +348,5 @@ export default function UserProfile() {
         user={user}
       />
     </div>
-  )
+  );
 }

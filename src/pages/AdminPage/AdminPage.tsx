@@ -10,8 +10,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
 } from "recharts";
 import AdminLayout from "./AdminLayout";
 import { fetchUsers, User } from "../../services/Admin/User/userService";
@@ -63,18 +61,14 @@ const AdminPage = () => {
   const matchesData = matches.reduce(
     (acc, match) => {
       if (match.status === "ready") acc.ready += 1;
-      if (match.status === "pending") acc.pending += 1;
-      if (match.status === "playing") acc.playing += 1;
       if (match.status === "finished") acc.completed += 1;
       return acc;
     },
-    { pending: 0, playing: 0, completed: 0, ready: 0 }
+    { completed: 0, ready: 0 }
   );
 
   const matchesChartData = [
     { name: "Ready", value: matchesData.ready },
-    { name: "Pending", value: matchesData.pending },
-    { name: "Playing", value: matchesData.playing },
     { name: "Finished", value: matchesData.completed },
   ];
 
@@ -120,11 +114,11 @@ const AdminPage = () => {
           </div>
 
           {/* Charts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Table Status Chart */}
             <div className="bg-white p-6 rounded-xl shadow-lg">
               <h3 className="text-xl font-semibold mb-6 text-gray-800">Table Status</h3>
-              <ResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
                     data={chartData}
@@ -141,9 +135,9 @@ const AdminPage = () => {
                       <Cell
                         key={`cell-${index}`}
                         fill={[
-                          "#10B981", // Emerald-500 for Available
-                          "#F59E0B", // Amber-500 for In Use
-                          "#EF4444", // Red-500 for Maintenance
+                          "#F59E0B",
+                          "#10B981",
+                          "#EF4444",
                         ][index % 3]}
                       />
                     ))}
@@ -165,7 +159,7 @@ const AdminPage = () => {
             {/* Matches Overview Chart */}
             <div className="bg-white p-6 rounded-xl shadow-lg">
               <h3 className="text-xl font-semibold mb-6 text-gray-800">Matches Overview</h3>
-              <ResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={matchesChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                   <XAxis
@@ -197,57 +191,12 @@ const AdminPage = () => {
                         key={`cell-${index}`}
                         fill={[
                           "#A78BFA", // Violet-400 for Ready
-                          "#818CF8", // Indigo-400 for Pending
-                          "#6366F1", // Indigo-500 for Playing
                           "#4F46E5", // Indigo-600 for Finished
                         ][index % 4]}
                       />
                     ))}
                   </Bar>
                 </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* User Growth Chart */}
-            <div className="bg-white p-6 rounded-xl shadow-lg">
-              <h3 className="text-xl font-semibold mb-6 text-gray-800">User Growth</h3>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart
-                  data={users.map((user, index) => ({
-                    name: `Week ${index + 1}`,
-                    value: index + 1,
-                  }))}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis
-                    dataKey="name"
-                    tick={{ fill: '#4B5563' }}
-                    axisLine={{ stroke: '#9CA3AF' }}
-                  />
-                  <YAxis
-                    tick={{ fill: '#4B5563' }}
-                    axisLine={{ stroke: '#9CA3AF' }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      borderRadius: '6px',
-                      padding: '8px',
-                      border: 'none',
-                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#2DD4BF"
-                    strokeWidth={2}
-                    dot={{ fill: '#2DD4BF', stroke: '#2DD4BF', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, stroke: '#14B8A6', strokeWidth: 2 }}
-                    animationDuration={2000}
-                  />
-                </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
@@ -336,31 +285,46 @@ const AdminPage = () => {
           {/* Matches */}
           <div className="bg-white rounded-lg shadow">
             <div className="px-4 py-5 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">Recent Matches</h2>
-              <p className="text-sm text-gray-500">Playing matches & Pending Matches</p>
+              <h2 className="text-lg font-medium text-gray-900">Active Matches</h2>
+              <p className="text-sm text-gray-500">Ready and Playing Matches</p>
             </div>
             <div className="p-4">
               <div className="space-y-4">
                 {paginatedMatches.map((match) => (
                   <div key={match._id} className="flex items-center justify-between p-4 border rounded-md">
-                    <div>
-                      <p className="font-medium text-gray-900">{match.mode_game}</p>
-                      <p className="text-sm text-gray-500">{match.createdAt}</p>
+                    <div className="flex-1 grid grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-500 font-medium">Mode Game</p>
+                        <p className="font-medium text-gray-900">{match.mode_game}</p>
+                      </div>
+                      <div className="-ml-4">
+                        <p className="text-sm text-gray-500 font-medium">Pool Table</p>
+                        <p className="font-medium text-gray-900">{match.pooltable}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 font-medium">Created At</p>
+                        <p className="font-medium text-gray-900">
+                          {new Date(match.createdAt).toLocaleString()}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 font-medium">Status</p>
+                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                          match.status === "ready"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-blue-100 text-blue-800"
+                        }`}>
+                          {match.status === "ready" ? "Ready" : "Playing"}
+                        </span>
+                      </div>
                     </div>
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full
-                      ${
-                        match.status === "Completed"
-                          ? "bg-gray-100 text-gray-800"
-                          : match.status === "In Progress"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {match.status}
-                    </span>
                   </div>
                 ))}
+                {paginatedMatches.length === 0 && (
+                  <div className="text-center py-4 text-gray-500">
+                    No active matches found
+                  </div>
+                )}
               </div>
               {/* Pagination for matches */}
               {totalPagesMatches > 1 && (

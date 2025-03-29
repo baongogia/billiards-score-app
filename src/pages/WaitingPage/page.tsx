@@ -35,7 +35,7 @@ export default function WaitingPage() {
   const [showAddPartnerModal, setShowAddPartnerModal] = useState(false);
   const [newPartnerName, setNewPartnerName] = useState("");
   const [partnerName, setPartnerName] = useState("");
-  const { playerName, setGameState } = useGame();
+  const { guestHost, playerName, setGameState } = useGame();
   const [storedPlayerName, setStoredPlayerName] = useState<string | null>(null);
   const [allUserData, setAllUserData] = useState<any>(null);
   const [matchData, setMatchData] = useState<any>(null);
@@ -45,8 +45,8 @@ export default function WaitingPage() {
     `${auth?.token ? playerName : guestNameInput}`
   );
   const [hostAvatar, setHostAvatar] = useState<string>("");
-  const serverhost = "http://localhost:3003";
-  // const serverhost = "https://billiards-score-app.vercel.app";
+  // const serverhost = "http://localhost:3003";
+  const serverhost = "https://billiards-score-app.vercel.app";
   const matchLink = `${serverhost}/WaitingPage/${tableId}/${matchData?.matchId}`;
   // #endregion
   // Get user data
@@ -257,7 +257,14 @@ export default function WaitingPage() {
               Invite
             </button>
           )}
-
+          {!auth?.token && !matchId && (
+            <button
+              className="px-2 border-1 flex justify-center items-center uppercase font-bold hover:bg-purple-700 transition duration-300 cursor-pointer text-white rounded"
+              onClick={() => setShowAddPartnerModal(true)}
+            >
+              Add Partner
+            </button>
+          )}
           <button
             className=" border-1 px-2 flex justify-center items-center uppercase font-bold  hover:bg-yellow-500 transition duration-300 cursor-pointer text-white rounded"
             onClick={() => setShowSetupModal(true)}
@@ -274,6 +281,8 @@ export default function WaitingPage() {
             onClick={() => {
               if (players.length > 1 && matchData?.matchId) {
                 socket.emit("startGame", { matchId: matchData.matchId });
+              } else {
+                navigate(`/GamePlay`);
               }
             }}
           >
@@ -297,7 +306,7 @@ export default function WaitingPage() {
       <div className="relative grid grid-cols-2 w-screen h-screen pointer-events-none">
         <PlayerCard
           className="player-1 text-center"
-          name={`${hostName} (HOST)`}
+          name={`${hostName || guestHost} (HOST)`}
           data={allUserData}
           avatar={hostAvatar}
         />
@@ -310,7 +319,6 @@ export default function WaitingPage() {
         {players.length > 3 && (
           <PlayerCard className="player-4" name={players[3]} />
         )}
-
         {players.length > 4 && toast.warning("Full room!")}
       </div>
 
@@ -322,9 +330,9 @@ export default function WaitingPage() {
             {matchData?.matchId ? (
               <div className="object-cover w-full mb-4">
                 <QRCodeCanvas value={matchLink} size={250} />
-                <div className="h-4 bg-amber-300 p-2 rounded-4xl">
+                {/* <div className="h-4 bg-amber-300 p-2 rounded-4xl">
                   {matchLink}
-                </div>
+                </div> */}
               </div>
             ) : (
               <Loading />
