@@ -35,7 +35,7 @@ const router = createBrowserRouter([
     path: "/HomePage/*",
     element: <HomePage />,
   },
-  { path: "/GamePlay", element: <GamePlay /> },
+  { path: "/GamePlay/:matchId?", element: <GamePlay /> },
   { path: "/MemberProfile/:id", element: <MemberProfile /> },
   { path: "/HistoryMatch/:userId", element: <HistoryMatch />},
   {

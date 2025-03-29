@@ -51,6 +51,16 @@ export const fetchUserProfile = async (id: string): Promise<User> => {
   }
 };
 
+export const fetchUserProfileByEmail = async (email: string): Promise<User> => {
+  try {
+    const response = await api.get(`v1/users/email/${email}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    throw error;
+  }
+};
+
 export const updateAdmin = async (id: string, userData: Partial<User>): Promise<User> => {
   try {
     const response = await api.put(`v1/users/admin/${id}`, userData);

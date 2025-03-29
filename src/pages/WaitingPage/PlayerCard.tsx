@@ -1,11 +1,17 @@
 interface PlayerCardProps {
   className?: string;
   name: string;
+  avatar?: string;
   data?: {
     avatar: string;
   };
 }
-export default function PlayerCard({ className, name, data }: PlayerCardProps) {
+export default function PlayerCard({
+  className,
+  name,
+  data,
+  avatar,
+}: PlayerCardProps) {
   return (
     <div
       style={{
@@ -21,6 +27,7 @@ export default function PlayerCard({ className, name, data }: PlayerCardProps) {
         style={{
           backgroundImage: `url("${
             data?.avatar ||
+            avatar ||
             "https://images.pexels.com/photos/5986316/pexels-photo-5986316.jpeg?auto=compress&cs=tinysrgb&w=1200"
           }")`,
         }}
