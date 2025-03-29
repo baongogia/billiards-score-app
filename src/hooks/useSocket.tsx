@@ -3,7 +3,11 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { io, Socket } from "socket.io-client";
 
-const socket: Socket = io("wss://swd392sp25.com:8000");
+const socket: Socket = io("wss://swd392sp25.com:8000", {
+  auth: {
+    token: localStorage.getItem("token"),
+  },
+});
 
 export const useSocket = () => {
   useEffect(() => {

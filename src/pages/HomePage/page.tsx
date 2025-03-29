@@ -31,19 +31,28 @@ const HomePage = () => {
       toast.error(error);
     }
   }, [auth]);
-  // Get tableId from URL params
+
+  // Fetch user data when component mounts
   useEffect(() => {
-    if (tableId) {
-      localStorage.setItem("tableId", tableId);
-    }
     fetchUserData();
-  }, [tableId, fetchUserData]);
+  }, [fetchUserData]);
+
   // Kiểm tra xem người dùng đã đăng nhập chưa
   useEffect(() => {
-    if (!auth?.isLoading && !auth?.isAuthenticated) {
-      navigate(`/${tableId}`);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
     }
-  }, [auth?.isLoading, auth?.isAuthenticated, tableId, navigate]);
+  }, []);
+
+  // Kiểm tra xem người dùng đã tham gia phòng chưa
+  useEffect(() => {
+    const tableId = localStorage.getItem("tableId");
+    if (tableId) {
+      navigate(`/WaitingPage/${tableId}`);
+    }
+  }, [navigate]);
+
   // Xử lý khi người dùng đăng nhập
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -73,17 +82,6 @@ const HomePage = () => {
     }
   }, [auth?.user, isGameStateSet, setGameState, allUserData]);
   // Handle start game
-  const { createMatchAccount } = useSocket();
-
-  const handleStartGame = async () => {
-    if (tableId) {
-      createMatchAccount(tableId);
-      toast.success("Match started successfully");
-    } else {
-      toast.error("Table ID is missing");
-    }
-    navigate(`/WaitingPage/${tableId}`);
-  };
 
   console.log("allUserData", allUserData);
   
@@ -144,10 +142,9 @@ const HomePage = () => {
               }}
               className="profile-picture small-profile-picture cursor-pointer bg-cover bg-center bg-no-repeat"
               style={{
-                backgroundImage: `url(${
-                  allUserData?.avatar ||
+                backgroundImage: `url(${allUserData?.avatar ||
                   "https://images.pexels.com/photos/5986316/pexels-photo-5986316.jpeg?auto=compress&cs=tinysrgb&w=800"
-                })`,
+                  })`,
               }}
             ></div>
           </div>
@@ -183,7 +180,7 @@ const HomePage = () => {
                     Account Settings
                   </a>
                 </li>
-                <li onClick={auth?.logout}>
+                <li onClick={() => auth?.logout(navigate)}>
                   <div className="menu-box-tab scnd-font-color ml-4.5 cursor-pointer">
                     <div className="flex items-center gap-5">
                       <RiLogoutBoxFill size={25} />
@@ -321,10 +318,9 @@ const HomePage = () => {
             </div>
           </div>
           {/* Player action */}
-          <div className="middle-container w-[100vw] md:w-[70vw]">
+          <div className="middle-container block w-[100vw] md:w-[70vw]">
             <div
-              style={{ display: "flex" }}
-              className="profile block p-2 gap-2 w-full"
+              className="profile flex items-center justify-center p-2 gap-2 w-full"
             >
               <div
                 style={{
@@ -352,261 +348,6 @@ const HomePage = () => {
                 Coming Soon
               </div>
               {/*  */}
-            </div>
-            <div className="donut-chart-block  block md:hidden">
-              <h2 className="titular">GAME STATS</h2>
-              <div className="donut-chart">
-                <div id="porcion1" className="recorte">
-                  <div className="quesito ios" data-rel="21"></div>
-                </div>
-                <div id="porcion2" className="recorte">
-                  <div className="quesito mac" data-rel="39"></div>
-                </div>
-                <div id="porcion3" className="recorte">
-                  <div className="quesito win" data-rel="31"></div>
-                </div>
-                <div id="porcionFin" className="recorte">
-                  <div className="quesito linux" data-rel="9"></div>
-                </div>
-                <p className="center-date">
-                  JUNE
-                  <br />
-                  <span className="scnd-font-color">2013</span>
-                </p>
-              </div>
-              <ul className="os-percentages horizontal-list">
-                <li>
-                  <p className="ios os scnd-font-color">Win</p>
-                  <p className="os-percentage">
-                    21<sup>%</sup>
-                  </p>
-                </li>
-                <li>
-                  <p className="mac os scnd-font-color">Lose</p>
-                  <p className="os-percentage">
-                    48<sup>%</sup>
-                  </p>
-                </li>
-                <li>
-                  <p className="linux os scnd-font-color">Draw</p>
-                  <p className="os-percentage">
-                    9<sup>%</sup>
-                  </p>
-                </li>
-                <li>
-                  <p className="win os scnd-font-color">Win Rate</p>
-                  <p className="os-percentage">
-                    32<sup>%</sup>
-                  </p>
-                </li>
-              </ul>
-            </div>
-            <div className="calendar-day mb-4">
-              <div className="arrow-btn-container">
-                <a className="arrow-btn left" href="#200">
-                  <span className="icon fontawesome-angle-left"></span>
-                </a>
-                <h2 className="titular">WEDNESDAY</h2>
-                <a className="arrow-btn right" href="#201">
-                  <span className="icon fontawesome-angle-right"></span>
-                </a>
-              </div>
-              <p className="the-day">26</p>
-              <a className="add-event button" href="#27">
-                ADD EVENT
-              </a>
-            </div>
-            <div className="calendar-month hidden md:block">
-              <div className="arrow-btn-container">
-                <a className="arrow-btn left" href="#202">
-                  <span className="icon fontawesome-angle-left"></span>
-                </a>
-                <h2 className="titular">APRIL 2013</h2>
-                <a className="arrow-btn right" href="#203">
-                  <span className="icon fontawesome-angle-right"></span>
-                </a>
-              </div>
-              <table className="calendar">
-                <thead className="days-week">
-                  <tr>
-                    <th>S</th>
-                    <th>M</th>
-                    <th>T</th>
-                    <th>W</th>
-                    <th>R</th>
-                    <th>F</th>
-                    <th>S</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <a className="scnd-font-color" href="#100">
-                        1
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <a className="scnd-font-color" href="#101">
-                        2
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#102">
-                        3
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#103">
-                        4
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#104">
-                        5
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#105">
-                        6
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#106">
-                        7
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#107">
-                        8
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <a className="scnd-font-color" href="#108">
-                        9
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#109">
-                        10
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#110">
-                        11
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#111">
-                        12
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#112">
-                        13
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#113">
-                        14
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#114">
-                        15
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <a className="scnd-font-color" href="#115">
-                        16
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#116">
-                        17
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#117">
-                        18
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#118">
-                        19
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#119">
-                        20
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#120">
-                        21
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#121">
-                        22
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <a className="scnd-font-color" href="#122">
-                        23
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#123">
-                        24
-                      </a>
-                    </td>
-                    <td>
-                      <a className="scnd-font-color" href="#124">
-                        25
-                      </a>
-                    </td>
-                    <td>
-                      <a className="today" href="#125">
-                        26
-                      </a>
-                    </td>
-                    <td>
-                      <a href="#126">27</a>
-                    </td>
-                    <td>
-                      <a href="#127">28</a>
-                    </td>
-                    <td>
-                      <a href="#128">29</a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <a href="#129">30</a>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                </tbody>
-              </table>
             </div>
           </div>
         </div>

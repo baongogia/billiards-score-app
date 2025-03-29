@@ -1,4 +1,5 @@
-import { createContext, useState, useEffect, ReactNode, useContext } from "react";
+import { createContext, useState, useEffect, ReactNode, useContext, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface User {
   name: string;
@@ -17,7 +18,7 @@ interface AuthContextType {
     user: User | null;
   }) => void;
   login: (token: string, user: User) => void;
-  logout: () => void;
+  logout: (navigate: ReturnType<typeof useNavigate>) => void;
   isLoading: boolean;
 }
 
@@ -85,20 +86,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = (newToken: string, userData: User) => {
     localStorage.setItem("token", newToken);
     localStorage.setItem("user", JSON.stringify(userData));
+    
     setToken(newToken);
     setUser(userData);
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
+  const logout = useCallback((navigate: ReturnType<typeof useNavigate>) => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
     console.log("Logout successfully");
-  };
+    navigate("/login"); // Thực hiện điều hướng
+  }, []);
 
   const setAuthState = (state: {
     isAuthenticated: boolean;
