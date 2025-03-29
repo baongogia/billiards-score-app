@@ -5,28 +5,28 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { useGame } from "../../context/GameContext";
-import { findUser } from "../../services/auth/authService";
 import { useCallback } from "react";
 import { RiLogoutBoxFill } from "react-icons/ri";
 import { useSocket } from "../../hooks/useSocket";
+import { fetchUserProfileByEmail } from "../../services/Admin/User/userService";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
   const tableId = localStorage.getItem("tableId");
-  const id = auth?.user?._id;
   const { setGameState } = useGame();
   const [isGameStateSet, setIsGameStateSet] = useState(false);
   const [allUserData, setAllUserData] = useState<any>(null);
+  const [id, setId] = useState("");
   // Get user data
   const fetchUserData = useCallback(async () => {
     try {
-      if (!auth?.user?._id) {
-        throw new Error("User ID is undefined");
+      if (!auth?.user?.email) {
+        throw new Error("Email is undefined");
       }
-      const res = await findUser(auth.user._id);
-      const allUserData = res.data.data;
-      setAllUserData(allUserData);
+      const res = await fetchUserProfileByEmail(auth.user.email);
+      setId(res._id);
+      setAllUserData(res);
     } catch (error: any) {
       toast.error(error);
     }
@@ -84,6 +84,9 @@ const HomePage = () => {
     }
     navigate(`/WaitingPage/${tableId}`);
   };
+
+  console.log("allUserData", allUserData);
+  
 
   return (
     <div className="w-[100vw] h-[100vh] bg-[#2c3e50]">
