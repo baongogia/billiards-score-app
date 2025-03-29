@@ -5,6 +5,7 @@ interface GameState {
   playerName: string; // Tên của người chơi chính (Host)
   partnerName: string; // Tên của người chơi thứ hai (Guest)
   mode: string;
+  guestHost: string;
   gameType: string;
   firstTurn: string;
   timeLimit: number;
@@ -21,6 +22,7 @@ const defaultGameState: GameState = {
   firstTurn: "",
   timeLimit: 60,
   tableId: undefined,
+  guestHost: "",
   setGameState: () => {},
 };
 

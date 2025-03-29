@@ -23,7 +23,6 @@ export const useSocket = () => {
 
     socket.on("roomCreated", (data: any) => {
       const { roomId, matchId } = data;
-      console.log("Room Created:", roomId, matchId);
       toast.success(
         `Room created successfully! Room ID: ${roomId}, Match ID: ${matchId}`
       );
