@@ -203,6 +203,23 @@ const GamePlay: React.FC = () => {
     setHistory([]);
   };
 
+  const handleLeaveGame = () => {
+    socket.emit("leaveRoom", { matchId });
+    if (partnerName) {
+      navigate(`/WaitingPage/${tableId}`);
+    }
+  };
+
+  useEffect(() => {
+    socket.on("userLeft", () => {
+      navigate(`/WaitingPage/${tableId}/${!auth?.token ? matchId : ""}`);
+      toast.error("Người chơi đã rời khỏi bàn");
+    });
+    return () => {
+      socket.off("gameEnded");
+    };
+  }, [socket, navigate, tableId, matchId, auth?.token]);
+
   return (
     <div className="flex items-center justify-center h-screen bg-green-950">
       <div className="absolute top-30 md:top-10">
@@ -300,13 +317,7 @@ const GamePlay: React.FC = () => {
             </h2>
             <div className="flex gap-2">
               <button
-                onClick={() =>
-                  navigate(
-                    !partnerName
-                      ? `/WaitingPage/${tableId}/${!auth?.token ? matchId : ""}`
-                      : `/WaitingPage/${tableId}`
-                  )
-                }
+                onClick={handleLeaveGame}
                 className="w-full bg-red-600 text-white py-2 rounded hover:bg-green-700 transition cursor-pointer"
               >
                 Thoát
