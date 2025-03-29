@@ -143,7 +143,7 @@ export default function TablesList() {
       case "in_use":
         return "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300";
       case "maintenance":
-        return "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300";
+        return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300";
       default:
         return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300";
     }

@@ -36,17 +36,24 @@ const ManagerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <nav
-        className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 fixed lg:relative inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out h-full`}
+        className={`${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0 fixed lg:relative inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out h-full`}
       >
         <div className="flex flex-col h-full">
           <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-            <div className="flex items-center">
+            <Link to="/HomePage" className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
                 <Table className="w-5 h-5 text-indigo-600" />
               </div>
-              <span className="ml-3 text-lg font-semibold text-gray-800">Billiard Club</span>
-            </div>
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-1 rounded-md hover:bg-gray-100 lg:hidden">
+              <span className="ml-3 text-lg font-semibold text-gray-800">
+                Billiard Club
+              </span>
+            </Link>
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-1 rounded-md hover:bg-gray-100 lg:hidden"
+            >
               <X size={20} />
             </button>
           </div>
@@ -63,9 +70,17 @@ const ManagerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         : "text-gray-700 hover:bg-gray-100"
                     }`}
                   >
-                    <item.icon className={`w-5 h-5 ${isActive(item.path) ? "text-indigo-600" : "text-gray-500"}`} />
+                    <item.icon
+                      className={`w-5 h-5 ${
+                        isActive(item.path)
+                          ? "text-indigo-600"
+                          : "text-gray-500"
+                      }`}
+                    />
                     <span>{item.label}</span>
-                    {isActive(item.path) && <div className="ml-auto w-1.5 h-5 bg-indigo-600 rounded-full"></div>}
+                    {isActive(item.path) && (
+                      <div className="ml-auto w-1.5 h-5 bg-indigo-600 rounded-full"></div>
+                    )}
                   </Link>
                 </li>
               ))}
@@ -79,7 +94,9 @@ const ManagerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   <User className="w-5 h-5 text-indigo-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-800">{user.name}</p>
+                  <p className="text-sm font-medium text-gray-800">
+                    {user.name}
+                  </p>
                   <p className="text-xs text-gray-500">Manager</p>
                 </div>
               </div>
@@ -120,7 +137,7 @@ const ManagerLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         <div className="h-full p-6">{children}</div>
       </main>
     </div>
-  )
+  );
 }
 
 export default ManagerLayout

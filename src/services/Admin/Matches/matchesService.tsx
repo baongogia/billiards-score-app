@@ -15,6 +15,7 @@ export const fetchMatches = async (): Promise<MatchData[]> => {
   try {
     const response = await api.get<{ data: MatchData[] }>("v1/matches");
     console.log("Get match success");
+    console.log(response.data.data);
     return response.data.data;
   } catch (error) {
     console.error("Error fetching matches:", error);
