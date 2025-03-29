@@ -5,6 +5,7 @@ import "./animation.ts";
 import { start } from "./animation.ts";
 import { GuestCard } from "./GuestCard.tsx";
 
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const [overLayer, setOverLayer] = useState(false);
@@ -52,10 +53,6 @@ export default function LandingPage() {
         <div className="title-box-2">
           <div className="title-2">CHINESE EIGHT</div>
         </div>
-        <div className="desc">
-          Chinese Eight-ball blends elements of snooker and pool, growing in
-          popularity for its dynamic and challenging gameplay.
-        </div>
       </div>
       <div
         className="details text-white opacity-0 md:opacity-100"
@@ -72,11 +69,6 @@ export default function LandingPage() {
         <div className="title-box-2">
           <div className="title-2">RUSSIAN</div>
         </div>
-
-        <div className="desc">
-          Russian billiards, or Pyramid, features larger balls and tighter
-          pockets, demanding extreme accuracy and skill.
-        </div>
         <div className="cta"></div>
       </div>
       {/* Pagination & Cover */}
@@ -86,8 +78,8 @@ export default function LandingPage() {
       <div className="absolute w-full h-full z-50 top-[69vh] left-[3.8vw] flex space-x-4">
         <div className="w-34 h-14 border-white border-1">
           <div
-            className="w-full h-full bg-[rgba(0,0,0,0.2)] text-white flex justify-center items-center
-                             font-bold hover:bg-white hover:text-black transition duration-300 cursor-pointer"
+            className="w-full h-full bg-black text-white flex justify-center items-center
+                      font-bold hover:bg-white hover:text-black transition duration-300 cursor-pointer"
             onClick={() => navigate("/login")}
           >
             LOGIN
@@ -95,11 +87,12 @@ export default function LandingPage() {
         </div>
         <div className="w-50 h-14 border-white border-1">
           <div
-            className="w-full h-full bg-[rgba(0,0,0,0.2)] text-white flex justify-center items-center uppercase font-bold
+            className="w-full h-full bg-black text-white flex flex-col justify-center items-center uppercase font-bold
           hover:bg-white hover:text-black transition duration-300 cursor-pointer"
             onClick={() => setOverLayer(true)}
           >
-            play as guest
+            Billiard Mobile App
+            <p>(Coming soon)</p>
           </div>
         </div>
       </div>

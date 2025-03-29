@@ -68,8 +68,8 @@ const ManagerPage = () => {
   const matchesData = matches.reduce(
     (acc, match) => {
       if (match.status === "ready") acc.ready += 1;
-      if (match.status === "pending") acc.pending += 1;
       if (match.status === "playing") acc.playing += 1;
+      if (match.status === "pending") acc.pending += 1;
       if (match.status === "finished") acc.completed += 1;
       return acc;
     },
@@ -78,8 +78,8 @@ const ManagerPage = () => {
 
   const matchesChartData = [
     { name: "Ready", value: matchesData.ready },
-    { name: "Pending", value: matchesData.pending },
     { name: "Playing", value: matchesData.playing },
+    { name: "Pending", value: matchesData.pending },
     { name: "Finished", value: matchesData.completed },
   ];
 
@@ -127,9 +127,9 @@ const ManagerPage = () => {
                       <Cell
                         key={`cell-${index}`}
                         fill={[
-                          "#10B981", // Emerald-500 for Available
-                          "#F59E0B", // Amber-500 for In Use
-                          "#EF4444", // Red-500 for Maintenance
+                          "#F59E0B",
+                          "#10B981",
+                          "#EF4444",
                         ][index % 3]}
                       />
                     ))}

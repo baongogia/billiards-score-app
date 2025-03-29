@@ -1,6 +1,6 @@
 
-import AdminLayout from "../AdminLayout";
-import MatchTable from "../../../components/Admin/MatchTable/MatchTable"
+import AdminLayout from "../../AdminLayout";
+import MatchTable from "../../../../components/Admin/MatchTable/MatchTable"
 
 const MatchesPage = () => {
   return (

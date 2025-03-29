@@ -346,7 +346,7 @@ const HomePage = () => {
                 }}
                 className="text-center h-full w-1/3 bg-[rgba(85,255,229,0.3)] backdrop-blur-2xl rounded-2xl flex justify-center items-center uppercase font-bold text-white cursor-pointer bg-cover bg-center text-2xl shadow-2xl"
               >
-                Play With AI
+                Coming Soon
               </div>
               {/*  */}
             </div>

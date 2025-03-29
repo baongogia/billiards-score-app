@@ -15,7 +15,7 @@ import UserProfile from "./components/Admin/UserTable/UserProfile";
 import UserCreate from "./components/Admin/UserTable/register";
 import StoresPage from "./pages/AdminPage/StoresPage/StoresPage";
 import CreateStore from "./components/Admin/StoreTable/CreateStore";
-import MatchesPage from "./pages/AdminPage/MatchesPage/MatchesPage";
+import MatchesPage from "./pages/AdminPage/StoresPage/MatchesPage/MatchesPage";
 import TablesPage from "./pages/AdminPage/TablesPage/TablesPage";
 
 import ManagerPage from "./pages/ManagerPage/ManagerPage";
